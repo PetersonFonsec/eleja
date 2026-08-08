@@ -152,6 +152,23 @@ normalizedCategory = ADVERTISING
 sourceCategory = "Publicidade por materiais impressos"
 ```
 
+Para candidatos do TSE, a fronteira implementada é:
+
+``` text
+TseCandidateRecord
+   |
+   v
+TSE Candidate Normalizer
+   |
+   +-- NormalizedCandidateData
+   +-- CandidateNormalizationIssue
+```
+
+O normalizador produz estruturas canônicas para eleição, partido, cargo,
+pessoa e candidatura, mas não cria entidades nem acessa o PostgreSQL. O
+vocabulário específico da fonte termina nessa fronteira: dados canônicos da
+Eleja não expõem nomes de colunas do TSE.
+
 ## 7. Validate
 
 Nenhum dataset deve ser publicado sem validação.

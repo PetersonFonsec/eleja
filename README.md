@@ -515,6 +515,7 @@ npm run api        # inicia a API em http://localhost:3000
 npm run batch      # executa o processo batch e encerra
 npm run batch:candidates -- --year=2026 # extrai o RAW oficial de candidatos
 npm run batch:candidates:parse -- --year=2026 # parseia o RAW local
+npm run batch:candidates:normalize -- --year=2026 # normaliza sem persistir
 npm run web        # inicia o servidor de desenvolvimento Angular
 
 npm run build      # compila todas as aplicações e pacotes
@@ -550,6 +551,15 @@ npm run batch:candidates:parse -- --year=2026
 Quando houver mais de um checksum local para o ano, selecione o artefato de
 forma explícita com `--checksum=<sha256>`. Se houver somente um, ele será usado
 automaticamente.
+
+Para executar parsing e normalização canônica sem persistência:
+
+``` bash
+npm run batch:candidates:normalize -- --year=2026
+```
+
+O comando usa a mesma seleção determinística de checksum do parser e informa
+contagens separadas para rejeições de parsing e normalização.
 
 ### Banco de dados local
 

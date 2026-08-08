@@ -6,6 +6,7 @@
     "start": "npm run build --workspace @eleja/database && npm run build && node --env-file-if-exists=../../.env dist/main.js",
     "start:candidates": "npm run build && node --env-file-if-exists=../../.env dist/candidates-main.js",
     "start:candidates:parse": "npm run build && node --env-file-if-exists=../../.env dist/candidates-parse-main.js",
+    "start:candidates:normalize": "npm run build && node --env-file-if-exists=../../.env dist/candidates-normalize-main.js",
     "build": "tsc -p tsconfig.build.json",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit"
