@@ -516,6 +516,7 @@ npm run batch      # executa o processo batch e encerra
 npm run batch:candidates -- --year=2026 # extrai o RAW oficial de candidatos
 npm run batch:candidates:parse -- --year=2026 # parseia o RAW local
 npm run batch:candidates:normalize -- --year=2026 # normaliza sem persistir
+npm run batch:candidates:persist -- --year=2026 # persiste candidatos
 npm run web        # inicia o servidor de desenvolvimento Angular
 
 npm run build      # compila todas as aplicações e pacotes
@@ -560,6 +561,16 @@ npm run batch:candidates:normalize -- --year=2026
 
 O comando usa a mesma seleção determinística de checksum do parser e informa
 contagens separadas para rejeições de parsing e normalização.
+
+Para executar o pipeline até a persistência no PostgreSQL:
+
+``` bash
+npm run batch:candidates:persist -- --year=2026
+```
+
+`CANDIDATE_PERSIST_BATCH_SIZE` limita o buffer de registros normalizados. Cada
+candidato é persistido atomicamente e o EntityManager é descartado entre
+transações, enquanto caches pequenos reutilizam eleições, partidos e cargos.
 
 ### Banco de dados local
 

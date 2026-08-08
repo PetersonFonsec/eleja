@@ -1525,6 +1525,14 @@
       },
       "indexes": [
         {
+          "columnNames": ["name", "birth_date"],
+          "composite": true,
+          "constraint": false,
+          "keyName": "people_name_birth_date_idx",
+          "primary": false,
+          "unique": false
+        },
+        {
           "columnNames": ["id"],
           "composite": false,
           "constraint": true,

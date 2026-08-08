@@ -214,6 +214,38 @@ Requisitos:
 Rodar o mesmo dataset novamente não deve criar uma segunda cópia dos
 mesmos registros.
 
+Para candidatos, `CandidatePersistenceService` consome somente
+`NormalizedCandidateData`. Ele resolve eleição por `(year, type, round)`,
+partido pelo identificador de fonte com fallback exato para número/sigla,
+cargo pelo código canônico e candidatura por `sourceCandidateId`.
+
+Como o TSE não fornece no arquivo atual um identificador estável de pessoa
+separado da candidatura, pessoas só são reutilizadas entre candidaturas quando
+nome canônico e data de nascimento coincidem exatamente, o gênero não é
+conflitante e não existe outra candidatura dessa pessoa na mesma eleição. Nome
+sozinho nunca é usado. Sem data de nascimento, ou quando já existe uma
+candidatura no mesmo pleito, uma nova pessoa é criada; uma reexecução da mesma
+candidatura reutiliza a pessoa já relacionada. Essa escolha prioriza evitar
+falsos merges e foi confirmada por uma colisão real de nome e nascimento no
+dataset de 2026.
+
+O banco mantém apenas um índice não exclusivo em `(name, birthDate)` para
+acelerar essa busca; não existe constraint de unicidade sobre identidade
+composta.
+
+``` text
+NormalizedCandidateData
+   |
+   v
+resolve Election / Party / Office / Person
+   |
+   v
+insert or update Candidacy
+   |
+   v
+PostgreSQL
+```
+
 ## 9. Export
 
 Após persistência e validação, gerar datasets públicos.

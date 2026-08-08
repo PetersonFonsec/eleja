@@ -1,6 +1,7 @@
 import { Collection } from '@mikro-orm/core';
 import {
   Entity,
+  Index,
   OneToMany,
   PrimaryKey,
   Property,
@@ -9,6 +10,10 @@ import { randomUUID } from 'node:crypto';
 import { Candidacy } from './candidacy.entity.js';
 
 @Entity({ tableName: 'people' })
+@Index({
+  name: 'people_name_birth_date_idx',
+  properties: ['name', 'birthDate'],
+})
 export class Person {
   @PrimaryKey({ type: 'uuid' })
   id = randomUUID();
