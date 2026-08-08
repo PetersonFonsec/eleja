@@ -1,4 +1,6 @@
 import {
+  CandidateSource,
+  CandidateSourceType,
   Candidacy,
   CandidacyStatus,
   Election,
@@ -28,7 +30,7 @@ describe('CandidatePersistenceService', () => {
 
   it('reuses Election, Party and Office for multiple candidates', async () => {
     const fixture = createFixture(nextYear++);
-    const service = new CandidatePersistenceService(orm);
+    const service = new CandidatePersistenceService(orm, fixture.context);
     const firstData = fixture.data('candidate-a', {
       person: { name: 'PESSOA A', birthDate: '1980-01-01' },
     });
@@ -63,19 +65,26 @@ describe('CandidatePersistenceService', () => {
 
   it('inserts then leaves the same candidacy unchanged', async () => {
     const fixture = createFixture(nextYear++);
-    const service = new CandidatePersistenceService(orm);
+    const service = new CandidatePersistenceService(orm, fixture.context);
     const data = fixture.data('idempotent');
 
     try {
       await expect(service.persist(data)).resolves.toMatchObject({
         status: 'INSERTED',
+        sourceStatus: 'INSERTED',
       });
       await expect(service.persist(data)).resolves.toMatchObject({
         status: 'UNCHANGED',
+        sourceStatus: 'UNCHANGED',
       });
       await expect(
         orm.em.fork().count(Candidacy, {
           sourceCandidateId: fixture.sourceId('idempotent'),
+        }),
+      ).resolves.toBe(1);
+      await expect(
+        orm.em.fork().count(CandidateSource, {
+          sourceIdentifier: fixture.sourceId('idempotent'),
         }),
       ).resolves.toBe(1);
     } finally {
@@ -83,9 +92,82 @@ describe('CandidatePersistenceService', () => {
     }
   });
 
-  it('updates mutable candidacy data without replacing relationships', async () => {
+  it('keeps different RAW snapshots as historical source observations', async () => {
     const fixture = createFixture(nextYear++);
     const service = new CandidatePersistenceService(orm);
+    const data = fixture.data('history');
+    const secondContext = {
+      ...fixture.context,
+      rawChecksum: 'b'.repeat(64),
+      rawStorageKey: `tse/${fixture.year}/candidates/${'b'.repeat(64)}/candidates.zip`,
+      importedAt: new Date('2026-08-09T12:00:00.000Z'),
+    };
+
+    try {
+      await expect(
+        service.persist(data, fixture.context),
+      ).resolves.toMatchObject({ sourceStatus: 'INSERTED' });
+      await expect(service.persist(data, secondContext)).resolves.toMatchObject(
+        { status: 'UNCHANGED', sourceStatus: 'INSERTED' },
+      );
+      await expect(
+        orm.em.fork().count(CandidateSource, {
+          sourceIdentifier: fixture.sourceId('history'),
+        }),
+      ).resolves.toBe(2);
+    } finally {
+      await fixture.cleanup(orm);
+    }
+  });
+
+  it('stores one source observation per candidacy for a shared snapshot', async () => {
+    const fixture = createFixture(nextYear++);
+    const service = new CandidatePersistenceService(orm, fixture.context);
+
+    try {
+      await service.persist(fixture.data('snapshot-a'));
+      await service.persist(fixture.data('snapshot-b'));
+      await expect(
+        orm.em.fork().count(CandidateSource, {
+          rawChecksum: fixture.context.rawChecksum,
+          sourceIdentifier: {
+            $in: [
+              fixture.sourceId('snapshot-a'),
+              fixture.sourceId('snapshot-b'),
+            ],
+          },
+        }),
+      ).resolves.toBe(2);
+    } finally {
+      await fixture.cleanup(orm);
+    }
+  });
+
+  it('rolls back canonical data when provenance cannot be persisted', async () => {
+    const fixture = createFixture(nextYear++);
+    const service = new CandidatePersistenceService(orm);
+    const data = fixture.data('atomic');
+
+    try {
+      await expect(
+        service.persist(data, {
+          ...fixture.context,
+          rawStorageKey: '/Users/developer/private/raw.zip',
+        }),
+      ).rejects.toThrow('Candidate source RAW storage key must be relative');
+      await expect(
+        orm.em.fork().count(Candidacy, {
+          sourceCandidateId: fixture.sourceId('atomic'),
+        }),
+      ).resolves.toBe(0);
+    } finally {
+      await fixture.cleanup(orm);
+    }
+  });
+
+  it('updates mutable candidacy data without replacing relationships', async () => {
+    const fixture = createFixture(nextYear++);
+    const service = new CandidatePersistenceService(orm, fixture.context);
     const initial = fixture.data('updated', {
       candidacy: { status: CandidacyStatus.ACTIVE, sourceStatus: 'APTO' },
     });
@@ -119,7 +201,7 @@ describe('CandidatePersistenceService', () => {
 
   it('reuses exact person identity across elections and separates different birth dates', async () => {
     const fixture = createFixture(nextYear++);
-    const service = new CandidatePersistenceService(orm);
+    const service = new CandidatePersistenceService(orm, fixture.context);
 
     try {
       const first = await service.persist(
@@ -171,7 +253,7 @@ describe('CandidatePersistenceService', () => {
 
   it('does not merge exact identity collisions within the same election', async () => {
     const fixture = createFixture(nextYear++);
-    const service = new CandidatePersistenceService(orm);
+    const service = new CandidatePersistenceService(orm, fixture.context);
     const person = {
       name: `COLISÃO DE IDENTIDADE ${fixture.officeCode}`,
       birthDate: '1979-11-29',
@@ -196,7 +278,7 @@ describe('CandidatePersistenceService', () => {
 
   it('does not reuse people without a birth date across candidacies', async () => {
     const fixture = createFixture(nextYear++);
-    const service = new CandidatePersistenceService(orm);
+    const service = new CandidatePersistenceService(orm, fixture.context);
 
     try {
       const first = await service.persist(
@@ -216,7 +298,7 @@ describe('CandidatePersistenceService', () => {
 
   it('rejects incompatible person reassignment for an existing candidacy', async () => {
     const fixture = createFixture(nextYear++);
-    const service = new CandidatePersistenceService(orm);
+    const service = new CandidatePersistenceService(orm, fixture.context);
 
     try {
       await service.persist(
@@ -269,6 +351,14 @@ function createFixture(year: number) {
     year,
     partySourceId,
     officeCode,
+    context: {
+      sourceType: CandidateSourceType.TSE,
+      sourceName: 'Tribunal Superior Eleitoral',
+      sourceUrl: 'https://cdn.tse.jus.br/candidates.zip',
+      rawStorageKey: `tse/${year}/candidates/${'a'.repeat(64)}/candidates.zip`,
+      rawChecksum: 'a'.repeat(64),
+      importedAt: new Date('2026-08-08T12:00:00.000Z'),
+    },
     sourceId: (value: string) => `candidate-${suffix}-${value}`,
     data(
       value: string,
@@ -325,6 +415,9 @@ function createFixture(year: number) {
       });
       const personIds = [...new Set(candidacies.map((item) => item.person.id))];
       if (sourceIds.size > 0) {
+        await em.nativeDelete(CandidateSource, {
+          sourceIdentifier: { $in: [...sourceIds] },
+        });
         await em.nativeDelete(Candidacy, {
           sourceCandidateId: { $in: [...sourceIds] },
         });

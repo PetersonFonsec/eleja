@@ -1,6 +1,8 @@
 {
   "name": "public",
-  "namespaces": ["public"],
+  "namespaces": [
+    "public"
+  ],
   "tables": [
     {
       "name": "batch_runs",
@@ -207,7 +209,12 @@
           "default": null,
           "comment": null,
           "collation": null,
-          "enumItems": ["RUNNING", "SUCCESS", "PARTIAL", "FAILED"],
+          "enumItems": [
+            "RUNNING",
+            "SUCCESS",
+            "PARTIAL",
+            "FAILED"
+          ],
           "mappedType": "enum"
         },
         "updated_at": {
@@ -230,7 +237,9 @@
       },
       "indexes": [
         {
-          "columnNames": ["dataset_version_id"],
+          "columnNames": [
+            "dataset_version_id"
+          ],
           "composite": false,
           "constraint": false,
           "keyName": "batch_runs_dataset_version_id_index",
@@ -238,7 +247,9 @@
           "unique": false
         },
         {
-          "columnNames": ["id"],
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "keyName": "batch_runs_pkey",
@@ -246,7 +257,9 @@
           "unique": true
         },
         {
-          "columnNames": ["status"],
+          "columnNames": [
+            "status"
+          ],
           "composite": false,
           "constraint": false,
           "keyName": "batch_runs_status_index",
@@ -265,10 +278,14 @@
       "triggers": [],
       "foreignKeys": {
         "batch_runs_dataset_version_id_foreign": {
-          "columnNames": ["dataset_version_id"],
+          "columnNames": [
+            "dataset_version_id"
+          ],
           "constraintName": "batch_runs_dataset_version_id_foreign",
           "localTableName": "public.batch_runs",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.dataset_versions"
         }
       },
@@ -513,7 +530,11 @@
           "default": null,
           "comment": null,
           "collation": null,
-          "enumItems": ["ACTIVE", "INACTIVE", "UNKNOWN"],
+          "enumItems": [
+            "ACTIVE",
+            "INACTIVE",
+            "UNKNOWN"
+          ],
           "mappedType": "enum"
         },
         "updated_at": {
@@ -536,7 +557,9 @@
       },
       "indexes": [
         {
-          "columnNames": ["election_id"],
+          "columnNames": [
+            "election_id"
+          ],
           "composite": false,
           "constraint": false,
           "keyName": "candidacies_election_id_index",
@@ -544,7 +567,9 @@
           "unique": false
         },
         {
-          "columnNames": ["office_id"],
+          "columnNames": [
+            "office_id"
+          ],
           "composite": false,
           "constraint": false,
           "keyName": "candidacies_office_id_index",
@@ -552,7 +577,9 @@
           "unique": false
         },
         {
-          "columnNames": ["party_id"],
+          "columnNames": [
+            "party_id"
+          ],
           "composite": false,
           "constraint": false,
           "keyName": "candidacies_party_id_index",
@@ -560,7 +587,9 @@
           "unique": false
         },
         {
-          "columnNames": ["person_id"],
+          "columnNames": [
+            "person_id"
+          ],
           "composite": false,
           "constraint": false,
           "keyName": "candidacies_person_id_index",
@@ -568,7 +597,9 @@
           "unique": false
         },
         {
-          "columnNames": ["id"],
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "keyName": "candidacies_pkey",
@@ -576,7 +607,9 @@
           "unique": true
         },
         {
-          "columnNames": ["source_candidate_id"],
+          "columnNames": [
+            "source_candidate_id"
+          ],
           "composite": false,
           "constraint": true,
           "keyName": "candidacies_source_candidate_id_unique",
@@ -584,7 +617,9 @@
           "unique": true
         },
         {
-          "columnNames": ["state"],
+          "columnNames": [
+            "state"
+          ],
           "composite": false,
           "constraint": false,
           "keyName": "candidacies_state_index",
@@ -603,35 +638,347 @@
       "triggers": [],
       "foreignKeys": {
         "candidacies_election_id_foreign": {
-          "columnNames": ["election_id"],
+          "columnNames": [
+            "election_id"
+          ],
           "constraintName": "candidacies_election_id_foreign",
           "localTableName": "public.candidacies",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.elections",
           "deleteRule": "restrict"
         },
         "candidacies_office_id_foreign": {
-          "columnNames": ["office_id"],
+          "columnNames": [
+            "office_id"
+          ],
           "constraintName": "candidacies_office_id_foreign",
           "localTableName": "public.candidacies",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.offices",
           "deleteRule": "restrict"
         },
         "candidacies_party_id_foreign": {
-          "columnNames": ["party_id"],
+          "columnNames": [
+            "party_id"
+          ],
           "constraintName": "candidacies_party_id_foreign",
           "localTableName": "public.candidacies",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.parties",
           "deleteRule": "restrict"
         },
         "candidacies_person_id_foreign": {
-          "columnNames": ["person_id"],
+          "columnNames": [
+            "person_id"
+          ],
           "constraintName": "candidacies_person_id_foreign",
           "localTableName": "public.candidacies",
-          "referencedColumnNames": ["id"],
+          "referencedColumnNames": [
+            "id"
+          ],
           "referencedTableName": "public.people",
+          "deleteRule": "restrict"
+        }
+      },
+      "comment": null
+    },
+    {
+      "name": "candidate_sources",
+      "schema": "public",
+      "columns": {
+        "candidacy_id": {
+          "name": "candidacy_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": true,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "imported_at": {
+          "name": "imported_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "last_checked_at": {
+          "name": "last_checked_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(200)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 200,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "raw_checksum": {
+          "name": "raw_checksum",
+          "type": "varchar(64)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 64,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "raw_storage_key": {
+          "name": "raw_storage_key",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "text"
+        },
+        "source_identifier": {
+          "name": "source_identifier",
+          "type": "varchar(100)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 100,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "source_url": {
+          "name": "source_url",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "text"
+        },
+        "type": {
+          "name": "type",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [
+            "TSE",
+            "GOVERNMENT",
+            "PARTY",
+            "CANDIDATE_WEBSITE",
+            "SOCIAL_NETWORK",
+            "OTHER"
+          ],
+          "mappedType": "enum"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        }
+      },
+      "indexes": [
+        {
+          "columnNames": [
+            "candidacy_id"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "candidate_sources_candidacy_id_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "candidacy_id",
+            "type",
+            "raw_checksum",
+            "source_identifier"
+          ],
+          "composite": true,
+          "constraint": true,
+          "keyName": "candidate_sources_observation_unique",
+          "primary": false,
+          "unique": true
+        },
+        {
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "keyName": "candidate_sources_pkey",
+          "primary": true,
+          "unique": true
+        },
+        {
+          "columnNames": [
+            "raw_checksum"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "candidate_sources_raw_checksum_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "source_identifier"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "candidate_sources_source_identifier_index",
+          "primary": false,
+          "unique": false
+        }
+      ],
+      "checks": [
+        {
+          "name": "candidate_sources_type_check",
+          "expression": "\"type\" in ('TSE', 'GOVERNMENT', 'PARTY', 'CANDIDATE_WEBSITE', 'SOCIAL_NETWORK', 'OTHER')",
+          "definition": "check (\"type\" in ('TSE', 'GOVERNMENT', 'PARTY', 'CANDIDATE_WEBSITE', 'SOCIAL_NETWORK', 'OTHER'))",
+          "columnName": "type"
+        }
+      ],
+      "triggers": [],
+      "foreignKeys": {
+        "candidate_sources_candidacy_id_foreign": {
+          "columnNames": [
+            "candidacy_id"
+          ],
+          "constraintName": "candidate_sources_candidacy_id_foreign",
+          "localTableName": "public.candidate_sources",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.candidacies",
           "deleteRule": "restrict"
         }
       },
@@ -825,7 +1172,12 @@
           "default": null,
           "comment": null,
           "collation": null,
-          "enumItems": ["PROCESSING", "READY", "PUBLISHED", "FAILED"],
+          "enumItems": [
+            "PROCESSING",
+            "READY",
+            "PUBLISHED",
+            "FAILED"
+          ],
           "mappedType": "enum"
         },
         "updated_at": {
@@ -865,7 +1217,9 @@
       },
       "indexes": [
         {
-          "columnNames": ["id"],
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "keyName": "dataset_versions_pkey",
@@ -873,7 +1227,9 @@
           "unique": true
         },
         {
-          "columnNames": ["version"],
+          "columnNames": [
+            "version"
+          ],
           "composite": false,
           "constraint": true,
           "keyName": "dataset_versions_version_unique",
@@ -979,7 +1335,10 @@
           "default": null,
           "comment": null,
           "collation": null,
-          "enumItems": ["GENERAL", "MUNICIPAL"],
+          "enumItems": [
+            "GENERAL",
+            "MUNICIPAL"
+          ],
           "mappedType": "enum"
         },
         "updated_at": {
@@ -1019,7 +1378,9 @@
       },
       "indexes": [
         {
-          "columnNames": ["id"],
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "keyName": "elections_pkey",
@@ -1027,22 +1388,29 @@
           "unique": true
         },
         {
-          "columnNames": ["year", "type", "round"],
+          "columnNames": [
+            "year",
+            "type",
+            "round"
+          ],
           "composite": true,
           "constraint": false,
           "keyName": "elections_year_type_round_unique",
           "primary": false,
           "unique": true,
-          "where": "round IS NOT NULL"
+          "where": "round is not null"
         },
         {
-          "columnNames": ["year", "type"],
+          "columnNames": [
+            "year",
+            "type"
+          ],
           "composite": true,
           "constraint": false,
           "keyName": "elections_year_type_without_round_unique",
           "primary": false,
           "unique": true,
-          "where": "round IS NULL"
+          "where": "round is null"
         }
       ],
       "checks": [
@@ -1143,7 +1511,12 @@
           "default": null,
           "comment": null,
           "collation": null,
-          "enumItems": ["NATIONAL", "STATE", "MUNICIPAL", "DISTRICT"],
+          "enumItems": [
+            "NATIONAL",
+            "STATE",
+            "MUNICIPAL",
+            "DISTRICT"
+          ],
           "mappedType": "enum"
         },
         "source_code": {
@@ -1183,7 +1556,9 @@
       },
       "indexes": [
         {
-          "columnNames": ["code"],
+          "columnNames": [
+            "code"
+          ],
           "composite": false,
           "constraint": true,
           "keyName": "offices_code_unique",
@@ -1191,7 +1566,9 @@
           "unique": true
         },
         {
-          "columnNames": ["id"],
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "keyName": "offices_pkey",
@@ -1199,7 +1576,9 @@
           "unique": true
         },
         {
-          "columnNames": ["source_code"],
+          "columnNames": [
+            "source_code"
+          ],
           "composite": false,
           "constraint": true,
           "keyName": "offices_source_code_unique",
@@ -1345,7 +1724,9 @@
       },
       "indexes": [
         {
-          "columnNames": ["acronym"],
+          "columnNames": [
+            "acronym"
+          ],
           "composite": false,
           "constraint": true,
           "keyName": "parties_acronym_unique",
@@ -1353,7 +1734,9 @@
           "unique": true
         },
         {
-          "columnNames": ["number"],
+          "columnNames": [
+            "number"
+          ],
           "composite": false,
           "constraint": true,
           "keyName": "parties_number_unique",
@@ -1361,7 +1744,9 @@
           "unique": true
         },
         {
-          "columnNames": ["id"],
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "keyName": "parties_pkey",
@@ -1369,7 +1754,9 @@
           "unique": true
         },
         {
-          "columnNames": ["source_party_id"],
+          "columnNames": [
+            "source_party_id"
+          ],
           "composite": false,
           "constraint": true,
           "keyName": "parties_source_party_id_unique",
@@ -1525,7 +1912,10 @@
       },
       "indexes": [
         {
-          "columnNames": ["name", "birth_date"],
+          "columnNames": [
+            "name",
+            "birth_date"
+          ],
           "composite": true,
           "constraint": false,
           "keyName": "people_name_birth_date_idx",
@@ -1533,7 +1923,9 @@
           "unique": false
         },
         {
-          "columnNames": ["id"],
+          "columnNames": [
+            "id"
+          ],
           "composite": false,
           "constraint": true,
           "keyName": "people_pkey",

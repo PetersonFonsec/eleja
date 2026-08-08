@@ -1,4 +1,5 @@
 import {
+  CandidateSource,
   Candidacy,
   Election,
   Office,
@@ -7,6 +8,7 @@ import {
   initializeDatabase,
 } from '@eleja/database';
 import type { NormalizedCandidateData } from '../normalization/normalized-candidate-data.js';
+import type { CandidateImportContext } from './candidate-import-context.js';
 
 type Database = Awaited<ReturnType<typeof initializeDatabase>>;
 type PersistenceEntityManager = Database['em'];
@@ -14,7 +16,7 @@ type EntityId = Election['id'];
 
 export interface CandidatePersistenceIssue {
   sourceCandidateId: string;
-  field: 'election' | 'party' | 'office' | 'person' | 'candidacy';
+  field: 'election' | 'party' | 'office' | 'person' | 'candidacy' | 'source';
   reason: string;
 }
 
@@ -31,6 +33,8 @@ export type CandidatePersistenceResult =
       status: 'INSERTED' | 'UPDATED' | 'UNCHANGED';
       person: Person;
       candidacy: Candidacy;
+      source: CandidateSource;
+      sourceStatus: 'INSERTED' | 'UPDATED' | 'UNCHANGED';
       created: CandidatePersistenceCreated;
     }
   | { status: 'REJECTED'; issue: CandidatePersistenceIssue };
@@ -66,14 +70,21 @@ export class CandidatePersistenceService {
     Pick<NormalizedCandidateData['office'], 'sourceCode' | 'scope'>
   >();
 
-  constructor(private readonly orm: Database) {}
+  constructor(
+    private readonly orm: Database,
+    private readonly defaultContext?: CandidateImportContext,
+  ) {}
 
   async persist(
     data: NormalizedCandidateData,
+    context = this.defaultContext,
   ): Promise<CandidatePersistenceResult> {
+    if (!context) {
+      throw new Error('Candidate import context is required');
+    }
     try {
       const transaction = await this.orm.em.transactional(async (em) =>
-        this.persistInTransaction(em, data),
+        this.persistInTransaction(em, data, context),
       );
       for (const entry of transaction.cacheEntries) {
         entry.cache.set(entry.key, entry.id);
@@ -109,6 +120,7 @@ export class CandidatePersistenceService {
   private async persistInTransaction(
     em: PersistenceEntityManager,
     data: NormalizedCandidateData,
+    context: CandidateImportContext,
   ): Promise<TransactionResult> {
     const existingCandidacy = await em.findOne(
       Candidacy,
@@ -116,8 +128,19 @@ export class CandidatePersistenceService {
       { populate: ['person', 'election', 'party', 'office'] },
     );
     if (existingCandidacy) {
+      const result = this.updateExistingCandidacy(existingCandidacy, data);
+      const source = await this.persistSource(
+        em,
+        existingCandidacy,
+        data,
+        context,
+      );
       return {
-        result: this.updateExistingCandidacy(existingCandidacy, data),
+        result: {
+          ...result,
+          source: source.entity,
+          sourceStatus: source.status,
+        },
         cacheEntries: [],
       };
     }
@@ -143,6 +166,7 @@ export class CandidatePersistenceService {
       },
     );
     em.persist(candidacy);
+    const source = await this.persistSource(em, candidacy, data, context);
 
     const created = {
       election: election.created,
@@ -152,7 +176,14 @@ export class CandidatePersistenceService {
       candidacy: true,
     };
     return {
-      result: { status: 'INSERTED', person: person.entity, candidacy, created },
+      result: {
+        status: 'INSERTED',
+        person: person.entity,
+        candidacy,
+        source: source.entity,
+        sourceStatus: source.status,
+        created,
+      },
       cacheEntries: [
         cacheEntry(this.electionIds, election),
         cacheEntry(this.partyIds, party),
@@ -164,7 +195,10 @@ export class CandidatePersistenceService {
   private updateExistingCandidacy(
     candidacy: Candidacy,
     data: NormalizedCandidateData,
-  ): Exclude<CandidatePersistenceResult, { status: 'REJECTED' }> {
+  ): Omit<
+    Exclude<CandidatePersistenceResult, { status: 'REJECTED' }>,
+    'source' | 'sourceStatus'
+  > {
     assertExistingIdentity(candidacy, data);
     let changed = updatePerson(candidacy.person, data);
     changed =
@@ -192,6 +226,53 @@ export class CandidatePersistenceService {
       candidacy,
       created: emptyCreated(),
     };
+  }
+
+  private async persistSource(
+    em: PersistenceEntityManager,
+    candidacy: Candidacy,
+    data: NormalizedCandidateData,
+    context: CandidateImportContext,
+  ): Promise<{
+    entity: CandidateSource;
+    status: 'INSERTED' | 'UPDATED' | 'UNCHANGED';
+  }> {
+    const identity = {
+      candidacy,
+      type: context.sourceType,
+      rawChecksum: context.rawChecksum.toLowerCase(),
+      sourceIdentifier: data.candidacy.sourceCandidateId,
+    };
+    const existing = await em.findOne(CandidateSource, identity);
+    if (!existing) {
+      const entity = new CandidateSource(
+        candidacy,
+        context.sourceType,
+        context.sourceName,
+        data.candidacy.sourceCandidateId,
+        context.rawStorageKey,
+        context.rawChecksum,
+        {
+          sourceUrl: context.sourceUrl,
+          importedAt: context.importedAt,
+          lastCheckedAt: context.importedAt,
+        },
+      );
+      em.persist(entity);
+      return { entity, status: 'INSERTED' };
+    }
+    if (existing.rawStorageKey !== context.rawStorageKey) {
+      conflict(data, 'source', 'source observation storage key conflict');
+    }
+
+    let changed = assignIfChanged(existing, 'name', context.sourceName);
+    changed =
+      assignIfChanged(existing, 'sourceUrl', context.sourceUrl) || changed;
+    if (context.importedAt > existing.lastCheckedAt) {
+      existing.lastCheckedAt = context.importedAt;
+      changed = true;
+    }
+    return { entity: existing, status: changed ? 'UPDATED' : 'UNCHANGED' };
   }
 
   private async resolveElection(

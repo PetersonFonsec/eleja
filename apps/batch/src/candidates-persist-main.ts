@@ -1,4 +1,4 @@
-import { initializeDatabase } from '@eleja/database';
+import { CandidateSourceType, initializeDatabase } from '@eleja/database';
 import {
   openLocalCandidateRawArtifact,
   readCandidateArtifactArguments,
@@ -6,6 +6,8 @@ import {
 import type { NormalizedCandidateData } from './normalization/normalized-candidate-data.js';
 import { TseCandidateNormalizer } from './normalization/tse-candidate-normalizer.js';
 import { CandidatePersistenceService } from './persistence/candidate-persistence.js';
+import type { CandidateImportContext } from './persistence/candidate-import-context.js';
+import { TseCandidateDatasetSource } from './sources/tse/tse-candidate-dataset-source.js';
 import { TseCandidateDatasetParser } from './sources/tse/tse-candidate-parser.js';
 
 interface PersistenceStatistics {
@@ -20,6 +22,9 @@ interface PersistenceStatistics {
   partiesCreated: number;
   officesCreated: number;
   peopleCreated: number;
+  sourcesInserted: number;
+  sourcesUpdated: number;
+  sourcesUnchanged: number;
 }
 
 async function main(): Promise<void> {
@@ -34,6 +39,15 @@ async function main(): Promise<void> {
     const parser = new TseCandidateDatasetParser();
     const normalizer = new TseCandidateNormalizer();
     const persistence = new CandidatePersistenceService(orm);
+    const context: CandidateImportContext = {
+      sourceType: CandidateSourceType.TSE,
+      sourceName: 'Tribunal Superior Eleitoral',
+      sourceUrl: new TseCandidateDatasetSource().resolve(artifact.electionYear)
+        .sourceUrl,
+      rawStorageKey: artifact.storageKey,
+      rawChecksum: artifact.checksum,
+      importedAt: new Date(),
+    };
     const iterator = parser.parse(artifact.content, artifact.electionYear);
     const buffer: NormalizedCandidateData[] = [];
     const statistics: PersistenceStatistics = {
@@ -48,6 +62,9 @@ async function main(): Promise<void> {
       partiesCreated: 0,
       officesCreated: 0,
       peopleCreated: 0,
+      sourcesInserted: 0,
+      sourcesUpdated: 0,
+      sourcesUnchanged: 0,
     };
 
     console.log('TSE candidate persistence started');
@@ -66,13 +83,13 @@ async function main(): Promise<void> {
           statistics.normalized += 1;
           buffer.push(normalized.data);
           if (buffer.length >= batchSize) {
-            await persistBuffer(buffer, persistence, statistics);
+            await persistBuffer(buffer, persistence, context, statistics);
           }
         }
       }
       next = await iterator.next();
     }
-    await persistBuffer(buffer, persistence, statistics);
+    await persistBuffer(buffer, persistence, context, statistics);
     const parseStatistics = next.value;
     const durationSeconds = (performance.now() - startedAt) / 1000;
     const persisted =
@@ -91,6 +108,9 @@ async function main(): Promise<void> {
     console.log(`Parties created: ${statistics.partiesCreated}`);
     console.log(`Offices created: ${statistics.officesCreated}`);
     console.log(`People created: ${statistics.peopleCreated}`);
+    console.log(`Sources inserted: ${statistics.sourcesInserted}`);
+    console.log(`Sources updated: ${statistics.sourcesUpdated}`);
+    console.log(`Sources unchanged: ${statistics.sourcesUnchanged}`);
     console.log(`Duration: ${durationSeconds.toFixed(2)}s`);
     console.log(
       `Throughput: ${durationSeconds > 0 ? (persisted / durationSeconds).toFixed(1) : '0'} candidates/s`,
@@ -103,10 +123,11 @@ async function main(): Promise<void> {
 async function persistBuffer(
   buffer: NormalizedCandidateData[],
   persistence: CandidatePersistenceService,
+  context: CandidateImportContext,
   statistics: PersistenceStatistics,
 ): Promise<void> {
   for (const data of buffer) {
-    const result = await persistence.persist(data);
+    const result = await persistence.persist(data, context);
     if (result.status === 'REJECTED') {
       statistics.persistenceRejected += 1;
       continue;
@@ -118,6 +139,9 @@ async function persistBuffer(
     statistics.partiesCreated += Number(result.created.party);
     statistics.officesCreated += Number(result.created.office);
     statistics.peopleCreated += Number(result.created.person);
+    if (result.sourceStatus === 'INSERTED') statistics.sourcesInserted += 1;
+    if (result.sourceStatus === 'UPDATED') statistics.sourcesUpdated += 1;
+    if (result.sourceStatus === 'UNCHANGED') statistics.sourcesUnchanged += 1;
   }
   buffer.length = 0;
 }

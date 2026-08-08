@@ -17,3 +17,5 @@ export { OfficeScope } from './entities/office-scope.js';
 export { Person } from './entities/person.entity.js';
 export { Candidacy } from './entities/candidacy.entity.js';
 export { CandidacyStatus } from './entities/candidacy-status.js';
+export { CandidateSource } from './entities/candidate-source.entity.js';
+export { CandidateSourceType } from './entities/candidate-source-type.js';

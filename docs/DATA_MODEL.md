@@ -231,8 +231,10 @@ id
 candidacyId
 type
 name
-url
 sourceIdentifier
+sourceUrl
+rawStorageKey
+rawChecksum
 importedAt
 lastCheckedAt
 createdAt
@@ -249,6 +251,15 @@ CANDIDATE_WEBSITE
 SOCIAL_NETWORK
 OTHER
 ```
+
+Cada candidatura pode ter várias observações de origem. A combinação
+`(candidacyId, type, rawChecksum, sourceIdentifier)` é única: reprocessar o
+mesmo snapshot reutiliza a evidência existente, enquanto um novo checksum cria
+um registro histórico. `rawStorageKey` é sempre uma chave relativa de storage.
+
+Registros canônicos e evidências de origem são armazenados separadamente. A
+persistência de ambos ocorre na mesma transação para impedir candidaturas sem a
+proveniência correspondente.
 
 ## 12. DatasetVersion
 

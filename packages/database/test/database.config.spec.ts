@@ -10,6 +10,7 @@ import { Office } from '../src/entities/office.entity.js';
 import { Party } from '../src/entities/party.entity.js';
 import { Person } from '../src/entities/person.entity.js';
 import { Candidacy } from '../src/entities/candidacy.entity.js';
+import { CandidateSource } from '../src/entities/candidate-source.entity.js';
 
 describe('createMikroOrmOptions', () => {
   it('creates PostgreSQL options from the supplied connection URL', () => {
@@ -24,6 +25,7 @@ describe('createMikroOrmOptions', () => {
       Office,
       Person,
       Candidacy,
+      CandidateSource,
     ]);
     expect(options.migrations?.transactional).toBe(true);
     expect(options.migrations?.allOrNothing).toBe(true);

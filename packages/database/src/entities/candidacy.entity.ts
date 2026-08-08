@@ -1,12 +1,15 @@
+import { Collection } from '@mikro-orm/core';
 import {
   Entity,
   Enum,
   ManyToOne,
+  OneToMany,
   PrimaryKey,
   Property,
 } from '@mikro-orm/decorators/legacy';
 import { randomUUID } from 'node:crypto';
 import { CandidacyStatus } from './candidacy-status.js';
+import { CandidateSource } from './candidate-source.entity.js';
 import { Election } from './election.entity.js';
 import { Office } from './office.entity.js';
 import { Party } from './party.entity.js';
@@ -57,6 +60,9 @@ export class Candidacy {
 
   @ManyToOne(() => Office, { index: true, deleteRule: 'restrict' })
   readonly office: Office;
+
+  @OneToMany(() => CandidateSource, (source) => source.candidacy)
+  sources = new Collection<CandidateSource>(this);
 
   @Property({ type: 'timestamptz' })
   createdAt: Date;

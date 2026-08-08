@@ -241,10 +241,17 @@ resolve Election / Party / Office / Person
    |
    v
 insert or update Candidacy
+   +-- canonical domain data
+   +-- CandidateSource provenance
    |
    v
 PostgreSQL
 ```
+
+O contexto da importação transporta a URL oficial, a chave relativa do artefato
+RAW, seu checksum SHA-256 e o instante da importação até a persistência, sem
+adicionar esses campos ao modelo canônico normalizado. Registros canônicos e
+evidências de origem são armazenados separadamente, mas na mesma transação.
 
 ## 9. Export
 

@@ -1,0 +1,8 @@
+export enum CandidateSourceType {
+  TSE = 'TSE',
+  GOVERNMENT = 'GOVERNMENT',
+  PARTY = 'PARTY',
+  CANDIDATE_WEBSITE = 'CANDIDATE_WEBSITE',
+  SOCIAL_NETWORK = 'SOCIAL_NETWORK',
+  OTHER = 'OTHER',
+}
