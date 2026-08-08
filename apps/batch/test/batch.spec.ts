@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { runBatch } from '../src/batch.js';
+import { executeBatch, runBatch } from '../src/batch.js';
 
 describe('batch bootstrap', () => {
   it('logs its start and successful completion', () => {
@@ -11,5 +11,18 @@ describe('batch bootstrap', () => {
       ['Eleja batch started'],
       ['Eleja batch finished'],
     ]);
+  });
+});
+
+describe('executeBatch', () => {
+  it('initializes and closes the database connection', async () => {
+    const close = vi.fn().mockResolvedValue(undefined);
+    const initializeDatabase = vi.fn().mockResolvedValue({ close });
+    const log = vi.fn();
+
+    await executeBatch(initializeDatabase, { log });
+
+    expect(initializeDatabase).toHaveBeenCalledOnce();
+    expect(close).toHaveBeenCalledOnce();
   });
 });

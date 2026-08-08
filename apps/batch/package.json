@@ -3,10 +3,13 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "npm run build && node dist/main.js",
+    "start": "npm run build --workspace @eleja/database && npm run build && node --env-file-if-exists=../../.env dist/main.js",
     "build": "tsc -p tsconfig.build.json",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@eleja/database": "*"
   },
   "devDependencies": {
     "@types/node": "^22.15.0",

@@ -499,7 +499,8 @@ Antes de implementar uma task:
 ### Pré-requisitos
 
 -   Node.js 22 LTS;
--   npm 10 ou superior.
+-   npm 10 ou superior;
+-   Docker com Docker Compose.
 
 Instale as dependências na raiz do repositório:
 
@@ -523,6 +524,40 @@ npm run format     # formata os arquivos com Prettier
 
 Com a API em execução, o endpoint de saúde está disponível em
 `GET http://localhost:3000/health`.
+
+### Banco de dados local
+
+O PostgreSQL não precisa estar instalado localmente. O desenvolvimento
+local utiliza exclusivamente o container PostgreSQL definido no Docker
+Compose.
+
+``` bash
+npm run db:up       # inicia o PostgreSQL e aguarda o healthcheck
+npm run db:logs     # acompanha os logs do PostgreSQL
+npm run db:down     # encerra o container
+```
+
+Copie `.env.example` para `.env` se precisar alterar a URL de conexão
+padrão. As credenciais documentadas são exclusivas para desenvolvimento
+local. Se a porta 5432 já estiver ocupada, ajuste `POSTGRES_PORT` e a
+porta correspondente em `DATABASE_URL`.
+
+As alterações de schema são realizadas por migrations versionadas:
+
+``` bash
+npm run migration:create
+npm run migration:up
+npm run migration:down
+```
+
+O fluxo local recomendado é:
+
+``` bash
+npm install
+npm run db:up
+npm run migration:up
+npm run api
+```
 
 ------------------------------------------------------------------------
 

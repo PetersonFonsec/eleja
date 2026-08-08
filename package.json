@@ -17,6 +17,12 @@
     "test": "npm run test --workspaces --if-present",
     "lint": "eslint .",
     "typecheck": "npm run typecheck --workspaces --if-present",
+    "db:up": "docker compose up -d --wait postgres",
+    "db:down": "docker compose down",
+    "db:logs": "docker compose logs -f postgres",
+    "migration:create": "npm run migration:create --workspace @eleja/database",
+    "migration:up": "npm run migration:up --workspace @eleja/database",
+    "migration:down": "npm run migration:down --workspace @eleja/database",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },

@@ -1,3 +1,7 @@
-import { runBatch } from './batch.js';
+import { initializeDatabase } from '@eleja/database';
+import { executeBatch } from './batch.js';
 
-runBatch();
+executeBatch(initializeDatabase).catch((error: unknown) => {
+  console.error(error);
+  process.exitCode = 1;
+});
