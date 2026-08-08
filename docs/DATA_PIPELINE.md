@@ -63,6 +63,17 @@ O arquivo original deve ser preservado antes da transformação.
 
 Preferência inicial: Cloudflare R2.
 
+Durante o desenvolvimento, a implementação local usa o filesystem por meio da
+mesma abstração de Raw Storage. Artefatos de candidatos são identificados pelo
+SHA-256 dos bytes recebidos e armazenados sem alteração em:
+
+``` text
+tse/<ano>/candidates/<sha256>/<nome-original>
+```
+
+Essa chave torna a extração idempotente para um conteúdo inalterado e preserva
+uma versão histórica diferente quando a fonte oficial muda.
+
 Exemplo:
 
 ``` text

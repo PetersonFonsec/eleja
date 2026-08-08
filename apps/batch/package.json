@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "start": "npm run build --workspace @eleja/database && npm run build && node --env-file-if-exists=../../.env dist/main.js",
+    "start:candidates": "npm run build && node --env-file-if-exists=../../.env dist/candidates-main.js",
     "build": "tsc -p tsconfig.build.json",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit"

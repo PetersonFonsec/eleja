@@ -513,6 +513,7 @@ Os principais comandos são:
 ``` bash
 npm run api        # inicia a API em http://localhost:3000
 npm run batch      # executa o processo batch e encerra
+npm run batch:candidates -- --year=2026 # extrai o RAW oficial de candidatos
 npm run web        # inicia o servidor de desenvolvimento Angular
 
 npm run build      # compila todas as aplicações e pacotes
@@ -525,6 +526,19 @@ npm run format     # formata os arquivos com Prettier
 
 Com a API em execução, o endpoint de saúde está disponível em
 `GET http://localhost:3000/health`.
+
+### Extração RAW de candidatos
+
+Para baixar o ZIP oficial de candidatos do TSE sem extrair ou transformar
+seu conteúdo:
+
+``` bash
+npm run batch:candidates -- --year=2026
+```
+
+Os artefatos locais são gravados em `.data/raw/tse/<ano>/candidates/<sha256>/`
+e ignorados pelo Git. `RAW_STORAGE_ROOT` altera a raiz local e
+`TSE_DOWNLOAD_TIMEOUT_MS` configura o timeout HTTP.
 
 ### Banco de dados local
 
