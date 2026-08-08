@@ -5,7 +5,8 @@
   "scripts": {
     "start": "npm run build --workspace @eleja/database && npm run build && node --env-file-if-exists=../../.env dist/main.js",
     "build": "tsc -p tsconfig.build.json",
-    "test": "vitest run",
+    "test": "vitest run --exclude '**/*.integration.spec.ts'",
+    "test:integration": "vitest run test/candidates.integration.spec.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {

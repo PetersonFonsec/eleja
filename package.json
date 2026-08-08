@@ -21,7 +21,7 @@
     "web": "npm run start --workspace @eleja/web",
     "build": "npm run build --workspace @eleja/database && npm run build --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
-    "test:integration": "npm run test:integration --workspace @eleja/database && npm run test:integration --workspace @eleja/batch",
+    "test:integration": "npm run test:integration --workspace @eleja/database && npm run test:integration --workspace @eleja/batch && npm run test:integration --workspace @eleja/api",
     "lint": "eslint .",
     "typecheck": "npm run build --workspace @eleja/database && npm run typecheck --workspaces --if-present",
     "db:up": "docker compose up -d --wait postgres",

@@ -4,9 +4,13 @@ import { Test } from '@nestjs/testing';
 import request from 'supertest';
 import { afterEach, describe, it } from 'vitest';
 import { AppModule } from '../src/app.module.js';
+import { CandidatesModule } from '../src/modules/candidates/candidates.module.js';
 
 @Module({})
 class TestDatabaseModule {}
+
+@Module({})
+class TestCandidatesModule {}
 
 describe('GET /health', () => {
   let app: INestApplication | undefined;
@@ -21,6 +25,8 @@ describe('GET /health', () => {
     })
       .overrideModule(DatabaseModule)
       .useModule(TestDatabaseModule)
+      .overrideModule(CandidatesModule)
+      .useModule(TestCandidatesModule)
       .compile();
 
     app = moduleRef.createNestApplication();

@@ -532,6 +532,28 @@ npm run format     # formata os arquivos com Prettier
 Com a API em execução, o endpoint de saúde está disponível em
 `GET http://localhost:3000/health`.
 
+### Candidate API
+
+Os primeiros endpoints públicos e somente leitura consultam exclusivamente o
+PostgreSQL:
+
+``` http
+GET /candidates
+GET /candidates/:id
+```
+
+A listagem aceita `page`, `limit`, `year`, `office`, `state`, `party` e `name`.
+Os filtros são combinados com semântica AND, `limit` possui máximo de 100 e a
+ordenação padrão é `ballotName`, seguida pelo UUID da candidatura.
+
+Exemplos:
+
+``` http
+GET /candidates?year=2026&limit=10
+GET /candidates?year=2026&state=SP&office=FEDERAL_DEPUTY
+GET /candidates?party=PT&name=joao
+```
+
 ### Extração RAW de candidatos
 
 Para baixar o ZIP oficial de candidatos do TSE sem extrair ou transformar
