@@ -494,6 +494,38 @@ Antes de implementar uma task:
 
 ------------------------------------------------------------------------
 
+## Desenvolvimento local
+
+### Pré-requisitos
+
+-   Node.js 22 LTS;
+-   npm 10 ou superior.
+
+Instale as dependências na raiz do repositório:
+
+``` bash
+npm install
+```
+
+Os principais comandos são:
+
+``` bash
+npm run api        # inicia a API em http://localhost:3000
+npm run batch      # executa o processo batch e encerra
+npm run web        # inicia o servidor de desenvolvimento Angular
+
+npm run build      # compila todas as aplicações e pacotes
+npm run test       # executa os testes
+npm run lint       # executa o ESLint
+npm run typecheck  # verifica os tipos TypeScript
+npm run format     # formata os arquivos com Prettier
+```
+
+Com a API em execução, o endpoint de saúde está disponível em
+`GET http://localhost:3000/health`.
+
+------------------------------------------------------------------------
+
 ## Documentação
 
   ---------------------------------------------------------------------------------
