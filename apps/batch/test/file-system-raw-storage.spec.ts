@@ -33,6 +33,10 @@ describe('FileSystemRawStorage', () => {
     });
     await expect(storage.exists(key)).resolves.toBe(true);
     await expect(readFile(join(root, key))).resolves.toEqual(bytes);
+    const content = await storage.get(key);
+    const chunks: Buffer[] = [];
+    for await (const chunk of content) chunks.push(Buffer.from(chunk));
+    expect(Buffer.concat(chunks)).toEqual(bytes);
   });
 
   it('does not overwrite an existing RAW artifact', async () => {
@@ -51,6 +55,14 @@ describe('FileSystemRawStorage', () => {
 
     await expect(storage.exists('../outside.zip')).rejects.toThrow(
       'must stay inside',
+    );
+  });
+
+  it('reports a missing artifact when opening RAW content', async () => {
+    const { storage } = await storageFixture();
+
+    await expect(storage.get('missing.zip')).rejects.toThrow(
+      'RAW artifact not found: missing.zip',
     );
   });
 });

@@ -2,7 +2,7 @@ import { constants } from 'node:fs';
 import { access, link, mkdir, unlink } from 'node:fs/promises';
 import { basename, dirname, resolve, sep } from 'node:path';
 import { randomUUID } from 'node:crypto';
-import { createWriteStream } from 'node:fs';
+import { createReadStream, createWriteStream } from 'node:fs';
 import { pipeline } from 'node:stream/promises';
 import type { Readable } from 'node:stream';
 import type { RawStorage, RawStoragePutResult } from './raw-storage.js';
@@ -24,6 +24,14 @@ export class FileSystemRawStorage implements RawStorage {
       }
       throw error;
     }
+  }
+
+  async get(key: string): Promise<Readable> {
+    const target = this.resolveKey(key);
+    if (!(await this.exists(key))) {
+      throw new Error(`RAW artifact not found: ${key}`);
+    }
+    return createReadStream(target);
   }
 
   async put(key: string, content: Readable): Promise<RawStoragePutResult> {

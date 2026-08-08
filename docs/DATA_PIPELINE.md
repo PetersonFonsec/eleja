@@ -109,6 +109,24 @@ ainda permanecem conceitos da fonte nesta etapa.
 
 O parser não deve introduzir interpretação de domínio desnecessária.
 
+O parser de candidatos do TSE mantém a fronteira:
+
+``` text
+RAW ZIP
+   |
+   v
+TSE Candidate Parser
+   |
+   +-- TseCandidateRecord
+   +-- TseCandidateParseIssue
+```
+
+Ele seleciona explicitamente o CSV consolidado
+`consulta_cand_<ano>_BRASIL.csv`, decodifica o conteúdo ISO-8859-1 e processa
+as linhas incrementalmente com delimitador `;`. Nomes de colunas como
+`SQ_CANDIDATO` e `NM_CANDIDATO` permanecem restritos à camada source/parser e
+não são introduzidos no modelo canônico.
+
 ## 6. Normalize
 
 Transforma o vocabulário da fonte para o modelo canônico.

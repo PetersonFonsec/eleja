@@ -13,6 +13,7 @@
     "api": "npm run start --workspace @eleja/api",
     "batch": "npm run start --workspace @eleja/batch",
     "batch:candidates": "npm run start:candidates --workspace @eleja/batch --",
+    "batch:candidates:parse": "npm run start:candidates:parse --workspace @eleja/batch --",
     "web": "npm run start --workspace @eleja/web",
     "build": "npm run build --workspace @eleja/database && npm run build --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",

@@ -5,16 +5,22 @@
   "scripts": {
     "start": "npm run build --workspace @eleja/database && npm run build && node --env-file-if-exists=../../.env dist/main.js",
     "start:candidates": "npm run build && node --env-file-if-exists=../../.env dist/candidates-main.js",
+    "start:candidates:parse": "npm run build && node --env-file-if-exists=../../.env dist/candidates-parse-main.js",
     "build": "tsc -p tsconfig.build.json",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@eleja/database": "*"
+    "@eleja/database": "*",
+    "csv-parse": "^7.0.2",
+    "unzipper": "^0.12.5"
   },
   "devDependencies": {
     "@types/node": "^22.15.0",
+    "@types/unzipper": "^0.10.11",
+    "@types/yazl": "^3.3.1",
     "typescript": "~5.9.3",
-    "vitest": "^4.0.0"
+    "vitest": "^4.0.0",
+    "yazl": "^3.3.1"
   }
 }

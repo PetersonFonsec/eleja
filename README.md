@@ -514,6 +514,7 @@ Os principais comandos são:
 npm run api        # inicia a API em http://localhost:3000
 npm run batch      # executa o processo batch e encerra
 npm run batch:candidates -- --year=2026 # extrai o RAW oficial de candidatos
+npm run batch:candidates:parse -- --year=2026 # parseia o RAW local
 npm run web        # inicia o servidor de desenvolvimento Angular
 
 npm run build      # compila todas as aplicações e pacotes
@@ -539,6 +540,16 @@ npm run batch:candidates -- --year=2026
 Os artefatos locais são gravados em `.data/raw/tse/<ano>/candidates/<sha256>/`
 e ignorados pelo Git. `RAW_STORAGE_ROOT` altera a raiz local e
 `TSE_DOWNLOAD_TIMEOUT_MS` configura o timeout HTTP.
+
+Para parsear o artefato RAW local sem persistir ou normalizar registros:
+
+``` bash
+npm run batch:candidates:parse -- --year=2026
+```
+
+Quando houver mais de um checksum local para o ano, selecione o artefato de
+forma explícita com `--checksum=<sha256>`. Se houver somente um, ele será usado
+automaticamente.
 
 ### Banco de dados local
 
