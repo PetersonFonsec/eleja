@@ -3,16 +3,17 @@
   "version": "0.0.0",
   "private": true,
   "main": "dist/index.js",
-  "types": "src/index.ts",
+  "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./src/index.ts",
+      "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     }
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "test": "vitest run",
+    "test": "vitest run --exclude '**/*.integration.spec.ts'",
+    "test:integration": "vitest run test/persistence.integration.spec.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "migration:create": "npm run build && node --env-file-if-exists=../../.env ../../node_modules/@mikro-orm/cli/cli.js migration:create --config dist/mikro-orm.config.js",
     "migration:up": "npm run build && node --env-file-if-exists=../../.env ../../node_modules/@mikro-orm/cli/cli.js migration:up --config dist/mikro-orm.config.js",
@@ -20,6 +21,7 @@
   },
   "dependencies": {
     "@mikro-orm/core": "^7.1.11",
+    "@mikro-orm/decorators": "^7.1.11",
     "@mikro-orm/migrations": "^7.1.11",
     "@mikro-orm/nestjs": "^7.0.2",
     "@mikro-orm/postgresql": "^7.1.11"
@@ -34,6 +36,7 @@
     "@mikro-orm/cli": "^7.1.11",
     "@nestjs/common": "^11.1.0",
     "@nestjs/core": "^11.1.0",
+    "@types/node": "^22.15.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
     "typescript": "~5.9.3",

@@ -517,6 +517,7 @@ npm run web        # inicia o servidor de desenvolvimento Angular
 
 npm run build      # compila todas as aplicações e pacotes
 npm run test       # executa os testes
+npm run test:integration # executa testes PostgreSQL com o banco local ativo
 npm run lint       # executa o ESLint
 npm run typecheck  # verifica os tipos TypeScript
 npm run format     # formata os arquivos com Prettier
