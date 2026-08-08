@@ -16,6 +16,8 @@
     "batch:candidates:parse": "npm run start:candidates:parse --workspace @eleja/batch --",
     "batch:candidates:normalize": "npm run start:candidates:normalize --workspace @eleja/batch --",
     "batch:candidates:persist": "npm run start:candidates:persist --workspace @eleja/batch --",
+    "batch:assets": "npm run start:assets --workspace @eleja/batch --",
+    "batch:assets:persist": "npm run start:assets:persist --workspace @eleja/batch --",
     "web": "npm run start --workspace @eleja/web",
     "build": "npm run build --workspace @eleja/database && npm run build --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",

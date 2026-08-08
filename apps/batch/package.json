@@ -8,10 +8,12 @@
     "start:candidates:parse": "npm run build && node --env-file-if-exists=../../.env dist/candidates-parse-main.js",
     "start:candidates:normalize": "npm run build && node --env-file-if-exists=../../.env dist/candidates-normalize-main.js",
     "start:candidates:persist": "npm run build --workspace @eleja/database && npm run build && node --env-file-if-exists=../../.env dist/candidates-persist-main.js",
+    "start:assets": "npm run build && node --env-file-if-exists=../../.env dist/assets-main.js",
+    "start:assets:persist": "npm run build --workspace @eleja/database && npm run build && node --env-file-if-exists=../../.env dist/assets-persist-main.js",
     "build": "tsc -p tsconfig.build.json",
     "test": "vitest run --exclude '**/*.integration.spec.ts'",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test:integration": "vitest run test/candidate-persistence.integration.spec.ts"
+    "test:integration": "vitest run test/*persistence.integration.spec.ts"
   },
   "dependencies": {
     "@eleja/database": "*",

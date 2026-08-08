@@ -74,6 +74,12 @@ tse/<ano>/candidates/<sha256>/<nome-original>
 Essa chave torna a extração idempotente para um conteúdo inalterado e preserva
 uma versão histórica diferente quando a fonte oficial muda.
 
+O mesmo mecanismo atende bens declarados em:
+
+``` text
+tse/<ano>/assets/<sha256>/bem_candidato_<ano>.zip
+```
+
 Exemplo:
 
 ``` text
@@ -126,6 +132,14 @@ Ele seleciona explicitamente o CSV consolidado
 as linhas incrementalmente com delimitador `;`. Nomes de colunas como
 `SQ_CANDIDATO` e `NM_CANDIDATO` permanecem restritos à camada source/parser e
 não são introduzidos no modelo canônico.
+
+O pipeline de bens usa o ZIP oficial `bem_candidato_<ano>.zip`, seleciona
+explicitamente `bem_candidato_<ano>_BRASIL.csv`, decodifica ISO-8859-1 e lê CSV
+incremental com delimitador `;`. `SQ_CANDIDATO` relaciona cada linha à
+candidatura e `NR_ORDEM_BEM_CANDIDATO` identifica o bem dentro dela.
+Essas características foram verificadas em 8 de agosto de 2026 no recurso
+"Bens de candidatos" do conjunto oficial "Candidatos - 2026" do Portal de
+Dados Abertos do TSE.
 
 ## 6. Normalize
 
@@ -252,6 +266,24 @@ O contexto da importação transporta a URL oficial, a chave relativa do artefat
 RAW, seu checksum SHA-256 e o instante da importação até a persistência, sem
 adicionar esses campos ao modelo canônico normalizado. Registros canônicos e
 evidências de origem são armazenados separadamente, mas na mesma transação.
+
+``` text
+Official TSE asset ZIP
+   |
+   v
+RAW -> Parse -> Normalize
+   |
+   v
+resolve Candidacy by SQ_CANDIDATO
+   |
+   v
+CandidateAsset + CandidateAssetSource
+```
+
+`VR_BEM_CANDIDATO` é convertido explicitamente do formato brasileiro para uma
+string decimal e persistido como `numeric(24,2)`. O bem canônico é reutilizado
+por `(candidacyId, sourceSequence)`; alterações atualizam o registro, enquanto
+checksums RAW diferentes criam novas observações de proveniência.
 
 ## 9. Export
 

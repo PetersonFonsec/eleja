@@ -19,3 +19,5 @@ export { Candidacy } from './entities/candidacy.entity.js';
 export { CandidacyStatus } from './entities/candidacy-status.js';
 export { CandidateSource } from './entities/candidate-source.entity.js';
 export { CandidateSourceType } from './entities/candidate-source-type.js';
+export { CandidateAsset } from './entities/candidate-asset.entity.js';
+export { CandidateAssetSource } from './entities/candidate-asset-source.entity.js';

@@ -10,6 +10,7 @@ import {
 import { randomUUID } from 'node:crypto';
 import { CandidacyStatus } from './candidacy-status.js';
 import { CandidateSource } from './candidate-source.entity.js';
+import { CandidateAsset } from './candidate-asset.entity.js';
 import { Election } from './election.entity.js';
 import { Office } from './office.entity.js';
 import { Party } from './party.entity.js';
@@ -63,6 +64,9 @@ export class Candidacy {
 
   @OneToMany(() => CandidateSource, (source) => source.candidacy)
   sources = new Collection<CandidateSource>(this);
+
+  @OneToMany(() => CandidateAsset, (asset) => asset.candidacy)
+  assets = new Collection<CandidateAsset>(this);
 
   @Property({ type: 'timestamptz' })
   createdAt: Date;

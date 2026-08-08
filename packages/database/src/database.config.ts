@@ -9,6 +9,8 @@ import { Party } from './entities/party.entity.js';
 import { Person } from './entities/person.entity.js';
 import { Candidacy } from './entities/candidacy.entity.js';
 import { CandidateSource } from './entities/candidate-source.entity.js';
+import { CandidateAsset } from './entities/candidate-asset.entity.js';
+import { CandidateAssetSource } from './entities/candidate-asset-source.entity.js';
 
 export const DEFAULT_DATABASE_URL =
   'postgresql://eleja:eleja@localhost:5432/eleja';
@@ -29,6 +31,8 @@ export function createMikroOrmOptions(
       Person,
       Candidacy,
       CandidateSource,
+      CandidateAsset,
+      CandidateAssetSource,
     ],
     extensions: [Migrator],
     migrations: {

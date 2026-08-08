@@ -174,10 +174,10 @@ Representa um bem declarado em uma candidatura específica.
 
 ``` text
 id
-sourceAssetId
 candidacyId
-category
-sourceCategory
+sourceSequence
+typeCode
+type
 description
 value
 createdAt
@@ -187,8 +187,14 @@ updatedAt
 O valor total do patrimônio deve preferencialmente ser calculado, não
 duplicado.
 
-Quando uma categoria for normalizada, manter também a categoria original
-se isso for útil para auditoria.
+`value` utiliza `numeric(24,2)` no PostgreSQL e string decimal canônica no
+TypeScript, evitando conversão por ponto flutuante. A identidade canônica é
+`(candidacyId, sourceSequence)`, baseada em `NR_ORDEM_BEM_CANDIDATO` do TSE.
+
+Cada bem possui observações `CandidateAssetSource` com URL oficial, chave RAW,
+checksum SHA-256, identificador `<SQ_CANDIDATO>:<sequência>` e timestamps. A
+combinação `(candidateAssetId, rawChecksum, sourceIdentifier)` evita duplicação
+do mesmo snapshot e preserva evidência de snapshots oficiais diferentes.
 
 ## 10. CandidateContact
 
