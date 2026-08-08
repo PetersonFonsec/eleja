@@ -14,3 +14,6 @@ export { ElectionType } from './entities/election-type.js';
 export { Party } from './entities/party.entity.js';
 export { Office } from './entities/office.entity.js';
 export { OfficeScope } from './entities/office-scope.js';
+export { Person } from './entities/person.entity.js';
+export { Candidacy } from './entities/candidacy.entity.js';
+export { CandidacyStatus } from './entities/candidacy-status.js';

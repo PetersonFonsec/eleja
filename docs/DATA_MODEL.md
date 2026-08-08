@@ -108,6 +108,7 @@ state
 city
 photoUrl
 status
+sourceStatus
 
 personId
 partyId
@@ -120,6 +121,10 @@ updatedAt
 
 `sourceCandidateId` representa o identificador estável fornecido pela
 fonte principal, quando disponível.
+
+`status` representa o estado canônico mínimo da candidatura (`ACTIVE`,
+`INACTIVE` ou `UNKNOWN`). `sourceStatus` preserva a descrição original da
+fonte para evitar perda de informação durante a futura normalização.
 
 Deve haver constraints suficientes para evitar duplicação durante
 reprocessamentos.
