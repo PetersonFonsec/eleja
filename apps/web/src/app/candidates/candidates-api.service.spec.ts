@@ -28,4 +28,17 @@ describe('CandidatesApiService', () => {
       'page=2&limit=20&year=2026&office=FEDERAL_DEPUTY&state=SP&party=PT&name=Maria',
     );
   });
+
+  it('constructs candidate detail and asset URLs', () => {
+    const get = vi.fn(() => of({}));
+    const service = new CandidatesApiService({ get } as unknown as HttpClient);
+
+    service.getById('candidate-id').subscribe();
+    service.getAssets('candidate-id').subscribe();
+
+    expect(get.mock.calls.map(([url]) => url)).toEqual([
+      '/api/candidates/candidate-id',
+      '/api/candidates/candidate-id/assets',
+    ]);
+  });
 });

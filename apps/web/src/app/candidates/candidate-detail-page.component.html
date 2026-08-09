@@ -1,0 +1,260 @@
+<header class="site-header">
+  <a class="brand" routerLink="/candidates" aria-label="Eleja — candidatos"
+    >eleja<span>.</span></a
+  >
+  <span class="source-pill">Dados públicos eleitorais</span>
+</header>
+
+<main>
+  <a class="back-link" routerLink="/candidates">← Voltar para candidatos</a>
+
+  @switch (candidateState().status) {
+    @case ('loading') {
+      <section class="profile-skeleton" aria-live="polite">
+        <span class="sr-only">Carregando dados do candidato</span>
+        <i></i>
+        <div><b></b><span></span><span></span></div>
+      </section>
+    }
+    @case ('invalid') {
+      <section class="page-state">
+        <p class="eyebrow">Endereço inválido</p>
+        <h1>Candidato não encontrado</h1>
+        <p>O identificador informado não é válido.</p>
+        <a routerLink="/candidates">Consultar candidatos</a>
+      </section>
+    }
+    @case ('not-found') {
+      <section class="page-state">
+        <p class="eyebrow">Não encontrado</p>
+        <h1>Candidato não encontrado</h1>
+        <p>
+          O candidato informado não existe ou não está disponível neste dataset.
+        </p>
+        <a routerLink="/candidates">Voltar para candidatos</a>
+      </section>
+    }
+    @case ('error') {
+      <section class="page-state" role="alert">
+        <p class="eyebrow">Erro de carregamento</p>
+        <h1>Não foi possível carregar os dados deste candidato</h1>
+        <p>Verifique sua conexão e tente novamente.</p>
+        <button type="button" (click)="retryCandidate()">
+          Tentar novamente
+        </button>
+      </section>
+    }
+    @case ('ready') {
+      @if (candidateState(); as state) {
+        @if (state.status === 'ready') {
+          <article>
+            <nav class="breadcrumb" aria-label="Navegação estrutural">
+              <a routerLink="/candidates">Candidatos</a
+              ><span aria-hidden="true">/</span
+              ><span>{{ state.data.candidacy.ballotName }}</span>
+            </nav>
+
+            <section class="profile-header">
+              <div class="portrait">
+                @if (state.data.candidacy.photoUrl && !imageFailed()) {
+                  <img
+                    [src]="state.data.candidacy.photoUrl"
+                    [alt]="'Foto de ' + state.data.candidacy.ballotName"
+                    (error)="onImageError()"
+                  />
+                } @else {
+                  <span aria-hidden="true">{{
+                    state.data.candidacy.ballotName.charAt(0) || '?'
+                  }}</span>
+                }
+              </div>
+              <div class="profile-copy">
+                <div class="title-line">
+                  <div>
+                    <p class="eyebrow">
+                      {{ state.data.election.year }} •
+                      {{ electionTypeLabel(state.data.election.type) }}
+                    </p>
+                    <h1>{{ state.data.candidacy.ballotName }}</h1>
+                  </div>
+                  @if (state.data.candidacy.ballotNumber !== null) {
+                    <strong aria-label="Número de urna">{{
+                      state.data.candidacy.ballotNumber
+                    }}</strong>
+                  }
+                </div>
+                <p class="full-name">{{ state.data.person.name }}</p>
+                <p class="office">
+                  {{ state.data.office.name }}
+                  @if (state.data.candidacy.state) {
+                    <span aria-hidden="true">•</span>
+                    {{ state.data.candidacy.state }}
+                  }
+                </p>
+                <p class="party">
+                  {{ state.data.party.name }} ({{ state.data.party.acronym }})
+                </p>
+                <span class="status"
+                  >Situação:
+                  {{ statusLabel(state.data.candidacy.status) }}</span
+                >
+              </div>
+            </section>
+
+            <div class="info-grid">
+              <section class="info-section">
+                <h2>Informações pessoais</h2>
+                <dl>
+                  @if (state.data.person.birthDate) {
+                    <div>
+                      <dt>Data de nascimento</dt>
+                      <dd>{{ formatDateOnly(state.data.person.birthDate) }}</dd>
+                    </div>
+                  }
+                  @if (state.data.person.gender) {
+                    <div>
+                      <dt>Gênero</dt>
+                      <dd>{{ state.data.person.gender }}</dd>
+                    </div>
+                  }
+                  @if (state.data.person.education) {
+                    <div>
+                      <dt>Escolaridade</dt>
+                      <dd>{{ state.data.person.education }}</dd>
+                    </div>
+                  }
+                  @if (state.data.person.occupation) {
+                    <div>
+                      <dt>Ocupação</dt>
+                      <dd>{{ state.data.person.occupation }}</dd>
+                    </div>
+                  }
+                </dl>
+              </section>
+
+              <section class="info-section">
+                <h2>Eleição e partido</h2>
+                <dl>
+                  <div>
+                    <dt>Eleição</dt>
+                    <dd>
+                      {{ electionTypeLabel(state.data.election.type) }} de
+                      {{ state.data.election.year }}
+                    </dd>
+                  </div>
+                  @if (state.data.election.round !== null) {
+                    <div>
+                      <dt>Turno</dt>
+                      <dd>{{ state.data.election.round }}º turno</dd>
+                    </div>
+                  }
+                  <div>
+                    <dt>Cargo</dt>
+                    <dd>{{ state.data.office.name }}</dd>
+                  </div>
+                  @if (state.data.candidacy.state) {
+                    <div>
+                      <dt>Estado</dt>
+                      <dd>{{ state.data.candidacy.state }}</dd>
+                    </div>
+                  }
+                  @if (state.data.candidacy.city) {
+                    <div>
+                      <dt>Município</dt>
+                      <dd>{{ state.data.candidacy.city }}</dd>
+                    </div>
+                  }
+                  <div>
+                    <dt>Partido</dt>
+                    <dd>
+                      {{ state.data.party.name }} —
+                      {{ state.data.party.acronym }}
+                      @if (state.data.party.number !== null) {
+                        • {{ state.data.party.number }}
+                      }
+                    </dd>
+                  </div>
+                </dl>
+              </section>
+            </div>
+
+            <section class="assets-section">
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow">Declaração pública</p>
+                  <h2>Patrimônio declarado</h2>
+                </div>
+                @if (assetData(); as assetData) {
+                  <div class="asset-total">
+                    <span
+                      >{{ assetData.summary.totalAssets }}
+                      {{
+                        assetData.summary.totalAssets === 1 ? 'bem' : 'bens'
+                      }}</span
+                    ><strong>{{
+                      formatBrlDecimal(assetData.summary.totalDeclaredValue)
+                    }}</strong>
+                  </div>
+                }
+              </div>
+
+              @switch (assetsState().status) {
+                @case ('loading') {
+                  <div class="assets-loading" aria-live="polite">
+                    <span>Carregando bens declarados…</span><i></i><i></i>
+                  </div>
+                }
+                @case ('error') {
+                  <div class="asset-state" role="alert">
+                    <h3>Não foi possível carregar os bens declarados</h3>
+                    <button type="button" (click)="retryAssets()">
+                      Tentar novamente
+                    </button>
+                  </div>
+                }
+                @case ('ready') {
+                  @if (assetData(); as assetData) {
+                    @if (assetData.summary.totalAssets === 0) {
+                      <div class="asset-state">
+                        <p>
+                          Nenhum bem declarado foi encontrado para esta
+                          candidatura.
+                        </p>
+                      </div>
+                    } @else {
+                      <div class="asset-list">
+                        @for (asset of assetData.data; track asset.id) {
+                          <article class="asset">
+                            <div>
+                              <p class="asset-type">{{ asset.type }}</p>
+                              @if (asset.description) {
+                                <p class="asset-description">
+                                  {{ asset.description }}
+                                </p>
+                              }
+                            </div>
+                            <strong>{{ formatBrlDecimal(asset.value) }}</strong>
+                          </article>
+                        }
+                      </div>
+                    }
+                  }
+                }
+              }
+            </section>
+
+            <p class="source-notice">
+              Dados provenientes de fontes públicas oficiais. As informações
+              exibidas reproduzem o dataset canônico da Eleja.
+            </p>
+          </article>
+        }
+      }
+    }
+  }
+</main>
+
+<footer>
+  <a class="brand" routerLink="/candidates">eleja<span>.</span></a>
+  <p>Informação pública para escolhas conscientes.</p>
+</footer>

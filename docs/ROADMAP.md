@@ -289,7 +289,8 @@ automático permanecem pendentes.
 
 A primeira tela funcional do frontend também está implementada: listagem
 responsiva de candidatos com busca, filtros, paginação e estados de interface.
-Perfil do candidato e comparação continuam pendentes.
+O perfil do candidato também está implementado com dados eleitorais, pessoais
+públicos e patrimônio declarado. A comparação continua pendente.
 
 Itens que podem ser introduzidos quando houver necessidade:
 

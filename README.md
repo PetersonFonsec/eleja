@@ -543,7 +543,9 @@ Com PostgreSQL populado e a API em execução, inicie o Angular:
 npm run web
 ```
 
-A listagem fica em `http://localhost:4200/candidates`. Em desenvolvimento, o
+A listagem fica em `http://localhost:4200/candidates`; os cards abrem o perfil
+em `/candidates/:id`, incluindo informações eleitorais, pessoais públicas e
+bens declarados. Em desenvolvimento, o
 Angular encaminha `/api` para `http://localhost:3000` usando
 `apps/web/proxy.conf.json`. O serviço lê a base da API em
 `apps/web/src/environments/environment.ts`; nenhuma URL de servidor é

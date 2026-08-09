@@ -2,6 +2,8 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import type {
+  CandidateAssetsResponse,
+  CandidateDetail,
   CandidateListQuery,
   CandidateListResponse,
 } from './candidate.types';
@@ -21,6 +23,18 @@ export class CandidatesApiService {
     return this.http.get<CandidateListResponse>(
       `${environment.apiBaseUrl}/candidates`,
       { params },
+    );
+  }
+
+  getById(id: string) {
+    return this.http.get<CandidateDetail>(
+      `${environment.apiBaseUrl}/candidates/${encodeURIComponent(id)}`,
+    );
+  }
+
+  getAssets(id: string) {
+    return this.http.get<CandidateAssetsResponse>(
+      `${environment.apiBaseUrl}/candidates/${encodeURIComponent(id)}/assets`,
     );
   }
 }

@@ -54,3 +54,43 @@ export interface CandidateListQuery {
   party?: string;
   name?: string;
 }
+
+export interface CandidateDetail {
+  id: string;
+  person: {
+    name: string;
+    birthDate: string | null;
+    gender: string | null;
+    education: string | null;
+    occupation: string | null;
+  };
+  candidacy: {
+    ballotName: string;
+    ballotNumber: number | null;
+    photoUrl: string | null;
+    status: string;
+    sourceStatus: string | null;
+    state: string | null;
+    city: string | null;
+  };
+  party: CandidateParty;
+  office: CandidateOffice;
+  election: CandidateElection;
+}
+
+export interface CandidateAsset {
+  id: string;
+  typeCode: string;
+  type: string;
+  description: string | null;
+  value: string;
+}
+
+export interface CandidateAssetsResponse {
+  candidateId: string;
+  summary: {
+    totalAssets: number;
+    totalDeclaredValue: string;
+  };
+  data: CandidateAsset[];
+}
