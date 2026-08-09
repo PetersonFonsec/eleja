@@ -332,6 +332,22 @@ full-dataset.zip
 
 A publicação é a última etapa.
 
+``` text
+PostgreSQL
+    |
+    v
+CSV Export local
+    |
+    v
+Objetos versionados no R2
+    |
+    v
+Alias latest
+    |
+    v
+Internet pública
+```
+
 O dataset somente se torna o `latest` depois que:
 
 -   extração terminou;
@@ -373,14 +389,29 @@ datasets/
   2026/
     latest/
       candidates.csv
-      assets.csv
-      full-dataset.zip
+      candidate-assets.csv
+      metadata.json
 
     2026-08-08/
       candidates.csv
-      assets.csv
-      full-dataset.zip
+      candidate-assets.csv
+      metadata.json
 ```
+
+Caminhos versionados são imutáveis. Uma reexecução aceita objetos com a mesma
+identidade de release, mas rejeita checksums diferentes para a mesma versão.
+Todos os objetos históricos são enviados e verificados antes de qualquer
+alteração em `latest`. Em seguida, os CSVs de `latest` são atualizados e seu
+`metadata.json` é gravado por último como marcador da release completa.
+
+Objetos versionados usam cache anual com `immutable`; objetos de `latest` usam
+cache público de cinco minutos. CSVs são publicados como
+`text/csv; charset=utf-8` e download por attachment; manifests usam
+`application/json; charset=utf-8`.
+
+Somente após a publicação completa o `DatasetVersion` em estado `READY` muda
+para `PUBLISHED` e recebe `publishedAt`. Releases históricas continuam
+`PUBLISHED`; o caminho `latest` representa qual delas está ativa.
 
 Downloads devem ser servidos diretamente pelo object storage/CDN, não
 pela API NestJS.

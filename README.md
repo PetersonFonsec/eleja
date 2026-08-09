@@ -520,6 +520,7 @@ npm run batch:candidates:persist -- --year=2026 # persiste candidatos
 npm run batch:assets -- --year=2026 # extrai o RAW oficial de bens
 npm run batch:assets:persist -- --year=2026 # persiste bens e proveniência
 npm run batch:export -- --year=2026 # gera os CSVs públicos locais
+npm run batch:publish -- --year=2026 --version=2026-08-08 # publica no R2
 npm run web        # inicia o servidor de desenvolvimento Angular
 
 npm run build      # compila todas as aplicações e pacotes
@@ -644,6 +645,35 @@ O comando grava `candidates.csv`, `candidate-assets.csv` e `metadata.json` em
 LF; valores nulos ficam vazios. O metadata registra contagem de linhas,
 tamanho e checksum SHA-256. Consulte [docs/DATASETS.md](docs/DATASETS.md) para
 o contrato completo das colunas e formatos.
+
+### Publicação dos datasets
+
+O bucket R2, suas credenciais e o domínio público devem ser provisionados pelo
+operador. A aplicação não cria bucket, configura DNS ou altera a exposição
+pública. Configure:
+
+``` env
+R2_ACCOUNT_ID=
+R2_ACCESS_KEY_ID=
+R2_SECRET_ACCESS_KEY=
+R2_BUCKET=
+R2_PUBLIC_BASE_URL=https://data.example.com
+```
+
+`R2_ENDPOINT` pode substituir o endpoint derivado de `R2_ACCOUNT_ID`. Para
+publicar artefatos já gerados, deve existir um `DatasetVersion` com a mesma
+versão em estado `READY` (ou `PUBLISHED` em uma reexecução idempotente):
+
+``` bash
+npm run batch:publish -- --year=2026 --version=2026-08-08
+```
+
+Primeiro são gravados os objetos históricos imutáveis em
+`datasets/<ano>/<versão>/`. Somente depois são atualizados os objetos em
+`datasets/<ano>/latest/`, com `metadata.json` por último como marcador da
+release. A credencial precisa apenas de leitura e escrita de objetos no bucket
+configurado; permissões administrativas da conta Cloudflare não são
+necessárias.
 
 ### Banco de dados local
 

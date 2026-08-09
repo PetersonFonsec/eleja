@@ -78,3 +78,28 @@ ordenação é por candidatura, sequência do bem na fonte e identificador do be
 Registra o ano, instante de geração e, para cada CSV, nome lógico, nome do
 arquivo, quantidade de linhas de dados, tamanho em bytes e checksum SHA-256.
 Caminhos absolutos locais não são incluídos.
+
+Na publicação, o manifesto também recebe `version` e `publishedAt`. Esses
+campos são adicionados ao objeto publicado sem inserir caminhos locais.
+
+## Caminhos públicos
+
+O domínio é definido por `R2_PUBLIC_BASE_URL`. Os caminhos estáveis da versão
+atual são:
+
+``` text
+/datasets/2026/latest/candidates.csv
+/datasets/2026/latest/candidate-assets.csv
+/datasets/2026/latest/metadata.json
+```
+
+Cada release também permanece disponível em um caminho histórico imutável:
+
+``` text
+/datasets/2026/<version>/candidates.csv
+/datasets/2026/<version>/candidate-assets.csv
+/datasets/2026/<version>/metadata.json
+```
+
+`latest/metadata.json` é o marcador da release atual e só é atualizado após a
+publicação completa dos objetos versionados e dos CSVs em `latest`.

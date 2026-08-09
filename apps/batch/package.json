@@ -11,12 +11,14 @@
     "start:assets": "npm run build && node --env-file-if-exists=../../.env dist/assets-main.js",
     "start:assets:persist": "npm run build --workspace @eleja/database && npm run build && node --env-file-if-exists=../../.env dist/assets-persist-main.js",
     "start:export": "npm run build --workspace @eleja/database && npm run build && node --env-file-if-exists=../../.env dist/export-main.js",
+    "start:publish": "npm run build --workspace @eleja/database && npm run build && node --env-file-if-exists=../../.env dist/publish-main.js",
     "build": "tsc -p tsconfig.build.json",
     "test": "vitest run --exclude '**/*.integration.spec.ts'",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test:integration": "vitest run test/*.integration.spec.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1106.0",
     "@eleja/database": "*",
     "csv-parse": "^7.0.2",
     "csv-stringify": "^6.8.3",
