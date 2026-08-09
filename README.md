@@ -519,6 +519,7 @@ npm run batch:candidates:normalize -- --year=2026 # normaliza sem persistir
 npm run batch:candidates:persist -- --year=2026 # persiste candidatos
 npm run batch:assets -- --year=2026 # extrai o RAW oficial de bens
 npm run batch:assets:persist -- --year=2026 # persiste bens e proveniência
+npm run batch:export -- --year=2026 # gera os CSVs públicos locais
 npm run web        # inicia o servidor de desenvolvimento Angular
 
 npm run build      # compila todas as aplicações e pacotes
@@ -629,6 +630,20 @@ npm run batch:assets:persist -- --year=2026
 O RAW é preservado em `.data/raw/tse/<ano>/assets/<sha256>/`. A persistência
 resolve a candidatura exclusivamente por `SQ_CANDIDATO`, mantém valores como
 decimais exatos e grava a evidência do artefato na mesma transação do bem.
+
+### Exportação dos datasets públicos
+
+Para gerar os CSVs a partir do modelo canônico persistido no PostgreSQL:
+
+``` bash
+npm run batch:export -- --year=2026
+```
+
+O comando grava `candidates.csv`, `candidate-assets.csv` e `metadata.json` em
+`.data/exports/<ano>/`. Os CSVs usam UTF-8, vírgula, cabeçalho e fim de linha
+LF; valores nulos ficam vazios. O metadata registra contagem de linhas,
+tamanho e checksum SHA-256. Consulte [docs/DATASETS.md](docs/DATASETS.md) para
+o contrato completo das colunas e formatos.
 
 ### Banco de dados local
 

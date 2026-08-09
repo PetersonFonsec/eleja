@@ -287,15 +287,32 @@ checksums RAW diferentes criam novas observações de proveniência.
 
 ## 9. Export
 
-Após persistência e validação, gerar datasets públicos.
+Após persistência e validação, o exportador lê exclusivamente o modelo
+canônico no PostgreSQL e gera datasets públicos. Ele não consulta arquivos RAW
+nem fontes externas.
 
-Exemplos:
+O comando inicial é:
+
+``` bash
+npm run batch:export -- --year=2026
+```
+
+e produz localmente:
 
 ``` text
 candidates.csv
-assets.csv
-contacts.csv
+candidate-assets.csv
+metadata.json
 ```
+
+As consultas usam lotes limitados e ordenação explícita. Cada CSV é escrito em
+arquivo temporário e renomeado somente depois da conclusão, evitando que um
+arquivo parcial pareça completo. O resultado inclui quantidade de registros,
+tamanho e checksum SHA-256. Repetir o export sobre o mesmo estado canônico
+produz os mesmos bytes e checksums dos CSVs.
+
+O contrato de colunas, formatos, relacionamentos e proteção contra fórmulas de
+planilha está documentado em [DATASETS.md](DATASETS.md).
 
 Futuramente:
 
