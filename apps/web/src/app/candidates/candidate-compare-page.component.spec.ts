@@ -1,5 +1,6 @@
 import '@angular/compiler';
 import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 import { BehaviorSubject, of, throwError } from 'rxjs';
 import { describe, expect, it, vi } from 'vitest';
 import type {
@@ -194,6 +195,7 @@ function setup(
     { queryParamMap: params } as unknown as ActivatedRoute,
     { navigate } as unknown as Router,
     api,
+    { setTitle: () => undefined } as unknown as Title,
   );
   return { page, params, navigate, detailCalls, assetCalls };
 }

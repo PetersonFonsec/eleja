@@ -1,5 +1,6 @@
 import '@angular/compiler';
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 import { BehaviorSubject, of, Subject, throwError } from 'rxjs';
 import { describe, expect, it } from 'vitest';
 import type {
@@ -8,7 +9,11 @@ import type {
 } from './candidate.types';
 import { CandidatesApiService } from './candidates-api.service';
 import { CandidateDetailPageComponent } from './candidate-detail-page.component';
-import { formatBrlDecimal, formatDateOnly } from './candidate-formatters';
+import {
+  electionTypeLabel,
+  formatBrlDecimal,
+  formatDateOnly,
+} from './candidate-formatters';
 
 const ID = '93280ad8-b089-46cc-9848-91462ff63e7c';
 const SECOND_ID = '1f5fba20-97fd-43e2-93b8-2abe19278720';
@@ -159,6 +164,11 @@ describe('candidate detail formatters', () => {
   it('formats a date-only value without timezone conversion', () => {
     expect(formatDateOnly('1985-04-17')).toBe('17/04/1985');
   });
+
+  it('translates canonical election types for every candidate view', () => {
+    expect(electionTypeLabel('GENERAL')).toBe('Eleição Geral');
+    expect(electionTypeLabel('MUNICIPAL')).toBe('Eleição Municipal');
+  });
 });
 
 function setup(
@@ -182,6 +192,7 @@ function setup(
   const page = new CandidateDetailPageComponent(
     { paramMap: params } as unknown as ActivatedRoute,
     api,
+    { setTitle: () => undefined } as unknown as Title,
   );
   return {
     page,

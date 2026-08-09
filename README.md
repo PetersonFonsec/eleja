@@ -19,6 +19,33 @@ acompanhamento de mandatos e promessas.
 
 ------------------------------------------------------------------------
 
+## Início rápido local
+
+Pré-requisitos: Node.js 22 LTS, npm 10+ e Docker com Docker Compose.
+
+``` bash
+npm install
+cp .env.example .env
+npm run db:up
+npm run migration:up
+npm run batch:run -- --year=2026
+```
+
+O batch baixa os arquivos oficiais do TSE, popula o PostgreSQL e gera os CSVs
+locais em `.data/exports/2026/<versão>/`. Depois, mantenha dois terminais
+abertos:
+
+``` bash
+npm run api # terminal 1 — http://localhost:3000
+npm run web # terminal 2 — http://localhost:4200
+```
+
+Abra `http://localhost:4200/candidates`. O Docker elimina a necessidade de uma
+instalação local do PostgreSQL. `npm run db:down` encerra o banco sem apagar o
+volume; a ingestão nunca é executada automaticamente ao iniciar a API ou o web.
+
+------------------------------------------------------------------------
+
 ## Objetivos
 
 -   Centralizar dados eleitorais públicos.
@@ -41,13 +68,12 @@ A obtenção dos dados é separada da API pública.
                 Fontes oficiais
                       |
                       v
-                Daily Batch
+                Local Batch
                       |
           +-----------+-----------+
           |                       |
           v                       v
-     Raw Storage              Normalize
-   Cloudflare R2                  |
+     Raw filesystem           Normalize
                                   v
                               Validate
                                   |
@@ -60,7 +86,7 @@ A obtenção dos dados é separada da API pública.
                     REST API             CSV Export
                        |                     |
                        v                     v
-                    Angular             Cloudflare R2
+                    Angular              Local CSV
 ```
 
 A API **não consulta o TSE ou outras fontes externas durante uma
@@ -73,7 +99,8 @@ validação.
 
 ## Pipeline de dados
 
-O processo batch é executado inicialmente **uma vez por dia**.
+O processo batch é executado explicitamente por comando no ambiente local. A
+execução diária permanece uma decisão futura de scheduling.
 
 ``` text
 Extract
@@ -155,16 +182,14 @@ Se a execução diária falhar, a última versão válida continua disponível.
 
 ### Storage
 
--   Cloudflare R2
+-   filesystem local para RAW e CSV no fluxo de desenvolvimento;
+-   Cloudflare R2 disponível como adaptador de publicação, sem publicação
+    automática no fluxo local.
 
-### Execução do batch
+### Execução futura do batch
 
-Inicialmente:
-
--   GitHub Actions
-
-A lógica do batch deve permanecer independente do executor para permitir
-migração futura para:
+A lógica permanece independente do executor para permitir scheduling futuro
+por:
 
 -   AWS Lambda;
 -   serverless containers;
@@ -206,7 +231,8 @@ API REST pública e predominantemente read-only.
 
 ### `apps/batch`
 
-Pipeline diário responsável pela ingestão e publicação dos dados.
+Pipeline explícito responsável pela ingestão e exportação local dos dados. O
+scheduling e a publicação remota não fazem parte do fluxo local.
 
 ### `apps/web`
 
@@ -506,6 +532,7 @@ Instale as dependências na raiz do repositório:
 
 ``` bash
 npm install
+cp .env.example .env
 ```
 
 Os principais comandos são:
@@ -523,6 +550,9 @@ npm run batch:export -- --year=2026 # gera os CSVs públicos locais
 npm run batch:publish -- --year=2026 --version=2026-08-08 # publica no R2
 npm run batch:run -- --year=2026 # executa o pipeline local completo
 npm run web        # inicia o servidor de desenvolvimento Angular
+npm run db:up      # inicia o PostgreSQL pelo Docker
+npm run db:down    # encerra o PostgreSQL preservando o volume
+npm run migration:up # aplica as migrations pendentes
 
 npm run build      # compila todas as aplicações e pacotes
 npm run test       # executa os testes
@@ -650,6 +680,9 @@ npm run batch:assets:persist -- --year=2026
 O RAW é preservado em `.data/raw/tse/<ano>/assets/<sha256>/`. A persistência
 resolve a candidatura exclusivamente por `SQ_CANDIDATO`, mantém valores como
 decimais exatos e grava a evidência do artefato na mesma transação do bem.
+Quando houver mais de um snapshot RAW, informe explicitamente
+`--checksum=<sha256>` no comando de persistência; o pipeline completo usa o
+artefato que acabou de extrair.
 
 ### Exportação dos datasets públicos
 
@@ -783,8 +816,9 @@ npm run api
 
 🚧 **Em desenvolvimento**
 
-O projeto está atualmente na fase de fundação e implementação do
-primeiro MVP.
+O recorte local de candidatos, bens e comparação do primeiro MVP está
+implementado. Publicação pública, deployment, scheduling e os demais domínios
+do roadmap continuam em desenvolvimento.
 
 O foco inicial é estabelecer:
 
@@ -806,8 +840,7 @@ interface web
 
 ## Licença
 
-A licença do código ainda deve ser definida antes da publicação pública
-do projeto.
+O código é distribuído sob a Apache License 2.0. Consulte [`LICENSE`](LICENSE).
 
 Os dados provenientes de fontes governamentais permanecem sujeitos aos
 termos, licenças e condições de suas respectivas fontes.

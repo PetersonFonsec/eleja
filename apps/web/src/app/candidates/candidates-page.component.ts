@@ -4,7 +4,8 @@ import {
   OnDestroy,
   signal,
 } from '@angular/core';
-import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router, RouterLink } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 import {
   BehaviorSubject,
   Subject,
@@ -74,7 +75,7 @@ export const STATES = [
 
 @Component({
   selector: 'app-candidates-page',
-  imports: [CandidateCardComponent],
+  imports: [CandidateCardComponent, RouterLink],
   templateUrl: './candidates-page.component.html',
   styleUrl: './candidates-page.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -103,7 +104,9 @@ export class CandidatesPageComponent implements OnDestroy {
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly api: CandidatesApiService,
+    title: Title,
   ) {
+    title.setTitle('Candidatos | Eleja');
     this.route.queryParamMap
       .pipe(
         map((params) => parseComparisonIds(params.get('compare'))),

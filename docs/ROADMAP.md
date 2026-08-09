@@ -282,10 +282,11 @@ Possíveis novas fontes:
 
 ## Estado atual da fundação de dados
 
+### Implementado localmente
+
 A orquestração local completa de candidatos, bens, persistência PostgreSQL e
-exportação CSV versionada está implementada. A publicação R2 continua sendo um
-comando independente e não faz parte do build local. Deployment e scheduling
-automático permanecem pendentes.
+exportação CSV versionada está implementada. O fluxo é explícito e executável
+por CLI; API e frontend não iniciam ingestão automaticamente.
 
 A primeira tela funcional do frontend também está implementada: listagem
 responsiva de candidatos com busca, filtros, paginação e estados de interface.
@@ -293,6 +294,14 @@ O perfil do candidato também está implementado com dados eleitorais, pessoais
 públicos e patrimônio declarado. A comparação frontend de até três candidaturas
 também está implementada com estado compartilhável na URL e totais de patrimônio
 declarado.
+
+### Pendente
+
+A publicação R2 existe como comando independente, mas não integra o fluxo local
+nem foi configurada como infraestrutura pública. Deployment, scheduling
+automático, contatos públicos e os endpoints de dataset/eleições continuam
+pendentes. Esses itens não são necessários para executar localmente o recorte
+atual de candidatos, bens e comparação.
 
 Itens que podem ser introduzidos quando houver necessidade:
 

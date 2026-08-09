@@ -200,7 +200,7 @@
                   @for (item of readyState.items; track item.id) {
                     <td>
                       {{ item.detail.election.year }} ·
-                      {{ item.detail.election.type }}
+                      {{ electionTypeLabel(item.detail.election.type) }}
                     </td>
                   }
                 </tr>

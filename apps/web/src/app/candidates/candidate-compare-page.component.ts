@@ -5,6 +5,7 @@ import {
   signal,
 } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 import {
   BehaviorSubject,
   Subject,
@@ -20,6 +21,7 @@ import {
 import {
   formatBrlDecimal,
   formatDateOnly,
+  electionTypeLabel,
   isUuid,
   statusLabel,
 } from './candidate-formatters';
@@ -59,6 +61,7 @@ type ComparisonState =
 export class CandidateComparePageComponent implements OnDestroy {
   readonly formatDateOnly = formatDateOnly;
   readonly formatBrlDecimal = formatBrlDecimal;
+  readonly electionTypeLabel = electionTypeLabel;
   readonly statusLabel = statusLabel;
   readonly state = signal<ComparisonState>({ status: 'setup' });
   readonly selectedIds = signal<string[]>([]);
@@ -73,7 +76,9 @@ export class CandidateComparePageComponent implements OnDestroy {
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly api: CandidatesApiService,
+    title: Title,
   ) {
+    title.setTitle('Comparar candidatos | Eleja');
     this.route.queryParamMap
       .pipe(
         map((params) => parseCandidateComparison(params.get('candidates'))),

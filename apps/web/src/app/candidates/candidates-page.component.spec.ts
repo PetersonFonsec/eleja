@@ -4,6 +4,7 @@ import { BehaviorSubject, of, Subject, throwError } from 'rxjs';
 import { describe, expect, it, vi } from 'vitest';
 import type { CandidateListResponse } from './candidate.types';
 import { CandidatesApiService } from './candidates-api.service';
+import { Title } from '@angular/platform-browser';
 import {
   CandidatesPageComponent,
   parseQuery,
@@ -127,6 +128,7 @@ function setup(request: () => ReturnType<CandidatesApiService['list']>) {
   const route = { queryParamMap: params } as unknown as ActivatedRoute;
   const router = { navigate } as unknown as Router;
   const api = { list: vi.fn(request) } as unknown as CandidatesApiService;
-  const page = new CandidatesPageComponent(route, router, api);
+  const title = { setTitle: vi.fn() } as unknown as Title;
+  const page = new CandidatesPageComponent(route, router, api, title);
   return { page, params, navigate };
 }

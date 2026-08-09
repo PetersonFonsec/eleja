@@ -5,6 +5,7 @@ import {
   signal,
 } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 import {
   BehaviorSubject,
   Observable,
@@ -24,6 +25,7 @@ import type {
 import {
   formatBrlDecimal,
   formatDateOnly,
+  electionTypeLabel,
   isUuid,
   statusLabel,
 } from './candidate-formatters';
@@ -60,6 +62,7 @@ export class CandidateDetailPageComponent implements OnDestroy {
   constructor(
     private readonly route: ActivatedRoute,
     private readonly api: CandidatesApiService,
+    private readonly title: Title,
   ) {
     this.id$ = this.route.paramMap.pipe(
       map((params) => params.get('id') ?? ''),
@@ -91,7 +94,16 @@ export class CandidateDetailPageComponent implements OnDestroy {
         ),
         takeUntil(this.destroyed),
       )
-      .subscribe((state) => this.candidateState.set(state));
+      .subscribe((state) => {
+        this.candidateState.set(state);
+        this.title.setTitle(
+          state.status === 'ready'
+            ? `${state.data.candidacy.ballotName} | Eleja`
+            : state.status === 'not-found' || state.status === 'invalid'
+              ? 'Candidato não encontrado | Eleja'
+              : 'Candidato | Eleja',
+        );
+      });
 
     this.id$
       .pipe(
@@ -138,14 +150,6 @@ export class CandidateDetailPageComponent implements OnDestroy {
     const state = this.assetsState();
     return state.status === 'ready' ? state.data : null;
   }
-}
-
-export function electionTypeLabel(value: string): string {
-  return value === 'GENERAL'
-    ? 'Eleição Geral'
-    : value === 'MUNICIPAL'
-      ? 'Eleição Municipal'
-      : value;
 }
 
 function httpStatus(error: unknown): number | undefined {

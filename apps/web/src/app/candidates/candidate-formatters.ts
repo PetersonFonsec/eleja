@@ -17,6 +17,12 @@ export function statusLabel(value: string): string {
   return 'Não informada';
 }
 
+export function electionTypeLabel(value: string): string {
+  if (value === 'GENERAL') return 'Eleição Geral';
+  if (value === 'MUNICIPAL') return 'Eleição Municipal';
+  return value;
+}
+
 export function isUuid(value: string): boolean {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
     value,
