@@ -13,6 +13,10 @@ const empty: CandidateListResponse = {
   data: [],
   meta: { page: 1, limit: 20, total: 0, totalPages: 0 },
 };
+const A = '93280ad8-b089-46cc-9848-91462ff63e7c';
+const B = '1f5fba20-97fd-43e2-93b8-2abe19278720';
+const C = '00108c35-de37-4a53-a360-238ba341c6ed';
+const D = 'b05d2db8-aa0e-481f-8aaa-dad715d43d22';
 
 describe('CandidatesPageComponent', () => {
   it('represents loading, success, empty and error states', () => {
@@ -75,6 +79,33 @@ describe('CandidatesPageComponent', () => {
     second.next({ ...empty, meta: { ...empty.meta, total: 1 } });
 
     expect(fixture.page.response().meta.total).toBe(1);
+  });
+
+  it('selects candidates and navigates to comparison with URL state', () => {
+    const fixture = setup(() => of(empty));
+    fixture.page.toggleComparison(A);
+    fixture.params.next(convertToParamMap({ year: '2026', compare: A }));
+    fixture.page.toggleComparison(B);
+    fixture.params.next(
+      convertToParamMap({ year: '2026', compare: `${A},${B}` }),
+    );
+    expect(fixture.page.comparisonIds()).toEqual([A, B]);
+
+    fixture.page.openComparison();
+    expect(fixture.navigate).toHaveBeenLastCalledWith(['/compare'], {
+      queryParams: { candidates: `${A},${B}` },
+    });
+  });
+
+  it('prevents a fourth comparison selection', () => {
+    const fixture = setup(() => of(empty));
+    fixture.params.next(
+      convertToParamMap({ year: '2026', compare: `${A},${B},${C}` }),
+    );
+    fixture.navigate.mockClear();
+    fixture.page.toggleComparison(D);
+    expect(fixture.navigate).not.toHaveBeenCalled();
+    expect(fixture.page.comparisonIds()).toEqual([A, B, C]);
   });
 });
 

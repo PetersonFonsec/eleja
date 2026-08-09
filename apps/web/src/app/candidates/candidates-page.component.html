@@ -122,7 +122,12 @@
       } @else {
         <div class="candidate-grid">
           @for (candidate of response().data; track candidate.id) {
-            <app-candidate-card [candidate]="candidate" />
+            <app-candidate-card
+              [candidate]="candidate"
+              [comparisonSelected]="comparisonIds().includes(candidate.id)"
+              [comparisonDisabled]="comparisonIds().length >= 3"
+              (comparisonToggle)="toggleComparison($event)"
+            />
           }
         </div>
 
@@ -163,6 +168,33 @@
     Dados eleitorais provenientes de fontes públicas oficiais.
   </p>
 </main>
+
+@if (comparisonIds().length > 0) {
+  <aside class="comparison-tray" aria-live="polite">
+    <div>
+      <strong
+        >{{ comparisonIds().length }}
+        {{
+          comparisonIds().length === 1
+            ? 'candidato selecionado'
+            : 'candidatos selecionados'
+        }}</strong
+      >
+      <span>Máximo de 3 candidatos por comparação.</span>
+    </div>
+    <button class="clear-comparison" type="button" (click)="clearComparison()">
+      Limpar
+    </button>
+    <button
+      class="open-comparison"
+      type="button"
+      [disabled]="comparisonIds().length < 2"
+      (click)="openComparison()"
+    >
+      Comparar
+    </button>
+  </aside>
+}
 
 <footer>
   <span class="brand">eleja<span>.</span></span>

@@ -27,6 +27,28 @@
   outline: 3px solid #efb642;
   outline-offset: 3px;
 }
+.comparison-action {
+  border-top: 1px solid #e3e9e7;
+  padding: 0.65rem 1rem;
+}
+.comparison-action label {
+  align-items: center;
+  color: #245d50;
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 0.84rem;
+  font-weight: 700;
+  gap: 0.5rem;
+}
+.comparison-action input {
+  accent-color: #174b40;
+  height: 1rem;
+  width: 1rem;
+}
+.comparison-action label:has(input:disabled) {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
 .portrait {
   align-items: center;
   aspect-ratio: 3 / 4;

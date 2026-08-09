@@ -1,7 +1,9 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  EventEmitter,
   Input,
+  Output,
   signal,
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
@@ -16,6 +18,9 @@ import type { CandidateListItem } from './candidate.types';
 })
 export class CandidateCardComponent {
   @Input({ required: true }) candidate!: CandidateListItem;
+  @Input() comparisonSelected = false;
+  @Input() comparisonDisabled = false;
+  @Output() readonly comparisonToggle = new EventEmitter<string>();
   readonly imageFailed = signal(false);
 
   candidateRoute(): string[] {
@@ -24,5 +29,11 @@ export class CandidateCardComponent {
 
   onImageError(): void {
     this.imageFailed.set(true);
+  }
+
+  toggleComparison(): void {
+    if (!this.comparisonDisabled || this.comparisonSelected) {
+      this.comparisonToggle.emit(this.candidate.id);
+    }
   }
 }

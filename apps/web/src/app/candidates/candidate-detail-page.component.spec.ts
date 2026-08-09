@@ -7,11 +7,8 @@ import type {
   CandidateDetail,
 } from './candidate.types';
 import { CandidatesApiService } from './candidates-api.service';
-import {
-  CandidateDetailPageComponent,
-  formatBrlDecimal,
-  formatDateOnly,
-} from './candidate-detail-page.component';
+import { CandidateDetailPageComponent } from './candidate-detail-page.component';
+import { formatBrlDecimal, formatDateOnly } from './candidate-formatters';
 
 const ID = '93280ad8-b089-46cc-9848-91462ff63e7c';
 const SECOND_ID = '1f5fba20-97fd-43e2-93b8-2abe19278720';

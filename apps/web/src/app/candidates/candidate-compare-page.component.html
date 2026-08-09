@@ -1,0 +1,270 @@
+<header class="site-header">
+  <a class="brand" routerLink="/candidates" aria-label="Eleja — página inicial"
+    >eleja<span>.</span></a
+  >
+  <span class="source-pill">Dados públicos eleitorais</span>
+</header>
+
+<main>
+  <nav class="breadcrumbs" aria-label="Navegação estrutural">
+    <a routerLink="/candidates">Candidatos</a><span aria-hidden="true">/</span
+    ><span>Comparação</span>
+  </nav>
+  <section class="page-intro">
+    <p class="eyebrow">Comparação informativa</p>
+    <h1>Compare candidatos</h1>
+    <p>Veja lado a lado informações públicas das candidaturas selecionadas.</p>
+  </section>
+
+  @if (invalidCount() > 0) {
+    <p class="notice" role="status">
+      {{ invalidCount() }}
+      {{
+        invalidCount() === 1
+          ? 'identificador inválido foi ignorado'
+          : 'identificadores inválidos foram ignorados'
+      }}.
+    </p>
+  }
+
+  @switch (state().status) {
+    @case ('setup') {
+      <section class="state-card">
+        <h2>Selecione pelo menos dois candidatos para comparar</h2>
+        <p>
+          A comparação aceita até três candidaturas e fica registrada somente na
+          URL.
+        </p>
+        <a routerLink="/candidates">Selecionar candidatos</a>
+      </section>
+    }
+    @case ('loading') {
+      <section class="loading-card" aria-busy="true">
+        <span class="sr-only">Carregando comparação</span>
+        @for (item of selectedIds(); track item) {
+          <div></div>
+        }
+      </section>
+    }
+    @case ('error') {
+      <section class="state-card" role="alert">
+        <h2>Não foi possível carregar a comparação</h2>
+        <p>Verifique sua conexão e tente novamente.</p>
+        <button type="button" (click)="retryLoad()">Tentar novamente</button>
+      </section>
+    }
+    @case ('ready') {
+      @if (state(); as readyState) {
+        @if (readyState.status === 'ready') {
+          @if (missingIds().length || failedIds().length) {
+            <div class="notice" role="status">
+              @if (missingIds().length) {
+                <p>
+                  {{ missingIds().length }} candidatura não foi encontrada e foi
+                  omitida.
+                </p>
+              }
+              @if (failedIds().length) {
+                <p>
+                  {{ failedIds().length }} candidatura não pôde ser carregada.
+                </p>
+              }
+            </div>
+          }
+          @if (hasDifferentOffice(readyState.items)) {
+            <p class="context-warning">
+              Você está comparando candidatos de cargos diferentes.
+            </p>
+          }
+          @if (hasDifferentElectionYear(readyState.items)) {
+            <p class="context-warning">
+              Você está comparando candidatos de eleições diferentes.
+            </p>
+          }
+
+          <div class="comparison-actions">
+            @if (selectedIds().length < 3) {
+              @if (addCandidateRoute(); as addRoute) {
+                <a
+                  [routerLink]="addRoute.path"
+                  [queryParams]="addRoute.queryParams"
+                  >Adicionar candidato</a
+                >
+              }
+            } @else {
+              <span>Máximo de 3 candidatos.</span>
+            }
+            <button type="button" (click)="clearComparison()">
+              Limpar comparação
+            </button>
+          </div>
+
+          <div
+            class="table-scroll"
+            tabindex="0"
+            aria-label="Tabela comparativa com rolagem horizontal"
+          >
+            <table>
+              <caption class="sr-only">
+                Comparação de informações públicas de candidatos
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col">Informação</th>
+                  @for (item of readyState.items; track item.id) {
+                    <th scope="col" class="candidate-header">
+                      <div class="portrait">
+                        @if (
+                          item.detail.candidacy.photoUrl &&
+                          !imageFailures().has(item.id)
+                        ) {
+                          <img
+                            [src]="item.detail.candidacy.photoUrl"
+                            [alt]="
+                              'Foto de ' + item.detail.candidacy.ballotName
+                            "
+                            (error)="onImageError(item.id)"
+                          />
+                        } @else {
+                          <span aria-hidden="true">{{
+                            item.detail.candidacy.ballotName.charAt(0) || '?'
+                          }}</span>
+                        }
+                      </div>
+                      <a [routerLink]="['/candidates', item.id]">{{
+                        item.detail.candidacy.ballotName
+                      }}</a>
+                      <small>{{ item.detail.person.name }}</small>
+                      <strong>{{
+                        item.detail.candidacy.ballotNumber ?? '—'
+                      }}</strong>
+                      <span>{{ item.detail.party.acronym }}</span>
+                      <button
+                        type="button"
+                        (click)="removeCandidate(item.id)"
+                        [attr.aria-label]="
+                          'Remover ' +
+                          item.detail.candidacy.ballotName +
+                          ' da comparação'
+                        "
+                      >
+                        Remover
+                      </button>
+                    </th>
+                  }
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">Cargo</th>
+                  @for (item of readyState.items; track item.id) {
+                    <td>{{ item.detail.office.name || '—' }}</td>
+                  }
+                </tr>
+                <tr>
+                  <th scope="row">Partido</th>
+                  @for (item of readyState.items; track item.id) {
+                    <td>
+                      {{ item.detail.party.name }} ({{
+                        item.detail.party.acronym
+                      }})
+                    </td>
+                  }
+                </tr>
+                <tr>
+                  <th scope="row">Número</th>
+                  @for (item of readyState.items; track item.id) {
+                    <td>{{ item.detail.candidacy.ballotNumber ?? '—' }}</td>
+                  }
+                </tr>
+                <tr>
+                  <th scope="row">Estado</th>
+                  @for (item of readyState.items; track item.id) {
+                    <td>{{ item.detail.candidacy.state ?? '—' }}</td>
+                  }
+                </tr>
+                <tr>
+                  <th scope="row">Município</th>
+                  @for (item of readyState.items; track item.id) {
+                    <td>{{ item.detail.candidacy.city ?? '—' }}</td>
+                  }
+                </tr>
+                <tr>
+                  <th scope="row">Situação</th>
+                  @for (item of readyState.items; track item.id) {
+                    <td>{{ statusLabel(item.detail.candidacy.status) }}</td>
+                  }
+                </tr>
+                <tr>
+                  <th scope="row">Eleição</th>
+                  @for (item of readyState.items; track item.id) {
+                    <td>
+                      {{ item.detail.election.year }} ·
+                      {{ item.detail.election.type }}
+                    </td>
+                  }
+                </tr>
+                <tr>
+                  <th scope="row">Data de nascimento</th>
+                  @for (item of readyState.items; track item.id) {
+                    <td>
+                      {{
+                        item.detail.person.birthDate
+                          ? formatDateOnly(item.detail.person.birthDate)
+                          : '—'
+                      }}
+                    </td>
+                  }
+                </tr>
+                <tr>
+                  <th scope="row">Escolaridade</th>
+                  @for (item of readyState.items; track item.id) {
+                    <td>{{ item.detail.person.education ?? '—' }}</td>
+                  }
+                </tr>
+                <tr>
+                  <th scope="row">Ocupação</th>
+                  @for (item of readyState.items; track item.id) {
+                    <td>{{ item.detail.person.occupation ?? '—' }}</td>
+                  }
+                </tr>
+                <tr>
+                  <th scope="row">Quantidade de bens</th>
+                  @for (item of readyState.items; track item.id) {
+                    <td>
+                      {{
+                        item.assets ? item.assets.totalAssets : 'Indisponível'
+                      }}
+                    </td>
+                  }
+                </tr>
+                <tr>
+                  <th scope="row">Patrimônio declarado</th>
+                  @for (item of readyState.items; track item.id) {
+                    <td>
+                      {{
+                        item.assets
+                          ? formatBrlDecimal(item.assets.totalDeclaredValue)
+                          : 'Indisponível'
+                      }}
+                    </td>
+                  }
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        }
+      }
+    }
+  }
+
+  <p class="source-notice">
+    Dados provenientes de fontes públicas oficiais. A comparação não constitui
+    recomendação eleitoral.
+  </p>
+</main>
+
+<footer>
+  <span class="brand">eleja<span>.</span></span>
+  <p>Informação pública para escolhas conscientes.</p>
+</footer>

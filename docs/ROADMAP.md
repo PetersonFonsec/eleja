@@ -290,7 +290,9 @@ automático permanecem pendentes.
 A primeira tela funcional do frontend também está implementada: listagem
 responsiva de candidatos com busca, filtros, paginação e estados de interface.
 O perfil do candidato também está implementado com dados eleitorais, pessoais
-públicos e patrimônio declarado. A comparação continua pendente.
+públicos e patrimônio declarado. A comparação frontend de até três candidaturas
+também está implementada com estado compartilhável na URL e totais de patrimônio
+declarado.
 
 Itens que podem ser introduzidos quando houver necessidade:
 

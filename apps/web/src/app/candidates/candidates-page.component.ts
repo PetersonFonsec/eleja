@@ -24,8 +24,10 @@ import type {
   PaginationMeta,
 } from './candidate.types';
 import { CandidatesApiService } from './candidates-api.service';
+import { isUuid } from './candidate-formatters';
 
 const LIMIT = 20;
+export const MAX_COMPARISON_CANDIDATES = 3;
 const EMPTY_META: PaginationMeta = {
   page: 1,
   limit: LIMIT,
@@ -87,6 +89,7 @@ export class CandidatesPageComponent implements OnDestroy {
   readonly loading = signal(true);
   readonly error = signal(false);
   readonly filtersOpen = signal(false);
+  readonly comparisonIds = signal<string[]>([]);
   readonly query = signal<CandidateListQuery>({
     page: 1,
     limit: LIMIT,
@@ -101,6 +104,13 @@ export class CandidatesPageComponent implements OnDestroy {
     private readonly router: Router,
     private readonly api: CandidatesApiService,
   ) {
+    this.route.queryParamMap
+      .pipe(
+        map((params) => parseComparisonIds(params.get('compare'))),
+        distinctUntilChanged((a, b) => a.join(',') === b.join(',')),
+        takeUntil(this.destroyed),
+      )
+      .subscribe((ids) => this.comparisonIds.set(ids));
     this.search
       .pipe(
         debounceTime(400),
@@ -171,6 +181,25 @@ export class CandidatesPageComponent implements OnDestroy {
       queryParams: { year: 2026 },
     });
   }
+  toggleComparison(id: string): void {
+    const current = this.comparisonIds();
+    const ids = current.includes(id)
+      ? current.filter((candidateId) => candidateId !== id)
+      : current.length < MAX_COMPARISON_CANDIDATES
+        ? [...current, id]
+        : current;
+    if (ids === current) return;
+    this.updateComparisonQuery(ids);
+  }
+  clearComparison(): void {
+    this.updateComparisonQuery([]);
+  }
+  openComparison(): void {
+    if (this.comparisonIds().length < 2) return;
+    void this.router.navigate(['/compare'], {
+      queryParams: { candidates: this.comparisonIds().join(',') },
+    });
+  }
   visiblePages(): number[] {
     const { page, totalPages } = this.response().meta;
     const start = Math.max(1, Math.min(page - 2, totalPages - 4));
@@ -196,6 +225,19 @@ export class CandidatesPageComponent implements OnDestroy {
       queryParamsHandling: 'merge',
     });
   }
+  private updateComparisonQuery(ids: string[]): void {
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { compare: ids.length ? ids.join(',') : null },
+      queryParamsHandling: 'merge',
+    });
+  }
+}
+
+export function parseComparisonIds(value: string | null): string[] {
+  return [...new Set((value ?? '').split(',').map((id) => id.trim()))]
+    .filter(isUuid)
+    .slice(0, MAX_COMPARISON_CANDIDATES);
 }
 
 export function parseQuery(params: ParamMap): CandidateListQuery {
