@@ -1,0 +1,170 @@
+<header class="site-header">
+  <a class="brand" href="/candidates" aria-label="Eleja — página inicial"
+    >eleja<span>.</span></a
+  >
+  <span class="source-pill">Dados públicos eleitorais</span>
+</header>
+
+<main>
+  <section class="page-intro">
+    <p class="eyebrow">Eleições 2026</p>
+    <h1>Candidatos</h1>
+    <p>
+      Consulte informações oficiais sobre quem participa das eleições
+      brasileiras.
+    </p>
+  </section>
+
+  <section class="search-panel" aria-label="Busca de candidatos">
+    <label for="candidate-search">Buscar por nome ou nome de urna</label>
+    <div class="search-field">
+      <span aria-hidden="true">⌕</span>
+      <input
+        id="candidate-search"
+        type="search"
+        [value]="query().name ?? ''"
+        placeholder="Digite um nome"
+        (input)="onSearch($any($event.target).value)"
+      />
+    </div>
+  </section>
+
+  <button
+    class="mobile-filter-button"
+    type="button"
+    (click)="filtersOpen.set(!filtersOpen())"
+    [attr.aria-expanded]="filtersOpen()"
+  >
+    Filtros <span aria-hidden="true">{{ filtersOpen() ? '−' : '+' }}</span>
+  </button>
+
+  <div class="discovery-layout">
+    <aside
+      class="filters"
+      [class.filters-open]="filtersOpen()"
+      aria-label="Filtros de candidatos"
+    >
+      <div class="filters-heading">
+        <h2>Filtros</h2>
+        <button type="button" (click)="clearFilters()">Limpar</button>
+      </div>
+      <label for="year">Eleição</label>
+      <select
+        id="year"
+        [value]="query().year"
+        (change)="onFilter('year', $any($event.target).value)"
+      >
+        <option value="2026">Eleições 2026</option>
+      </select>
+
+      <label for="office">Cargo</label>
+      <select
+        id="office"
+        [value]="query().office ?? ''"
+        (change)="onFilter('office', $any($event.target).value)"
+      >
+        <option value="">Todos os cargos</option>
+        @for (office of offices; track office[0]) {
+          <option [value]="office[0]">{{ office[1] }}</option>
+        }
+      </select>
+
+      <label for="state">Estado</label>
+      <select
+        id="state"
+        [value]="query().state ?? ''"
+        (change)="onFilter('state', $any($event.target).value)"
+      >
+        <option value="">Todo o Brasil</option>
+        @for (state of states; track state) {
+          <option [value]="state">{{ state }}</option>
+        }
+      </select>
+
+      <label for="party">Partido</label>
+      <input
+        id="party"
+        type="text"
+        maxlength="20"
+        [value]="query().party ?? ''"
+        placeholder="Ex.: PT"
+        (change)="onFilter('party', $any($event.target).value)"
+      />
+    </aside>
+
+    <section class="results" aria-live="polite" [attr.aria-busy]="loading()">
+      @if (!loading() && !error()) {
+        <p class="results-summary">{{ resultSummary() }}</p>
+      }
+
+      @if (loading()) {
+        <span class="sr-only">Carregando candidatos</span>
+        <div class="candidate-grid" aria-hidden="true">
+          @for (item of [1, 2, 3, 4, 5, 6]; track item) {
+            <div class="skeleton">
+              <span></span>
+              <div><b></b><i></i><i></i></div>
+            </div>
+          }
+        </div>
+      } @else if (error()) {
+        <div class="state-card" role="alert">
+          <h2>Não foi possível carregar os candidatos</h2>
+          <p>Verifique sua conexão e tente novamente.</p>
+          <button type="button" (click)="retryLoad()">Tentar novamente</button>
+        </div>
+      } @else if (response().meta.total === 0) {
+        <div class="state-card">
+          <h2>Nenhum candidato encontrado</h2>
+          <p>Tente remover ou alterar os filtros selecionados.</p>
+          <button type="button" (click)="clearFilters()">Limpar filtros</button>
+        </div>
+      } @else {
+        <div class="candidate-grid">
+          @for (candidate of response().data; track candidate.id) {
+            <app-candidate-card [candidate]="candidate" />
+          }
+        </div>
+
+        @if (response().meta.totalPages > 1) {
+          <nav class="pagination" aria-label="Paginação dos candidatos">
+            <button
+              type="button"
+              (click)="goToPage(query().page - 1)"
+              [disabled]="query().page === 1"
+            >
+              Anterior
+            </button>
+            @for (page of visiblePages(); track page) {
+              <button
+                type="button"
+                (click)="goToPage(page)"
+                [class.current]="page === query().page"
+                [attr.aria-current]="page === query().page ? 'page' : null"
+                [attr.aria-label]="'Página ' + page"
+              >
+                {{ page }}
+              </button>
+            }
+            <button
+              type="button"
+              (click)="goToPage(query().page + 1)"
+              [disabled]="query().page === response().meta.totalPages"
+            >
+              Próxima
+            </button>
+          </nav>
+        }
+      }
+    </section>
+  </div>
+
+  <p class="source-notice">
+    Dados eleitorais provenientes de fontes públicas oficiais.
+  </p>
+</main>
+
+<footer>
+  <span class="brand">eleja<span>.</span></span>
+  <p>Informação pública para escolhas conscientes.</p>
+</footer>

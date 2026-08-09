@@ -1,0 +1,102 @@
+:host {
+  display: block;
+}
+.candidate-card {
+  background: #fff;
+  border: 1px solid #dce4e1;
+  border-radius: 16px;
+  box-shadow: 0 5px 18px rgba(22, 53, 47, 0.06);
+  transition:
+    border-color 0.2s,
+    transform 0.2s;
+}
+.candidate-card:hover {
+  border-color: #83a99f;
+  transform: translateY(-2px);
+}
+.candidate-link {
+  color: inherit;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 84px 1fr;
+  padding: 1rem;
+  text-decoration: none;
+}
+.candidate-link:focus-visible {
+  border-radius: 16px;
+  outline: 3px solid #efb642;
+  outline-offset: 3px;
+}
+.portrait {
+  align-items: center;
+  aspect-ratio: 3 / 4;
+  background: #e5ece9;
+  border-radius: 12px;
+  color: #42655c;
+  display: flex;
+  font-size: 2rem;
+  font-weight: 700;
+  justify-content: center;
+  overflow: hidden;
+}
+.portrait img {
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+.candidate-copy {
+  min-width: 0;
+}
+.candidate-heading {
+  align-items: flex-start;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+h2 {
+  font-size: 1.05rem;
+  letter-spacing: 0.01em;
+  margin: 0.15rem 0 0.25rem;
+  text-transform: uppercase;
+}
+.full-name,
+.candidate-context,
+.party {
+  margin: 0;
+}
+.full-name {
+  color: #52635f;
+  font-size: 0.9rem;
+}
+.ballot-number {
+  color: #194e42;
+  font-size: 1.4rem;
+}
+.candidate-context {
+  color: #263d37;
+  font-size: 0.92rem;
+  font-weight: 650;
+  margin-top: 0.85rem;
+}
+.party {
+  color: #657570;
+  font-size: 0.82rem;
+  margin-top: 0.3rem;
+}
+.status {
+  background: #f1f3f2;
+  border-radius: 999px;
+  color: #5a6663;
+  display: inline-block;
+  font-size: 0.72rem;
+  margin-top: 0.7rem;
+  padding: 0.25rem 0.55rem;
+}
+@media (max-width: 480px) {
+  .candidate-link {
+    grid-template-columns: 66px 1fr;
+  }
+  .ballot-number {
+    font-size: 1.2rem;
+  }
+}

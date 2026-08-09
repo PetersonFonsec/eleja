@@ -535,6 +535,20 @@ npm run format     # formata os arquivos com Prettier
 Com a API em execução, o endpoint de saúde está disponível em
 `GET http://localhost:3000/health`.
 
+### Frontend de candidatos
+
+Com PostgreSQL populado e a API em execução, inicie o Angular:
+
+``` bash
+npm run web
+```
+
+A listagem fica em `http://localhost:4200/candidates`. Em desenvolvimento, o
+Angular encaminha `/api` para `http://localhost:3000` usando
+`apps/web/proxy.conf.json`. O serviço lê a base da API em
+`apps/web/src/environments/environment.ts`; nenhuma URL de servidor é
+embutida nos componentes.
+
 ### Candidate API
 
 Os primeiros endpoints públicos e somente leitura consultam exclusivamente o

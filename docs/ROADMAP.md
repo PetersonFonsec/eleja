@@ -287,6 +287,10 @@ exportação CSV versionada está implementada. A publicação R2 continua sendo
 comando independente e não faz parte do build local. Deployment e scheduling
 automático permanecem pendentes.
 
+A primeira tela funcional do frontend também está implementada: listagem
+responsiva de candidatos com busca, filtros, paginação e estados de interface.
+Perfil do candidato e comparação continuam pendentes.
+
 Itens que podem ser introduzidos quando houver necessidade:
 
 -   cache da API;

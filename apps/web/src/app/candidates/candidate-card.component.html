@@ -1,0 +1,44 @@
+<article class="candidate-card">
+  <a class="candidate-link" [routerLink]="candidateRoute()">
+    <div class="portrait">
+      @if (candidate.photoUrl && !imageFailed()) {
+        <img
+          [src]="candidate.photoUrl"
+          [alt]="'Foto de ' + candidate.ballotName"
+          (error)="onImageError()"
+        />
+      } @else {
+        <span aria-hidden="true">{{
+          candidate.ballotName.charAt(0) || '?'
+        }}</span>
+      }
+    </div>
+
+    <div class="candidate-copy">
+      <div class="candidate-heading">
+        <div>
+          <h2>{{ candidate.ballotName }}</h2>
+          <p class="full-name">{{ candidate.name }}</p>
+        </div>
+        @if (candidate.ballotNumber !== null) {
+          <strong class="ballot-number" aria-label="Número de urna">
+            {{ candidate.ballotNumber }}
+          </strong>
+        }
+      </div>
+
+      <p class="candidate-context">
+        {{ candidate.office.name }}
+        @if (candidate.state) {
+          <span aria-hidden="true">•</span> {{ candidate.state }}
+        }
+      </p>
+      <p class="party">
+        {{ candidate.party.name }} ({{ candidate.party.acronym }})
+      </p>
+      @if (candidate.status === 'INACTIVE') {
+        <span class="status">Candidatura inativa</span>
+      }
+    </div>
+  </a>
+</article>
