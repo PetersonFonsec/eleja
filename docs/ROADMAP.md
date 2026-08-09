@@ -280,6 +280,13 @@ Possíveis novas fontes:
 
 # Backlog técnico
 
+## Estado atual da fundação de dados
+
+A orquestração local completa de candidatos, bens, persistência PostgreSQL e
+exportação CSV versionada está implementada. A publicação R2 continua sendo um
+comando independente e não faz parte do build local. Deployment e scheduling
+automático permanecem pendentes.
+
 Itens que podem ser introduzidos quando houver necessidade:
 
 -   cache da API;

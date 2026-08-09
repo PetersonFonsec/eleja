@@ -20,6 +20,7 @@
     "batch:assets:persist": "npm run start:assets:persist --workspace @eleja/batch --",
     "batch:export": "npm run start:export --workspace @eleja/batch --",
     "batch:publish": "npm run start:publish --workspace @eleja/batch --",
+    "batch:run": "npm run start:run --workspace @eleja/batch --",
     "web": "npm run start --workspace @eleja/web",
     "build": "npm run build --workspace @eleja/database && npm run build --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",

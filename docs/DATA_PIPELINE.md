@@ -37,6 +37,35 @@ Export
 Publish
 ```
 
+O fluxo local completo atualmente executável é:
+
+``` text
+Datasets oficiais do TSE
+        |
+        v
+      Extract
+        |
+        v
+ RAW local content-addressed
+        |
+        v
+ Parse -> Normalize -> Persist (streaming)
+        |
+        v
+    PostgreSQL
+        |
+        v
+      Export
+        |
+        v
+Dataset CSV local versionado
+```
+
+Ele é iniciado manualmente com
+`npm run batch:run -- --year=2026 [--version=YYYY-MM-DD]`. A execução local
+não agenda jobs e não publica objetos remotos; essas etapas permanecem comandos
+independentes.
+
 ## 3. Extract
 
 Responsável apenas por obter o conteúdo original.
@@ -304,6 +333,11 @@ candidates.csv
 candidate-assets.csv
 metadata.json
 ```
+
+Na orquestração completa, esses arquivos ficam em
+`.data/exports/<ano>/<versão>/` e o manifesto inclui `version` e
+`status: READY`. O export isolado mantém `.data/exports/<ano>/` para
+compatibilidade.
 
 As consultas usam lotes limitados e ordenação explícita. Cada CSV é escrito em
 arquivo temporário e renomeado somente depois da conclusão, evitando que um

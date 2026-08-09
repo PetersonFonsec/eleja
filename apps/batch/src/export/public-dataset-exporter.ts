@@ -14,7 +14,15 @@ export class PublicDatasetExporter {
     private readonly batchSize = 1000,
   ) {}
 
-  async export(year: number, outputDirectory: string) {
+  async export(
+    year: number,
+    outputDirectory: string,
+    metadataOptions?: {
+      version?: string;
+      status?: 'READY';
+      expectedRows?: { candidates: number; assets: number };
+    },
+  ) {
     const candidates = await new CandidateCsvExporter(
       this.orm,
       this.batchSize,
@@ -24,7 +32,14 @@ export class PublicDatasetExporter {
       this.batchSize,
     ).export(year, outputDirectory);
     const datasets = [candidates, assets];
-    await writeMetadata(year, outputDirectory, datasets);
+    if (
+      metadataOptions?.expectedRows &&
+      (candidates.rows !== metadataOptions.expectedRows.candidates ||
+        assets.rows !== metadataOptions.expectedRows.assets)
+    ) {
+      throw new Error('Export row counts do not match the canonical database');
+    }
+    await writeMetadata(year, outputDirectory, datasets, metadataOptions);
     return { year, generatedAt: new Date(), datasets };
   }
 }
@@ -33,6 +48,7 @@ async function writeMetadata(
   year: number,
   outputDirectory: string,
   datasets: CsvExportResult[],
+  options?: { version?: string; status?: 'READY' },
 ): Promise<void> {
   await mkdir(outputDirectory, { recursive: true });
   const finalPath = join(outputDirectory, 'metadata.json');
@@ -42,6 +58,8 @@ async function writeMetadata(
   );
   const metadata = {
     year,
+    ...(options?.version ? { version: options.version } : {}),
+    ...(options?.status ? { status: options.status } : {}),
     generatedAt: new Date().toISOString(),
     datasets: datasets.map(({ dataset, fileName, rows, size, checksum }) => ({
       name: dataset === 'CANDIDATES' ? 'candidates' : 'candidate-assets',

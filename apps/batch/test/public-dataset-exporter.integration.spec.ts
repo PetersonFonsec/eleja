@@ -36,10 +36,18 @@ describe('PublicDatasetExporter', () => {
 
   it('exports canonical related datasets deterministically in bounded batches', async () => {
     const exporter = new PublicDatasetExporter(orm, 1);
-    const first = await exporter.export(fixture.year, directory);
+    const first = await exporter.export(fixture.year, directory, {
+      version: '9999-01-01',
+      status: 'READY',
+      expectedRows: { candidates: 2, assets: 2 },
+    });
     const firstCandidates = await readFile(join(directory, 'candidates.csv'));
     const firstAssets = await readFile(join(directory, 'candidate-assets.csv'));
-    const second = await exporter.export(fixture.year, directory);
+    const second = await exporter.export(fixture.year, directory, {
+      version: '9999-01-01',
+      status: 'READY',
+      expectedRows: { candidates: 2, assets: 2 },
+    });
     const secondCandidates = await readFile(join(directory, 'candidates.csv'));
     const secondAssets = await readFile(
       join(directory, 'candidate-assets.csv'),
@@ -93,6 +101,8 @@ describe('PublicDatasetExporter', () => {
     );
     expect(metadata).toMatchObject({
       year: fixture.year,
+      version: '9999-01-01',
+      status: 'READY',
       datasets: [
         { file: 'candidates.csv', rows: 2 },
         { file: 'candidate-assets.csv', rows: 2 },

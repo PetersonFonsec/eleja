@@ -65,4 +65,22 @@ describe('DatasetVersion', () => {
     expect(dataset.recordsUpdated).toBe(2);
     expect(dataset.recordsRejected).toBe(1);
   });
+
+  it('reopens a failed version for a new processing attempt', () => {
+    const dataset = new DatasetVersion('2026-08-08', null, startedAt);
+    dataset.recordCounters({
+      recordsRead: 10,
+      recordsInserted: 7,
+      recordsUpdated: 2,
+      recordsRejected: 1,
+    });
+    dataset.markFailed(finishedAt);
+
+    dataset.retry(publishedAt);
+
+    expect(dataset.status).toBe(DatasetVersionStatus.PROCESSING);
+    expect(dataset.startedAt).toEqual(publishedAt);
+    expect(dataset.finishedAt).toBeNull();
+    expect(dataset.recordsRead).toBe(0);
+  });
 });

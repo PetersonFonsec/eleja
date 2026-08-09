@@ -521,6 +521,7 @@ npm run batch:assets -- --year=2026 # extrai o RAW oficial de bens
 npm run batch:assets:persist -- --year=2026 # persiste bens e proveniência
 npm run batch:export -- --year=2026 # gera os CSVs públicos locais
 npm run batch:publish -- --year=2026 --version=2026-08-08 # publica no R2
+npm run batch:run -- --year=2026 # executa o pipeline local completo
 npm run web        # inicia o servidor de desenvolvimento Angular
 
 npm run build      # compila todas as aplicações e pacotes
@@ -645,6 +646,31 @@ O comando grava `candidates.csv`, `candidate-assets.csv` e `metadata.json` em
 LF; valores nulos ficam vazios. O metadata registra contagem de linhas,
 tamanho e checksum SHA-256. Consulte [docs/DATASETS.md](docs/DATASETS.md) para
 o contrato completo das colunas e formatos.
+
+### Pipeline eleitoral local completo
+
+Com as dependências instaladas, prepare o banco e execute o pipeline manual:
+
+``` bash
+npm run db:up
+npm run migration:up
+npm run batch:run -- --year=2026
+npm run api
+```
+
+Por padrão, a versão usa a data local atual. Para uma versão reprodutível,
+informe-a explicitamente:
+
+``` bash
+npm run batch:run -- --year=2026 --version=2026-08-08
+```
+
+O comando baixa e preserva os RAWs oficiais, processa candidatos antes de
+bens, persiste o modelo canônico e gera o snapshot em
+`.data/exports/<ano>/<versão>/`. Cada tentativa cria um `BatchRun`. Uma versão
+com falha pode ser repetida, mantendo o histórico; uma versão `READY` é
+imutável e não é reconstruída silenciosamente. A orquestração termina em
+`READY` e não publica no R2 automaticamente.
 
 ### Publicação dos datasets
 

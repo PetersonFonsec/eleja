@@ -16,7 +16,7 @@ async function main(): Promise<void> {
     repositoryRoot,
     process.env.CSV_EXPORT_ROOT ?? '.data/exports',
   );
-  const exportDirectory = resolve(exportRoot, String(year));
+  const exportDirectory = resolve(exportRoot, String(year), version);
   const config = readR2Config();
   const orm = await initializeDatabase();
   try {

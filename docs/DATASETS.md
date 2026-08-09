@@ -9,6 +9,11 @@ npm run batch:export -- --year=2026
 Os arquivos são gerados em `.data/exports/<ano>/`. A exportação consulta
 somente o modelo canônico persistido no PostgreSQL.
 
+O pipeline completo gera snapshots versionados em
+`.data/exports/<ano>/<versão>/`. Nesse fluxo, `metadata.json` inclui a versão e
+`status: READY`; o arquivo só é escrito após os CSVs e suas contagens terem
+sido validados contra o PostgreSQL.
+
 ## Formato comum
 
 - codificação UTF-8;

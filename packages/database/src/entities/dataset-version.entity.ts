@@ -89,6 +89,18 @@ export class DatasetVersion {
     this.finishedAt = at;
   }
 
+  retry(at = new Date()): void {
+    this.assertStatus(DatasetVersionStatus.FAILED, 'retry');
+    this.statusValue = DatasetVersionStatus.PROCESSING;
+    this.startedAt = at;
+    this.finishedAt = null;
+    this.publishedAt = null;
+    this.recordsRead = 0;
+    this.recordsInserted = 0;
+    this.recordsUpdated = 0;
+    this.recordsRejected = 0;
+  }
+
   publish(at = new Date()): void {
     this.assertStatus(DatasetVersionStatus.READY, 'publish');
     this.statusValue = DatasetVersionStatus.PUBLISHED;
