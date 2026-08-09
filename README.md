@@ -540,6 +540,7 @@ PostgreSQL:
 ``` http
 GET /candidates
 GET /candidates/:id
+GET /candidates/:id/assets
 ```
 
 A listagem aceita `page`, `limit`, `year`, `office`, `state`, `party` e `name`.
@@ -552,6 +553,28 @@ Exemplos:
 GET /candidates?year=2026&limit=10
 GET /candidates?year=2026&state=SP&office=FEDERAL_DEPUTY
 GET /candidates?party=PT&name=joao
+```
+
+O endpoint de bens retorna todos os bens da candidatura, ordenados por valor
+decrescente, e calcula a quantidade e soma diretamente no PostgreSQL:
+
+``` json
+{
+  "candidateId": "uuid",
+  "summary": {
+    "totalAssets": 2,
+    "totalDeclaredValue": "550000.30"
+  },
+  "data": [
+    {
+      "id": "uuid",
+      "typeCode": "21",
+      "type": "Veículo automotor",
+      "description": "Automóvel declarado",
+      "value": "550000.20"
+    }
+  ]
+}
 ```
 
 ### Extração RAW de candidatos

@@ -1,4 +1,5 @@
 import {
+  CandidateAsset,
   Candidacy,
   CandidacyStatus,
   Election,
@@ -142,6 +143,54 @@ describe('Candidate REST API', () => {
       .get('/candidates/not-a-uuid')
       .expect(400);
   });
+
+  it('returns all assets with exact PostgreSQL summary and deterministic ordering', async () => {
+    const response = await request(app.getHttpServer())
+      .get(`/candidates/${fixture.detailId}/assets`)
+      .expect(200);
+    expect(response.body).toEqual({
+      candidateId: fixture.detailId,
+      summary: {
+        totalAssets: 3,
+        totalDeclaredValue: '1000000000.29',
+      },
+      data: [
+        expect.objectContaining({ value: '999999999.99' }),
+        expect.objectContaining({ value: '0.20' }),
+        expect.objectContaining({ value: '0.10' }),
+      ],
+    });
+    expect(response.body.data[0]).not.toHaveProperty('candidacy');
+    expect(response.body.data[0]).not.toHaveProperty('sources');
+  });
+
+  it('returns one asset and an exact summary', async () => {
+    const response = await request(app.getHttpServer())
+      .get(`/candidates/${fixture.singleAssetCandidateId}/assets`)
+      .expect(200);
+    expect(response.body.summary).toEqual({
+      totalAssets: 1,
+      totalDeclaredValue: '-10.25',
+    });
+    expect(response.body.data).toHaveLength(1);
+  });
+
+  it('distinguishes a candidate without assets from an unknown candidate', async () => {
+    await request(app.getHttpServer())
+      .get(`/candidates/${fixture.noAssetsCandidateId}/assets`)
+      .expect(200)
+      .expect({
+        candidateId: fixture.noAssetsCandidateId,
+        summary: { totalAssets: 0, totalDeclaredValue: '0.00' },
+        data: [],
+      });
+    await request(app.getHttpServer())
+      .get(`/candidates/${randomUUID()}/assets`)
+      .expect(404);
+    await request(app.getHttpServer())
+      .get('/candidates/not-a-uuid/assets')
+      .expect(400);
+  });
 });
 
 async function createFixture() {
@@ -192,6 +241,19 @@ async function createFixture() {
     sourceCandidateId: `candidate-c-${suffix}`,
     state: 'SP',
   });
+  const assets = [
+    new CandidateAsset(alfa, 1, '01', 'Aplicação', 'Centavos A', '0.10'),
+    new CandidateAsset(alfa, 2, '01', 'Aplicação', 'Centavos B', '0.20'),
+    new CandidateAsset(
+      alfa,
+      3,
+      '01',
+      'Aplicação',
+      'Valor elevado',
+      '999999999.99',
+    ),
+    new CandidateAsset(beta, 1, '02', 'Conta', null, '-10.25'),
+  ];
   em.persist([
     election,
     partyA,
@@ -204,6 +266,7 @@ async function createFixture() {
     alfa,
     beta,
     gama,
+    ...assets,
   ]);
   await em.flush();
   return {
@@ -211,8 +274,13 @@ async function createFixture() {
     partyAcronym: partyA.acronym,
     officeCode,
     detailId: alfa.id,
+    singleAssetCandidateId: beta.id,
+    noAssetsCandidateId: gama.id,
     async cleanup() {
       const clean = orm.em.fork();
+      await clean.nativeDelete(CandidateAsset, {
+        id: { $in: assets.map((asset) => asset.id) },
+      });
       await clean.nativeDelete(Candidacy, {
         id: { $in: [alfa.id, beta.id, gama.id] },
       });

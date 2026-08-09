@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import type { Candidacy } from '@eleja/database';
 import { CandidatesQueryService } from './candidates-query.service.js';
+import { CandidateAssetsQueryService } from './candidate-assets-query.service.js';
 import {
   CandidateListQueryPipe,
   type CandidateListQueryDto,
@@ -18,6 +19,8 @@ export class CandidatesController {
   constructor(
     @Inject(CandidatesQueryService)
     private readonly queries: CandidatesQueryService,
+    @Inject(CandidateAssetsQueryService)
+    private readonly assetQueries: CandidateAssetsQueryService,
   ) {}
 
   @Get()
@@ -28,5 +31,10 @@ export class CandidatesController {
   @Get(':id')
   detail(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
     return this.queries.detail(id as Candidacy['id']);
+  }
+
+  @Get(':id/assets')
+  assets(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
+    return this.assetQueries.list(id as Candidacy['id']);
   }
 }
