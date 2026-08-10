@@ -1790,7 +1790,7 @@
           "keyName": "elections_year_type_round_unique",
           "primary": false,
           "unique": true,
-          "where": "round IS NOT NULL"
+          "where": "round is not null"
         },
         {
           "columnNames": ["year", "type"],
@@ -1799,7 +1799,7 @@
           "keyName": "elections_year_type_without_round_unique",
           "primary": false,
           "unique": true,
-          "where": "round IS NULL"
+          "where": "round is null"
         }
       ],
       "checks": [
@@ -1944,7 +1944,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "unique": false,
+          "unique": true,
           "length": null,
           "precision": null,
           "scale": null,
@@ -2048,6 +2048,14 @@
           "keyName": "legislative_mandates_body_legislature_number_idx",
           "primary": false,
           "unique": false
+        },
+        {
+          "columnNames": ["person_id", "body", "legislature_number"],
+          "composite": true,
+          "constraint": true,
+          "keyName": "legislative_mandates_person_body_legislature_unique",
+          "primary": false,
+          "unique": true
         },
         {
           "columnNames": ["person_id"],

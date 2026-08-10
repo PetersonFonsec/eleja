@@ -355,6 +355,48 @@ as variáveis `CAMARA_DEPUTIES_START_DATE` e `CAMARA_DEPUTIES_END_DATE` permitem
 ampliá-lo sem alterar código. A integração não cria mandatos: esse estágio se
 encerra em `PersonExternalIdentity`.
 
+## 8.2 Importação de mandatos da Câmara
+
+O comando `npm run batch:camara:mandates -- --year=2026` atualiza o histórico
+de mandatos somente para pessoas da população eleitoral solicitada que já têm
+uma `PersonExternalIdentity(CAMARA)`:
+
+``` text
+PersonExternalIdentity(CAMARA)
+        ↓
+Câmara Mandate Source
+        ↓
+CamaraMandateNormalizer
+        ↓
+LegislativeMandate
+```
+
+Foram verificados em 10 de agosto de 2026 os endpoints oficiais
+`GET /api/v2/deputados/{id}/historico` e `GET /api/v2/legislaturas/{id}`. O
+primeiro retorna mudanças de situação com legislatura, UF, partido, instante e
+vocabulário oficial; o segundo fornece os limites de calendário da legislatura.
+A fonte não fornece um identificador estável separado para o mandato, portanto
+`externalMandateId` permanece nulo.
+
+A identidade lógica e idempotente é
+`(person, body, legislatureNumber)`, protegida por constraint no PostgreSQL.
+Uma correção da fonte atualiza a mesma linha; legislaturas diferentes permanecem
+separadas. O início é a primeira entrada oficial em `Exercício`. O fim vem de um
+evento terminal/interrupção ou do encerramento oficial de uma legislatura já
+concluída. Inconsistências temporais e UFs inválidas são rejeitadas.
+
+O status usa mapeamento explícito das situações oficiais. `Exercício` é ativo;
+`Fim de Mandato` e `Vacância` são concluídos; afastamento, convocação, licença,
+suplência e suspensão são interrupções. Valores novos permanecem preservados em
+`sourceStatus` e são normalizados como `UNKNOWN`.
+
+Uma linha canônica representa a participação na legislatura. Caso existam
+múltiplas mudanças partidárias, `partyAcronym` guarda a sigla mais recente como
+snapshot, sem implicar filiação durante todo o período. Intervalos detalhados de
+filiação ou afastamento permanecem uma evolução futura. A fonte mantém cache em
+memória das legislaturas e cada deputado vinculado é consultado uma vez por
+execução.
+
 ## 9. Export
 
 Após persistência e validação, o exportador lê exclusivamente o modelo

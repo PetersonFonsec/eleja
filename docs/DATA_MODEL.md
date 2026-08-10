@@ -466,6 +466,11 @@ nulos. O status canônico é pequeno (`ACTIVE`, `COMPLETED`, `INTERRUPTED`,
 A sigla partidária é uma fotografia do mandato, não uma relação que implique
 filiação constante durante todo o período.
 
+Para mandatos da Câmara, que não expõe um ID estável separado do mandato, a
+identidade lógica é `(person, body, legislatureNumber)`. Essa combinação é
+única no banco e permite atualizar datas, situação e fotografia partidária sem
+duplicar a legislatura. `externalMandateId` permanece nulo.
+
 ### LegislativeProposal e autoria
 
 A proposta é identificada de modo idempotente por `(source, externalId)`; tipo,

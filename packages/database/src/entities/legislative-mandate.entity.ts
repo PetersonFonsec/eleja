@@ -7,6 +7,7 @@ import {
   OneToMany,
   PrimaryKey,
   Property,
+  Unique,
 } from '@mikro-orm/decorators/legacy';
 import { randomUUID } from 'node:crypto';
 import { LegislativeBody } from './legislative-body.js';
@@ -21,6 +22,10 @@ const UF_PATTERN =
 @Index({
   name: 'legislative_mandates_body_legislature_number_idx',
   properties: ['body', 'legislatureNumber'],
+})
+@Unique({
+  name: 'legislative_mandates_person_body_legislature_unique',
+  properties: ['person', 'body', 'legislatureNumber'],
 })
 export class LegislativeMandate {
   @PrimaryKey({ type: 'uuid' })

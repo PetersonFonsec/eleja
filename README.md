@@ -57,6 +57,17 @@ ajustado com `CAMARA_DEPUTIES_START_DATE` e `CAMARA_DEPUTIES_END_DATE`. O
 matching é conservador e só persiste correspondências de nome civil e data de
 nascimento exatos após normalização segura.
 
+Depois que as identidades Câmara estiverem disponíveis, importe os mandatos das
+pessoas relacionadas à população eleitoral solicitada:
+
+``` bash
+npm run batch:camara:mandates -- --year=2026
+```
+
+Esse comando requer PostgreSQL em execução, migrações aplicadas, identidades
+`CAMARA` previamente importadas e acesso à API oficial. Ele não executa uma nova
+tentativa de correspondência de identidade.
+
 ------------------------------------------------------------------------
 
 ## Objetivos

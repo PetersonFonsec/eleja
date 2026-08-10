@@ -1,4 +1,5 @@
 import type { CamaraDeputyRecord } from './camara-deputy-record.js';
+import { CamaraApiClient } from './camara-api-client.js';
 
 const DEFAULT_BASE_URL = 'https://dadosabertos.camara.leg.br/api/v2/';
 
@@ -18,14 +19,14 @@ export interface CamaraDeputySourceOptions {
 }
 
 export class CamaraDeputySource {
+  private readonly client: CamaraApiClient;
+
   constructor(
-    private readonly request: typeof fetch = fetch,
-    private readonly timeoutMs = 20_000,
+    request: typeof fetch = fetch,
+    timeoutMs = 20_000,
     private readonly baseUrl = DEFAULT_BASE_URL,
   ) {
-    if (!Number.isSafeInteger(timeoutMs) || timeoutMs <= 0) {
-      throw new Error('Câmara request timeout must be a positive integer');
-    }
+    this.client = new CamaraApiClient(request, timeoutMs, baseUrl);
   }
 
   async fetchAll(
@@ -61,7 +62,7 @@ export class CamaraDeputySource {
   }
 
   private async fetchListPage(url: string): Promise<ListPage> {
-    const value = await this.fetchJson(url, 'deputy list');
+    const value = await this.client.fetchJson(url, 'deputy list');
     if (
       !isObject(value) ||
       !Array.isArray(value.dados) ||
@@ -116,7 +117,7 @@ export class CamaraDeputySource {
 
   private async fetchDetail(item: ListItem): Promise<CamaraDeputyRecord> {
     const detailUrl = new URL(`deputados/${item.id}`, this.baseUrl).href;
-    const value = await this.fetchJson(detailUrl, `deputy ${item.id}`);
+    const value = await this.client.fetchJson(detailUrl, `deputy ${item.id}`);
     if (!isObject(value) || !isObject(value.dados)) {
       throw new Error(`Câmara deputy ${item.id} response is malformed`);
     }
@@ -144,44 +145,6 @@ export class CamaraDeputySource {
       photoUrl: readNullableString(status?.urlFoto),
       profileUrl: item.uri,
     };
-  }
-
-  private async fetchJson(url: string, resource: string): Promise<unknown> {
-    try {
-      const response = await this.request(url, {
-        signal: AbortSignal.timeout(this.timeoutMs),
-        headers: {
-          accept: 'application/json',
-          'user-agent': 'Eleja/0.0 (+https://github.com/)',
-        },
-      });
-      if (!response.ok) {
-        await response.body?.cancel();
-        throw new Error(
-          `Câmara ${resource} request failed with HTTP ${response.status}`,
-        );
-      }
-      try {
-        return await response.json();
-      } catch (error: unknown) {
-        throw new Error(`Câmara ${resource} response is malformed`, {
-          cause: error,
-        });
-      }
-    } catch (error: unknown) {
-      if (error instanceof Error && error.message.startsWith('Câmara '))
-        throw error;
-      if (
-        error instanceof Error &&
-        (error.name === 'TimeoutError' || error.name === 'AbortError')
-      ) {
-        throw new Error(
-          `Câmara ${resource} request timed out after ${this.timeoutMs}ms`,
-          { cause: error },
-        );
-      }
-      throw new Error(`Câmara ${resource} request failed`, { cause: error });
-    }
   }
 }
 
