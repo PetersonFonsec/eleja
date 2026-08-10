@@ -1,8 +1,6 @@
 {
   "name": "public",
-  "namespaces": [
-    "public"
-  ],
+  "namespaces": ["public"],
   "tables": [
     {
       "name": "batch_runs",
@@ -209,12 +207,7 @@
           "default": null,
           "comment": null,
           "collation": null,
-          "enumItems": [
-            "RUNNING",
-            "SUCCESS",
-            "PARTIAL",
-            "FAILED"
-          ],
+          "enumItems": ["RUNNING", "SUCCESS", "PARTIAL", "FAILED"],
           "mappedType": "enum"
         },
         "updated_at": {
@@ -237,9 +230,7 @@
       },
       "indexes": [
         {
-          "columnNames": [
-            "dataset_version_id"
-          ],
+          "columnNames": ["dataset_version_id"],
           "composite": false,
           "constraint": false,
           "keyName": "batch_runs_dataset_version_id_index",
@@ -247,9 +238,7 @@
           "unique": false
         },
         {
-          "columnNames": [
-            "id"
-          ],
+          "columnNames": ["id"],
           "composite": false,
           "constraint": true,
           "keyName": "batch_runs_pkey",
@@ -257,9 +246,7 @@
           "unique": true
         },
         {
-          "columnNames": [
-            "status"
-          ],
+          "columnNames": ["status"],
           "composite": false,
           "constraint": false,
           "keyName": "batch_runs_status_index",
@@ -278,14 +265,10 @@
       "triggers": [],
       "foreignKeys": {
         "batch_runs_dataset_version_id_foreign": {
-          "columnNames": [
-            "dataset_version_id"
-          ],
+          "columnNames": ["dataset_version_id"],
           "constraintName": "batch_runs_dataset_version_id_foreign",
           "localTableName": "public.batch_runs",
-          "referencedColumnNames": [
-            "id"
-          ],
+          "referencedColumnNames": ["id"],
           "referencedTableName": "public.dataset_versions"
         }
       },
@@ -530,11 +513,7 @@
           "default": null,
           "comment": null,
           "collation": null,
-          "enumItems": [
-            "ACTIVE",
-            "INACTIVE",
-            "UNKNOWN"
-          ],
+          "enumItems": ["ACTIVE", "INACTIVE", "UNKNOWN"],
           "mappedType": "enum"
         },
         "updated_at": {
@@ -557,9 +536,7 @@
       },
       "indexes": [
         {
-          "columnNames": [
-            "election_id"
-          ],
+          "columnNames": ["election_id"],
           "composite": false,
           "constraint": false,
           "keyName": "candidacies_election_id_index",
@@ -567,9 +544,7 @@
           "unique": false
         },
         {
-          "columnNames": [
-            "office_id"
-          ],
+          "columnNames": ["office_id"],
           "composite": false,
           "constraint": false,
           "keyName": "candidacies_office_id_index",
@@ -577,9 +552,7 @@
           "unique": false
         },
         {
-          "columnNames": [
-            "party_id"
-          ],
+          "columnNames": ["party_id"],
           "composite": false,
           "constraint": false,
           "keyName": "candidacies_party_id_index",
@@ -587,9 +560,7 @@
           "unique": false
         },
         {
-          "columnNames": [
-            "person_id"
-          ],
+          "columnNames": ["person_id"],
           "composite": false,
           "constraint": false,
           "keyName": "candidacies_person_id_index",
@@ -597,9 +568,7 @@
           "unique": false
         },
         {
-          "columnNames": [
-            "id"
-          ],
+          "columnNames": ["id"],
           "composite": false,
           "constraint": true,
           "keyName": "candidacies_pkey",
@@ -607,9 +576,7 @@
           "unique": true
         },
         {
-          "columnNames": [
-            "source_candidate_id"
-          ],
+          "columnNames": ["source_candidate_id"],
           "composite": false,
           "constraint": true,
           "keyName": "candidacies_source_candidate_id_unique",
@@ -617,9 +584,7 @@
           "unique": true
         },
         {
-          "columnNames": [
-            "state"
-          ],
+          "columnNames": ["state"],
           "composite": false,
           "constraint": false,
           "keyName": "candidacies_state_index",
@@ -638,50 +603,34 @@
       "triggers": [],
       "foreignKeys": {
         "candidacies_election_id_foreign": {
-          "columnNames": [
-            "election_id"
-          ],
+          "columnNames": ["election_id"],
           "constraintName": "candidacies_election_id_foreign",
           "localTableName": "public.candidacies",
-          "referencedColumnNames": [
-            "id"
-          ],
+          "referencedColumnNames": ["id"],
           "referencedTableName": "public.elections",
           "deleteRule": "restrict"
         },
         "candidacies_office_id_foreign": {
-          "columnNames": [
-            "office_id"
-          ],
+          "columnNames": ["office_id"],
           "constraintName": "candidacies_office_id_foreign",
           "localTableName": "public.candidacies",
-          "referencedColumnNames": [
-            "id"
-          ],
+          "referencedColumnNames": ["id"],
           "referencedTableName": "public.offices",
           "deleteRule": "restrict"
         },
         "candidacies_party_id_foreign": {
-          "columnNames": [
-            "party_id"
-          ],
+          "columnNames": ["party_id"],
           "constraintName": "candidacies_party_id_foreign",
           "localTableName": "public.candidacies",
-          "referencedColumnNames": [
-            "id"
-          ],
+          "referencedColumnNames": ["id"],
           "referencedTableName": "public.parties",
           "deleteRule": "restrict"
         },
         "candidacies_person_id_foreign": {
-          "columnNames": [
-            "person_id"
-          ],
+          "columnNames": ["person_id"],
           "constraintName": "candidacies_person_id_foreign",
           "localTableName": "public.candidacies",
-          "referencedColumnNames": [
-            "id"
-          ],
+          "referencedColumnNames": ["id"],
           "referencedTableName": "public.people",
           "deleteRule": "restrict"
         }
@@ -906,9 +855,7 @@
       },
       "indexes": [
         {
-          "columnNames": [
-            "candidate_asset_id"
-          ],
+          "columnNames": ["candidate_asset_id"],
           "composite": false,
           "constraint": false,
           "keyName": "candidate_asset_sources_candidate_asset_id_index",
@@ -928,9 +875,7 @@
           "unique": true
         },
         {
-          "columnNames": [
-            "id"
-          ],
+          "columnNames": ["id"],
           "composite": false,
           "constraint": true,
           "keyName": "candidate_asset_sources_pkey",
@@ -938,9 +883,7 @@
           "unique": true
         },
         {
-          "columnNames": [
-            "raw_checksum"
-          ],
+          "columnNames": ["raw_checksum"],
           "composite": false,
           "constraint": false,
           "keyName": "candidate_asset_sources_raw_checksum_index",
@@ -959,14 +902,10 @@
       "triggers": [],
       "foreignKeys": {
         "candidate_asset_sources_candidate_asset_id_foreign": {
-          "columnNames": [
-            "candidate_asset_id"
-          ],
+          "columnNames": ["candidate_asset_id"],
           "constraintName": "candidate_asset_sources_candidate_asset_id_foreign",
           "localTableName": "public.candidate_asset_sources",
-          "referencedColumnNames": [
-            "id"
-          ],
+          "referencedColumnNames": ["id"],
           "referencedTableName": "public.candidate_assets",
           "deleteRule": "restrict"
         }
@@ -1133,9 +1072,7 @@
       },
       "indexes": [
         {
-          "columnNames": [
-            "candidacy_id"
-          ],
+          "columnNames": ["candidacy_id"],
           "composite": false,
           "constraint": false,
           "keyName": "candidate_assets_candidacy_id_index",
@@ -1143,10 +1080,7 @@
           "unique": false
         },
         {
-          "columnNames": [
-            "candidacy_id",
-            "source_sequence"
-          ],
+          "columnNames": ["candidacy_id", "source_sequence"],
           "composite": true,
           "constraint": true,
           "keyName": "candidate_assets_candidacy_sequence_unique",
@@ -1154,9 +1088,7 @@
           "unique": true
         },
         {
-          "columnNames": [
-            "id"
-          ],
+          "columnNames": ["id"],
           "composite": false,
           "constraint": true,
           "keyName": "candidate_assets_pkey",
@@ -1168,14 +1100,10 @@
       "triggers": [],
       "foreignKeys": {
         "candidate_assets_candidacy_id_foreign": {
-          "columnNames": [
-            "candidacy_id"
-          ],
+          "columnNames": ["candidacy_id"],
           "constraintName": "candidate_assets_candidacy_id_foreign",
           "localTableName": "public.candidate_assets",
-          "referencedColumnNames": [
-            "id"
-          ],
+          "referencedColumnNames": ["id"],
           "referencedTableName": "public.candidacies",
           "deleteRule": "restrict"
         }
@@ -1400,9 +1328,7 @@
       },
       "indexes": [
         {
-          "columnNames": [
-            "candidacy_id"
-          ],
+          "columnNames": ["candidacy_id"],
           "composite": false,
           "constraint": false,
           "keyName": "candidate_sources_candidacy_id_index",
@@ -1423,9 +1349,7 @@
           "unique": true
         },
         {
-          "columnNames": [
-            "id"
-          ],
+          "columnNames": ["id"],
           "composite": false,
           "constraint": true,
           "keyName": "candidate_sources_pkey",
@@ -1433,9 +1357,7 @@
           "unique": true
         },
         {
-          "columnNames": [
-            "raw_checksum"
-          ],
+          "columnNames": ["raw_checksum"],
           "composite": false,
           "constraint": false,
           "keyName": "candidate_sources_raw_checksum_index",
@@ -1443,9 +1365,7 @@
           "unique": false
         },
         {
-          "columnNames": [
-            "source_identifier"
-          ],
+          "columnNames": ["source_identifier"],
           "composite": false,
           "constraint": false,
           "keyName": "candidate_sources_source_identifier_index",
@@ -1464,14 +1384,10 @@
       "triggers": [],
       "foreignKeys": {
         "candidate_sources_candidacy_id_foreign": {
-          "columnNames": [
-            "candidacy_id"
-          ],
+          "columnNames": ["candidacy_id"],
           "constraintName": "candidate_sources_candidacy_id_foreign",
           "localTableName": "public.candidate_sources",
-          "referencedColumnNames": [
-            "id"
-          ],
+          "referencedColumnNames": ["id"],
           "referencedTableName": "public.candidacies",
           "deleteRule": "restrict"
         }
@@ -1666,12 +1582,7 @@
           "default": null,
           "comment": null,
           "collation": null,
-          "enumItems": [
-            "PROCESSING",
-            "READY",
-            "PUBLISHED",
-            "FAILED"
-          ],
+          "enumItems": ["PROCESSING", "READY", "PUBLISHED", "FAILED"],
           "mappedType": "enum"
         },
         "updated_at": {
@@ -1711,9 +1622,7 @@
       },
       "indexes": [
         {
-          "columnNames": [
-            "id"
-          ],
+          "columnNames": ["id"],
           "composite": false,
           "constraint": true,
           "keyName": "dataset_versions_pkey",
@@ -1721,9 +1630,7 @@
           "unique": true
         },
         {
-          "columnNames": [
-            "version"
-          ],
+          "columnNames": ["version"],
           "composite": false,
           "constraint": true,
           "keyName": "dataset_versions_version_unique",
@@ -1829,10 +1736,7 @@
           "default": null,
           "comment": null,
           "collation": null,
-          "enumItems": [
-            "GENERAL",
-            "MUNICIPAL"
-          ],
+          "enumItems": ["GENERAL", "MUNICIPAL"],
           "mappedType": "enum"
         },
         "updated_at": {
@@ -1872,9 +1776,7 @@
       },
       "indexes": [
         {
-          "columnNames": [
-            "id"
-          ],
+          "columnNames": ["id"],
           "composite": false,
           "constraint": true,
           "keyName": "elections_pkey",
@@ -1882,29 +1784,22 @@
           "unique": true
         },
         {
-          "columnNames": [
-            "year",
-            "type",
-            "round"
-          ],
+          "columnNames": ["year", "type", "round"],
           "composite": true,
           "constraint": false,
           "keyName": "elections_year_type_round_unique",
           "primary": false,
           "unique": true,
-          "where": "round is not null"
+          "where": "round IS NOT NULL"
         },
         {
-          "columnNames": [
-            "year",
-            "type"
-          ],
+          "columnNames": ["year", "type"],
           "composite": true,
           "constraint": false,
           "keyName": "elections_year_type_without_round_unique",
           "primary": false,
           "unique": true,
-          "where": "round is null"
+          "where": "round IS NULL"
         }
       ],
       "checks": [
@@ -1913,6 +1808,794 @@
           "expression": "\"type\" in ('GENERAL', 'MUNICIPAL')",
           "definition": "check (\"type\" in ('GENERAL', 'MUNICIPAL'))",
           "columnName": "type"
+        }
+      ],
+      "triggers": [],
+      "foreignKeys": {},
+      "comment": null
+    },
+    {
+      "name": "legislative_mandates",
+      "schema": "public",
+      "columns": {
+        "body": {
+          "name": "body",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": ["CHAMBER_OF_DEPUTIES", "SENATE"],
+          "mappedType": "enum"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "ended_at": {
+          "name": "ended_at",
+          "type": "date",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "date"
+        },
+        "external_mandate_id": {
+          "name": "external_mandate_id",
+          "type": "varchar(160)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 160,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "legislature_number": {
+          "name": "legislature_number",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
+        "party_acronym": {
+          "name": "party_acronym",
+          "type": "varchar(30)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 30,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "person_id": {
+          "name": "person_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "source_status": {
+          "name": "source_status",
+          "type": "varchar(200)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 200,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "started_at": {
+          "name": "started_at",
+          "type": "date",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "date"
+        },
+        "state": {
+          "name": "state",
+          "type": "varchar(2)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 2,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": ["ACTIVE", "COMPLETED", "INTERRUPTED", "UNKNOWN"],
+          "mappedType": "enum"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        }
+      },
+      "indexes": [
+        {
+          "columnNames": ["body", "legislature_number"],
+          "composite": true,
+          "constraint": false,
+          "keyName": "legislative_mandates_body_legislature_number_idx",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": ["person_id"],
+          "composite": false,
+          "constraint": false,
+          "keyName": "legislative_mandates_person_id_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": ["id"],
+          "composite": false,
+          "constraint": true,
+          "keyName": "legislative_mandates_pkey",
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [
+        {
+          "name": "legislative_mandates_body_check",
+          "expression": "\"body\" in ('CHAMBER_OF_DEPUTIES', 'SENATE')",
+          "definition": "check (\"body\" in ('CHAMBER_OF_DEPUTIES', 'SENATE'))",
+          "columnName": "body"
+        },
+        {
+          "name": "legislative_mandates_status_check",
+          "expression": "\"status\" in ('ACTIVE', 'COMPLETED', 'INTERRUPTED', 'UNKNOWN')",
+          "definition": "check (\"status\" in ('ACTIVE', 'COMPLETED', 'INTERRUPTED', 'UNKNOWN'))",
+          "columnName": "status"
+        }
+      ],
+      "triggers": [],
+      "foreignKeys": {
+        "legislative_mandates_person_id_foreign": {
+          "columnNames": ["person_id"],
+          "constraintName": "legislative_mandates_person_id_foreign",
+          "localTableName": "public.legislative_mandates",
+          "referencedColumnNames": ["id"],
+          "referencedTableName": "public.people",
+          "deleteRule": "restrict"
+        }
+      },
+      "comment": null
+    },
+    {
+      "name": "legislative_proposal_authors",
+      "schema": "public",
+      "columns": {
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "is_primary_author": {
+          "name": "is_primary_author",
+          "type": "boolean",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "false",
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "boolean"
+        },
+        "mandate_id": {
+          "name": "mandate_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "person_id": {
+          "name": "person_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "proposal_id": {
+          "name": "proposal_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": true,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "role": {
+          "name": "role",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": ["AUTHOR", "COAUTHOR", "UNKNOWN"],
+          "mappedType": "enum"
+        },
+        "source_author_order": {
+          "name": "source_author_order",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        }
+      },
+      "indexes": [
+        {
+          "columnNames": ["mandate_id"],
+          "composite": false,
+          "constraint": false,
+          "keyName": "legislative_proposal_authors_mandate_id_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": ["person_id"],
+          "composite": false,
+          "constraint": false,
+          "keyName": "legislative_proposal_authors_person_id_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": ["id"],
+          "composite": false,
+          "constraint": true,
+          "keyName": "legislative_proposal_authors_pkey",
+          "primary": true,
+          "unique": true
+        },
+        {
+          "columnNames": ["proposal_id"],
+          "composite": false,
+          "constraint": false,
+          "keyName": "legislative_proposal_authors_proposal_id_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": ["proposal_id", "person_id"],
+          "composite": true,
+          "constraint": true,
+          "keyName": "legislative_proposal_authors_proposal_person_unique",
+          "primary": false,
+          "unique": true
+        }
+      ],
+      "checks": [
+        {
+          "name": "legislative_proposal_authors_role_check",
+          "expression": "\"role\" in ('AUTHOR', 'COAUTHOR', 'UNKNOWN')",
+          "definition": "check (\"role\" in ('AUTHOR', 'COAUTHOR', 'UNKNOWN'))",
+          "columnName": "role"
+        }
+      ],
+      "triggers": [],
+      "foreignKeys": {
+        "legislative_proposal_authors_mandate_id_foreign": {
+          "columnNames": ["mandate_id"],
+          "constraintName": "legislative_proposal_authors_mandate_id_foreign",
+          "localTableName": "public.legislative_proposal_authors",
+          "referencedColumnNames": ["id"],
+          "referencedTableName": "public.legislative_mandates",
+          "deleteRule": "restrict"
+        },
+        "legislative_proposal_authors_person_id_foreign": {
+          "columnNames": ["person_id"],
+          "constraintName": "legislative_proposal_authors_person_id_foreign",
+          "localTableName": "public.legislative_proposal_authors",
+          "referencedColumnNames": ["id"],
+          "referencedTableName": "public.people",
+          "deleteRule": "restrict"
+        },
+        "legislative_proposal_authors_proposal_id_foreign": {
+          "columnNames": ["proposal_id"],
+          "constraintName": "legislative_proposal_authors_proposal_id_foreign",
+          "localTableName": "public.legislative_proposal_authors",
+          "referencedColumnNames": ["id"],
+          "referencedTableName": "public.legislative_proposals",
+          "deleteRule": "restrict"
+        }
+      },
+      "comment": null
+    },
+    {
+      "name": "legislative_proposals",
+      "schema": "public",
+      "columns": {
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "external_id": {
+          "name": "external_id",
+          "type": "varchar(160)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 160,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "number": {
+          "name": "number",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
+        "source": {
+          "name": "source",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": true,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": ["CAMARA", "SENADO"],
+          "mappedType": "enum"
+        },
+        "source_status": {
+          "name": "source_status",
+          "type": "varchar(200)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 200,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "status": {
+          "name": "status",
+          "type": "varchar(100)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 100,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "summary": {
+          "name": "summary",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "text"
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "text"
+        },
+        "type": {
+          "name": "type",
+          "type": "varchar(50)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 50,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "url": {
+          "name": "url",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "text"
+        },
+        "year": {
+          "name": "year",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        }
+      },
+      "indexes": [
+        {
+          "columnNames": ["id"],
+          "composite": false,
+          "constraint": true,
+          "keyName": "legislative_proposals_pkey",
+          "primary": true,
+          "unique": true
+        },
+        {
+          "columnNames": ["source", "external_id"],
+          "composite": true,
+          "constraint": true,
+          "keyName": "legislative_proposals_source_external_id_unique",
+          "primary": false,
+          "unique": true
+        },
+        {
+          "columnNames": ["type", "year"],
+          "composite": true,
+          "constraint": false,
+          "keyName": "legislative_proposals_type_year_idx",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": ["year"],
+          "composite": false,
+          "constraint": false,
+          "keyName": "legislative_proposals_year_index",
+          "primary": false,
+          "unique": false
+        }
+      ],
+      "checks": [
+        {
+          "name": "legislative_proposals_source_check",
+          "expression": "\"source\" in ('CAMARA', 'SENADO')",
+          "definition": "check (\"source\" in ('CAMARA', 'SENADO'))",
+          "columnName": "source"
         }
       ],
       "triggers": [],
@@ -2005,12 +2688,7 @@
           "default": null,
           "comment": null,
           "collation": null,
-          "enumItems": [
-            "NATIONAL",
-            "STATE",
-            "MUNICIPAL",
-            "DISTRICT"
-          ],
+          "enumItems": ["NATIONAL", "STATE", "MUNICIPAL", "DISTRICT"],
           "mappedType": "enum"
         },
         "source_code": {
@@ -2050,9 +2728,7 @@
       },
       "indexes": [
         {
-          "columnNames": [
-            "code"
-          ],
+          "columnNames": ["code"],
           "composite": false,
           "constraint": true,
           "keyName": "offices_code_unique",
@@ -2060,9 +2736,7 @@
           "unique": true
         },
         {
-          "columnNames": [
-            "id"
-          ],
+          "columnNames": ["id"],
           "composite": false,
           "constraint": true,
           "keyName": "offices_pkey",
@@ -2070,9 +2744,7 @@
           "unique": true
         },
         {
-          "columnNames": [
-            "source_code"
-          ],
+          "columnNames": ["source_code"],
           "composite": false,
           "constraint": true,
           "keyName": "offices_source_code_unique",
@@ -2218,9 +2890,7 @@
       },
       "indexes": [
         {
-          "columnNames": [
-            "acronym"
-          ],
+          "columnNames": ["acronym"],
           "composite": false,
           "constraint": true,
           "keyName": "parties_acronym_unique",
@@ -2228,9 +2898,7 @@
           "unique": true
         },
         {
-          "columnNames": [
-            "number"
-          ],
+          "columnNames": ["number"],
           "composite": false,
           "constraint": true,
           "keyName": "parties_number_unique",
@@ -2238,9 +2906,7 @@
           "unique": true
         },
         {
-          "columnNames": [
-            "id"
-          ],
+          "columnNames": ["id"],
           "composite": false,
           "constraint": true,
           "keyName": "parties_pkey",
@@ -2248,9 +2914,7 @@
           "unique": true
         },
         {
-          "columnNames": [
-            "source_party_id"
-          ],
+          "columnNames": ["source_party_id"],
           "composite": false,
           "constraint": true,
           "keyName": "parties_source_party_id_unique",
@@ -2406,10 +3070,7 @@
       },
       "indexes": [
         {
-          "columnNames": [
-            "name",
-            "birth_date"
-          ],
+          "columnNames": ["name", "birth_date"],
           "composite": true,
           "constraint": false,
           "keyName": "people_name_birth_date_idx",
@@ -2417,9 +3078,7 @@
           "unique": false
         },
         {
-          "columnNames": [
-            "id"
-          ],
+          "columnNames": ["id"],
           "composite": false,
           "constraint": true,
           "keyName": "people_pkey",
@@ -2430,6 +3089,194 @@
       "checks": [],
       "triggers": [],
       "foreignKeys": {},
+      "comment": null
+    },
+    {
+      "name": "person_external_identities",
+      "schema": "public",
+      "columns": {
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "external_id": {
+          "name": "external_id",
+          "type": "varchar(160)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 160,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "person_id": {
+          "name": "person_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "uuid"
+        },
+        "source": {
+          "name": "source",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": true,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": ["TSE", "CAMARA", "SENADO"],
+          "mappedType": "enum"
+        },
+        "source_url": {
+          "name": "source_url",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "text"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "verified_at": {
+          "name": "verified_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        }
+      },
+      "indexes": [
+        {
+          "columnNames": ["person_id"],
+          "composite": false,
+          "constraint": false,
+          "keyName": "person_external_identities_person_id_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": ["id"],
+          "composite": false,
+          "constraint": true,
+          "keyName": "person_external_identities_pkey",
+          "primary": true,
+          "unique": true
+        },
+        {
+          "columnNames": ["source", "external_id"],
+          "composite": true,
+          "constraint": true,
+          "keyName": "person_external_identities_source_external_id_unique",
+          "primary": false,
+          "unique": true
+        }
+      ],
+      "checks": [
+        {
+          "name": "person_external_identities_source_check",
+          "expression": "\"source\" in ('TSE', 'CAMARA', 'SENADO')",
+          "definition": "check (\"source\" in ('TSE', 'CAMARA', 'SENADO'))",
+          "columnName": "source"
+        }
+      ],
+      "triggers": [],
+      "foreignKeys": {
+        "person_external_identities_person_id_foreign": {
+          "columnNames": ["person_id"],
+          "constraintName": "person_external_identities_person_id_foreign",
+          "localTableName": "public.person_external_identities",
+          "referencedColumnNames": ["id"],
+          "referencedTableName": "public.people",
+          "deleteRule": "restrict"
+        }
+      },
       "comment": null
     }
   ],

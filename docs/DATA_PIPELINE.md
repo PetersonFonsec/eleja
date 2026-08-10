@@ -314,6 +314,47 @@ string decimal e persistido como `numeric(24,2)`. O bem canônico é reutilizado
 por `(candidacyId, sourceSequence)`; alterações atualizam o registro, enquanto
 checksums RAW diferentes criam novas observações de proveniência.
 
+## 8.1 Correspondência de identidades da Câmara
+
+O comando manual
+`npm run batch:camara:match-deputies -- --year=2026` associa pessoas já
+importadas a identificadores oficiais da Câmara dos Deputados:
+
+``` text
+Câmara Dados Abertos
+       ↓
+Deputy Source Adapter
+       ↓
+Identity Matcher
+       ↓
+PersonExternalIdentity(CAMARA)
+       ↓
+Person
+```
+
+Foram verificados em 10 de agosto de 2026 os contratos oficiais
+`GET /api/v2/deputados` e `GET /api/v2/deputados/{id}`. A listagem aceita
+intervalo temporal, usa páginas de no máximo 100 itens e indica a próxima página
+em `links[rel=next]`. Como ela pode repetir um parlamentar após mudanças de
+partido ou situação, os IDs são deduplicados antes de buscar cada cadastro
+detalhado. O detalhe fornece `nomeCivil`, `dataNascimento` e o último status com
+nome parlamentar, UF, partido e foto. O identificador e a URI oficiais da
+listagem são preservados na identidade externa.
+
+O matching de identidade é conservador e prioriza precisão sobre recall. Uma
+correspondência exige simultaneamente nome civil exato após normalização Unicode,
+de caixa e espaços, e data de nascimento exata. Nome sozinho nunca basta. UF,
+nome parlamentar e partido são somente evidências auxiliares; partido divergente
+não rejeita uma identidade, pois filiações mudam. Mais de um resultado forte é
+`AMBIGUOUS`, ausência de resultado é `NOT_FOUND`, e nenhum dos dois é persistido.
+
+O adaptador percorre a fonte uma vez por execução, monta um índice em memória e
+não consulta a Câmara para cada pessoa Eleja. O recorte padrão começa em
+`1987-02-01`, cobrindo as legislaturas do período constitucional contemporâneo;
+as variáveis `CAMARA_DEPUTIES_START_DATE` e `CAMARA_DEPUTIES_END_DATE` permitem
+ampliá-lo sem alterar código. A integração não cria mandatos: esse estágio se
+encerra em `PersonExternalIdentity`.
+
 ## 9. Export
 
 Após persistência e validação, o exportador lê exclusivamente o modelo

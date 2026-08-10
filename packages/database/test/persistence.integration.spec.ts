@@ -11,6 +11,13 @@ import { Party } from '../src/entities/party.entity.js';
 import { Candidacy } from '../src/entities/candidacy.entity.js';
 import { CandidacyStatus } from '../src/entities/candidacy-status.js';
 import { Person } from '../src/entities/person.entity.js';
+import { LegislativeBody } from '../src/entities/legislative-body.js';
+import { LegislativeMandate } from '../src/entities/legislative-mandate.entity.js';
+import { LegislativeProposalAuthor } from '../src/entities/legislative-proposal-author.entity.js';
+import { LegislativeProposal } from '../src/entities/legislative-proposal.entity.js';
+import { LegislativeSource } from '../src/entities/legislative-source.js';
+import { PersonExternalIdentitySource } from '../src/entities/person-external-identity-source.js';
+import { PersonExternalIdentity } from '../src/entities/person-external-identity.entity.js';
 
 describe('dataset persistence', () => {
   let orm: Awaited<ReturnType<typeof initializeDatabase>>;
@@ -236,6 +243,156 @@ describe('dataset persistence', () => {
       await cleanup.nativeDelete(Election, { id: election.id });
       await cleanup.nativeDelete(Party, { id: party.id });
       await cleanup.nativeDelete(Office, { id: office.id });
+    }
+  });
+
+  it('persists and reloads representative legislative history', async () => {
+    const em = orm.em.fork();
+    const suffix = randomUUID();
+    const person = new Person(`Pessoa legislativa ${suffix}`);
+    const identity = new PersonExternalIdentity(
+      person,
+      PersonExternalIdentitySource.CAMARA,
+      `deputy-${suffix}`,
+    );
+    const mandate = new LegislativeMandate(
+      person,
+      LegislativeBody.CHAMBER_OF_DEPUTIES,
+      { legislatureNumber: 57, state: 'SP', partyAcronym: 'ABC' },
+    );
+    const proposal = new LegislativeProposal(
+      LegislativeSource.CAMARA,
+      `proposal-${suffix}`,
+      'PL',
+      { number: 42, year: 2026 },
+    );
+    const authorship = new LegislativeProposalAuthor(proposal, person, {
+      mandate,
+      isPrimaryAuthor: true,
+      sourceAuthorOrder: 1,
+    });
+
+    try {
+      em.persist([person, identity, mandate, proposal, authorship]);
+      await em.flush();
+      em.clear();
+
+      const reloaded = await em.findOneOrFail(
+        LegislativeProposalAuthor,
+        authorship.id,
+        { populate: ['proposal', 'person', 'mandate'] },
+      );
+      expect(reloaded.person.name).toBe(`Pessoa legislativa ${suffix}`);
+      expect(reloaded.proposal.externalId).toBe(`proposal-${suffix}`);
+      expect(reloaded.mandate?.legislatureNumber).toBe(57);
+      expect(reloaded.isPrimaryAuthor).toBe(true);
+    } finally {
+      const cleanup = orm.em.fork();
+      await cleanup.nativeDelete(LegislativeProposalAuthor, authorship.id);
+      await cleanup.nativeDelete(PersonExternalIdentity, identity.id);
+      await cleanup.nativeDelete(LegislativeProposal, proposal.id);
+      await cleanup.nativeDelete(LegislativeMandate, mandate.id);
+      await cleanup.nativeDelete(Person, person.id);
+    }
+  });
+
+  it('enforces source-aware identity and proposal uniqueness', async () => {
+    const suffix = randomUUID();
+    const person = new Person(`Pessoa única ${suffix}`);
+    const camaraIdentity = new PersonExternalIdentity(
+      person,
+      PersonExternalIdentitySource.CAMARA,
+      suffix,
+    );
+    const senadoIdentity = new PersonExternalIdentity(
+      person,
+      PersonExternalIdentitySource.SENADO,
+      suffix,
+    );
+    const camaraProposal = new LegislativeProposal(
+      LegislativeSource.CAMARA,
+      suffix,
+      'PL',
+    );
+    const senadoProposal = new LegislativeProposal(
+      LegislativeSource.SENADO,
+      suffix,
+      'PLS',
+    );
+
+    try {
+      const setup = orm.em.fork();
+      setup.persist([
+        person,
+        camaraIdentity,
+        senadoIdentity,
+        camaraProposal,
+        senadoProposal,
+      ]);
+      await setup.flush();
+
+      const duplicateIdentityEm = orm.em.fork();
+      duplicateIdentityEm.persist(
+        new PersonExternalIdentity(
+          person,
+          PersonExternalIdentitySource.CAMARA,
+          suffix,
+        ),
+      );
+      await expect(duplicateIdentityEm.flush()).rejects.toThrow();
+
+      const duplicateProposalEm = orm.em.fork();
+      duplicateProposalEm.persist(
+        new LegislativeProposal(LegislativeSource.CAMARA, suffix, 'PEC'),
+      );
+      await expect(duplicateProposalEm.flush()).rejects.toThrow();
+    } finally {
+      const cleanup = orm.em.fork();
+      await cleanup.nativeDelete(LegislativeProposal, { externalId: suffix });
+      await cleanup.nativeDelete(PersonExternalIdentity, {
+        externalId: suffix,
+      });
+      await cleanup.nativeDelete(Person, person.id);
+    }
+  });
+
+  it('supports multiple proposal authors and rejects duplicate authorship', async () => {
+    const suffix = randomUUID();
+    const firstPerson = new Person(`Primeira pessoa ${suffix}`);
+    const secondPerson = new Person(`Segunda pessoa ${suffix}`);
+    const proposal = new LegislativeProposal(
+      LegislativeSource.CAMARA,
+      `multi-${suffix}`,
+      'PL',
+    );
+    const firstAuthor = new LegislativeProposalAuthor(proposal, firstPerson);
+    const secondAuthor = new LegislativeProposalAuthor(proposal, secondPerson);
+
+    try {
+      const setup = orm.em.fork();
+      setup.persist([
+        firstPerson,
+        secondPerson,
+        proposal,
+        firstAuthor,
+        secondAuthor,
+      ]);
+      await setup.flush();
+
+      expect(await setup.count(LegislativeProposalAuthor, { proposal })).toBe(
+        2,
+      );
+
+      const duplicateEm = orm.em.fork();
+      duplicateEm.persist(new LegislativeProposalAuthor(proposal, firstPerson));
+      await expect(duplicateEm.flush()).rejects.toThrow();
+    } finally {
+      const cleanup = orm.em.fork();
+      await cleanup.nativeDelete(LegislativeProposalAuthor, { proposal });
+      await cleanup.nativeDelete(LegislativeProposal, proposal.id);
+      await cleanup.nativeDelete(Person, {
+        id: { $in: [firstPerson.id, secondPerson.id] },
+      });
     }
   });
 });

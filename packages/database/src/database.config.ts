@@ -11,6 +11,10 @@ import { Candidacy } from './entities/candidacy.entity.js';
 import { CandidateSource } from './entities/candidate-source.entity.js';
 import { CandidateAsset } from './entities/candidate-asset.entity.js';
 import { CandidateAssetSource } from './entities/candidate-asset-source.entity.js';
+import { LegislativeMandate } from './entities/legislative-mandate.entity.js';
+import { LegislativeProposalAuthor } from './entities/legislative-proposal-author.entity.js';
+import { LegislativeProposal } from './entities/legislative-proposal.entity.js';
+import { PersonExternalIdentity } from './entities/person-external-identity.entity.js';
 
 export const DEFAULT_DATABASE_URL =
   'postgresql://eleja:eleja@localhost:5432/eleja';
@@ -33,6 +37,10 @@ export function createMikroOrmOptions(
       CandidateSource,
       CandidateAsset,
       CandidateAssetSource,
+      PersonExternalIdentity,
+      LegislativeMandate,
+      LegislativeProposal,
+      LegislativeProposalAuthor,
     ],
     extensions: [Migrator],
     migrations: {

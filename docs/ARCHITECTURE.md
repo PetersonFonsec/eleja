@@ -228,6 +228,22 @@ similares sem necessidade comprovada.
 O batch deve poder ser chamado por CLI, GitHub Actions, Lambda ou
 container sem reescrever sua lógica de negócio.
 
+### Convergência futura de fontes por pessoa
+
+O modelo canônico permite convergir fontes oficiais sem misturar seus ciclos de
+vida:
+
+``` text
+TSE             → Candidacy
+Câmara/Senado   → Legislative history
+                         ↓
+                       Person
+```
+
+O modelo legislativo está disponível, mas a integração com Câmara e Senado não
+está implementada. Quando existir, a ingestão continuará pertencendo ao batch;
+a API não consultará essas fontes durante requisições.
+
 ## 7. Dataset versioning
 
 Cada publicação diária deve ser identificável.

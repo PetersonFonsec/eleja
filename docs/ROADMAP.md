@@ -303,6 +303,11 @@ automático, contatos públicos e os endpoints de dataset/eleições continuam
 pendentes. Esses itens não são necessários para executar localmente o recorte
 atual de candidatos, bens e comparação.
 
+O modelo canônico inicial de histórico legislativo (TASK-021 legislativa) e a
+correspondência conservadora de identidades com a Câmara (TASK-022 legislativa)
+estão implementados. A importação de mandatos (TASK-023 legislativa) permanece
+pendente.
+
 Itens que podem ser introduzidos quando houver necessidade:
 
 -   cache da API;

@@ -8,6 +8,9 @@ import {
 } from '@mikro-orm/decorators/legacy';
 import { randomUUID } from 'node:crypto';
 import { Candidacy } from './candidacy.entity.js';
+import { LegislativeMandate } from './legislative-mandate.entity.js';
+import { LegislativeProposalAuthor } from './legislative-proposal-author.entity.js';
+import { PersonExternalIdentity } from './person-external-identity.entity.js';
 
 @Entity({ tableName: 'people' })
 @Index({
@@ -35,6 +38,17 @@ export class Person {
 
   @OneToMany(() => Candidacy, (candidacy) => candidacy.person)
   candidacies = new Collection<Candidacy>(this);
+
+  @OneToMany(() => PersonExternalIdentity, (identity) => identity.person)
+  externalIdentities = new Collection<PersonExternalIdentity>(this);
+
+  @OneToMany(() => LegislativeMandate, (mandate) => mandate.person)
+  legislativeMandates = new Collection<LegislativeMandate>(this);
+
+  @OneToMany(() => LegislativeProposalAuthor, (author) => author.person)
+  legislativeProposalAuthorships = new Collection<LegislativeProposalAuthor>(
+    this,
+  );
 
   @Property({ type: 'timestamptz' })
   createdAt: Date;

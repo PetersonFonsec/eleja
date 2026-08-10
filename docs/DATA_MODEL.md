@@ -427,3 +427,55 @@ FavoriteCandidate
 
 Qualquer mudança dessa regra exige decisão explícita de produto e
 arquitetura.
+
+## 19. Histórico legislativo
+
+A atividade legislativa pertence à `Person`, não à `Candidacy`. Uma
+candidatura registra a participação em uma eleição; um mandato registra a
+atuação posterior da pessoa em uma casa legislativa.
+
+``` text
+Person
+ ├── Candidacy
+ ├── PersonExternalIdentity
+ └── LegislativeMandate
+
+LegislativeProposal
+ └── LegislativeProposalAuthor
+      ├── Person
+      └── LegislativeMandate?
+```
+
+### PersonExternalIdentity
+
+Associa a pessoa canônica a identificadores de sistemas públicos. A identidade
+é única por `(source, externalId)`, permitindo que o mesmo valor textual exista
+em fontes diferentes e que uma pessoa tenha identidades TSE, Câmara e Senado.
+`verifiedAt` é opcional e não implica um workflow de verificação.
+
+IDs de provedores não são armazenados diretamente em `Person`.
+
+### LegislativeMandate
+
+Representa um mandato federal na Câmara dos Deputados ou no Senado. Mantém a
+pessoa, casa, legislatura, UF, fotografia da sigla partidária, período e status.
+`externalMandateId` e campos ainda desconhecidos pela fonte podem permanecer
+nulos. O status canônico é pequeno (`ACTIVE`, `COMPLETED`, `INTERRUPTED`,
+`UNKNOWN`) e `sourceStatus` preserva o vocabulário oficial.
+
+A sigla partidária é uma fotografia do mandato, não uma relação que implique
+filiação constante durante todo o período.
+
+### LegislativeProposal e autoria
+
+A proposta é identificada de modo idempotente por `(source, externalId)`; tipo,
+número e ano servem para apresentação e busca, não como identidade global. O
+tipo permanece string para acomodar vocabulários oficiais sem um enum
+prematuro. `status` é nullable e flexível até que integrações reais justifiquem
+um vocabulário canônico; `sourceStatus` preserva o valor oficial.
+
+`LegislativeProposalAuthor` materializa a relação muitos-para-muitos entre
+pessoas e propostas. O mandato é opcional porque a pessoa pode ser resolvida
+antes do contexto exato do mandato. A relação preserva papel, indicação de
+autor principal e ordem oficial quando disponíveis, e impede duplicação de uma
+mesma pessoa na mesma proposta.

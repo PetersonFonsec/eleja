@@ -44,6 +44,19 @@ Abra `http://localhost:4200/candidates`. O Docker elimina a necessidade de uma
 instalação local do PostgreSQL. `npm run db:down` encerra o banco sem apagar o
 volume; a ingestão nunca é executada automaticamente ao iniciar a API ou o web.
 
+Para associar pessoas candidatas a identificadores oficiais de deputados da
+Câmara, depois de importar as candidaturas e aplicar as migrações, execute:
+
+``` bash
+npm run batch:camara:match-deputies -- --year=2026
+```
+
+O comando requer acesso à API oficial de Dados Abertos da Câmara. Por padrão,
+consulta exercícios parlamentares desde `1987-02-01`; o intervalo pode ser
+ajustado com `CAMARA_DEPUTIES_START_DATE` e `CAMARA_DEPUTIES_END_DATE`. O
+matching é conservador e só persiste correspondências de nome civil e data de
+nascimento exatos após normalização segura.
+
 ------------------------------------------------------------------------
 
 ## Objetivos
