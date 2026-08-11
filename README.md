@@ -68,6 +68,40 @@ Esse comando requer PostgreSQL em execução, migrações aplicadas, identidades
 `CAMARA` previamente importadas e acesso à API oficial. Ele não executa uma nova
 tentativa de correspondência de identidade.
 
+Para importar metadados e autorias de proposições das pessoas vinculadas:
+
+``` bash
+npm run batch:camara:proposals -- --year=2026
+```
+
+O comando requer PostgreSQL, migrações aplicadas, identidades `CAMARA`
+previamente importadas e acesso à API oficial. Mandatos já importados permitem
+vincular uma autoria ao mandato exato; quando isso não é inequívoco, a autoria
+permanece válida com `mandate = null`.
+
+Para importar votações nominais correspondentes aos períodos de mandato das
+pessoas vinculadas:
+
+``` bash
+npm run batch:camara:votes -- --year=2026
+```
+
+O comando requer PostgreSQL, migrações aplicadas, identidades `CAMARA`, acesso à
+API oficial e, preferencialmente, mandatos importados. O ano seleciona a
+população Eleja; os períodos consultados vêm dos mandatos conhecidos, não do ano
+eleitoral. Sem mandato com data inicial conhecida, nenhuma votação é consultada.
+
+Para importar despesas oficiais da cota parlamentar nos anos cobertos pelos
+mandatos conhecidos:
+
+``` bash
+npm run batch:camara:expenses -- --year=2026
+```
+
+Requer PostgreSQL, migrações aplicadas, identidades `CAMARA`, acesso à internet
+e, fortemente recomendado, mandatos da TASK-023. O ano seleciona a população de
+candidatos, não o ano da despesa.
+
 ------------------------------------------------------------------------
 
 ## Objetivos
@@ -328,6 +362,11 @@ GET /elections/:id
 GET /candidates
 GET /candidates/:id
 GET /candidates/:id/assets
+GET /candidates/:id/legislative-profile
+GET /candidates/:id/mandates
+GET /candidates/:id/proposals
+GET /candidates/:id/votes
+GET /candidates/:id/expenses
 GET /candidates/:id/contacts
 ```
 
@@ -651,6 +690,13 @@ decrescente, e calcula a quantidade e soma diretamente no PostgreSQL:
   ]
 }
 ```
+
+Os endpoints legislativos resolvem `Candidacy → Person` e leem somente o modelo
+canônico no PostgreSQL. Propostas aceitam `page`, `limit`, `type`, `year` e
+`primaryAuthor`; votos aceitam `page`, `limit`, `year`, `position` e
+`proposalId`; despesas aceitam `page`, `limit`, `year`, `month` e `category`.
+O limite padrão é 20 e o máximo é 100. O resumo de despesas respeita os filtros
+e mantém `totalNetValue` como string decimal exata.
 
 ### Extração RAW de candidatos
 

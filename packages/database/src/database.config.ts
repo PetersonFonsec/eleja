@@ -14,7 +14,10 @@ import { CandidateAssetSource } from './entities/candidate-asset-source.entity.j
 import { LegislativeMandate } from './entities/legislative-mandate.entity.js';
 import { LegislativeProposalAuthor } from './entities/legislative-proposal-author.entity.js';
 import { LegislativeProposal } from './entities/legislative-proposal.entity.js';
+import { LegislativeVoting } from './entities/legislative-voting.entity.js';
+import { LegislativeVote } from './entities/legislative-vote.entity.js';
 import { PersonExternalIdentity } from './entities/person-external-identity.entity.js';
+import { ParliamentaryExpense } from './entities/parliamentary-expense.entity.js';
 
 export const DEFAULT_DATABASE_URL =
   'postgresql://eleja:eleja@localhost:5432/eleja';
@@ -41,6 +44,9 @@ export function createMikroOrmOptions(
       LegislativeMandate,
       LegislativeProposal,
       LegislativeProposalAuthor,
+      LegislativeVoting,
+      LegislativeVote,
+      ParliamentaryExpense,
     ],
     extensions: [Migrator],
     migrations: {

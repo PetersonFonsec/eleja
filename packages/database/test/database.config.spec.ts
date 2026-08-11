@@ -16,7 +16,10 @@ import { CandidateAssetSource } from '../src/entities/candidate-asset-source.ent
 import { LegislativeMandate } from '../src/entities/legislative-mandate.entity.js';
 import { LegislativeProposalAuthor } from '../src/entities/legislative-proposal-author.entity.js';
 import { LegislativeProposal } from '../src/entities/legislative-proposal.entity.js';
+import { LegislativeVote } from '../src/entities/legislative-vote.entity.js';
+import { LegislativeVoting } from '../src/entities/legislative-voting.entity.js';
 import { PersonExternalIdentity } from '../src/entities/person-external-identity.entity.js';
+import { ParliamentaryExpense } from '../src/entities/parliamentary-expense.entity.js';
 
 describe('createMikroOrmOptions', () => {
   it('creates PostgreSQL options from the supplied connection URL', () => {
@@ -38,6 +41,9 @@ describe('createMikroOrmOptions', () => {
       LegislativeMandate,
       LegislativeProposal,
       LegislativeProposalAuthor,
+      LegislativeVoting,
+      LegislativeVote,
+      ParliamentaryExpense,
     ]);
     expect(options.migrations?.transactional).toBe(true);
     expect(options.migrations?.allOrNothing).toBe(true);

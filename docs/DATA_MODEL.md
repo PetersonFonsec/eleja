@@ -444,6 +444,13 @@ LegislativeProposal
  └── LegislativeProposalAuthor
       ├── Person
       └── LegislativeMandate?
+
+LegislativeProposal?
+ ↑
+LegislativeVoting
+ └── LegislativeVote
+      ├── Person
+      └── LegislativeMandate?
 ```
 
 ### PersonExternalIdentity
@@ -484,3 +491,48 @@ pessoas e propostas. O mandato é opcional porque a pessoa pode ser resolvida
 antes do contexto exato do mandato. A relação preserva papel, indicação de
 autor principal e ordem oficial quando disponíveis, e impede duplicação de uma
 mesma pessoa na mesma proposta.
+
+Na integração Câmara, propostas são identificadas por `(source, externalId)` e
+autorias por `(proposal, person)`. Autores são resolvidos somente por identidade
+externa oficial, nunca por nome. `proponente` determina o autor principal e a
+ordem de assinatura oficial é preservada. O vínculo ao mandato é opcional e só
+ocorre quando a data de apresentação pertence inequivocamente a um único
+mandato da pessoa.
+
+### LegislativeVoting e LegislativeVote
+
+`LegislativeVoting` representa o evento oficial e é único por
+`(source, externalId)`. Preserva data/hora, descrição, resultado canônico
+mínimo, representação oficial e URL de origem. A referência a
+`LegislativeProposal` é opcional e só é preenchida por identificador oficial
+inequívoco; descrições nunca são usadas para casar propostas.
+
+A Câmara fornece `dataHoraRegistro` sem offset. O banco usa `timestamp without
+time zone` para preservar exatamente o horário civil informado, sem interpretá-lo
+na timezone do processo.
+
+`LegislativeVote` registra a posição final oficial de uma pessoa em um evento e
+é único por `(voting, person)`. Posição canônica e valor oficial são preservados;
+valores não reconhecidos permanecem como `OTHER`, sem conversão forçada para
+sim/não. A pessoa é resolvida exclusivamente por
+`PersonExternalIdentity(CAMARA)`. O mandato só é associado quando exatamente um
+intervalo da Câmara contém a data da votação, e a entidade protege que mandato e
+voto pertençam à mesma pessoa.
+
+### ParliamentaryExpense
+
+Representa um lançamento oficial da Cota para Exercício da Atividade
+Parlamentar. Pertence à `Person` resolvida por identidade Câmara e pode apontar
+para um `LegislativeMandate` quando exatamente um intervalo contém a data do
+documento. O vínculo permanece nulo quando ausente ou ambíguo.
+
+``` text
+Person
+ └── LegislativeMandate?
+      └── ParliamentaryExpense
+```
+
+Valores bruto, líquido e de glosa são preservados separadamente como
+`numeric(24,2)`. A identidade é única por `(source, externalId)`; para a API da
+Câmara, `externalId` combina deputado, código do documento, lote, ressarcimento
+e parcela, pois o código do documento pode agrupar múltiplos lançamentos.

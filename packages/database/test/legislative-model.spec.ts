@@ -4,6 +4,10 @@ import { LegislativeMandate } from '../src/entities/legislative-mandate.entity.j
 import { LegislativeProposalAuthor } from '../src/entities/legislative-proposal-author.entity.js';
 import { LegislativeProposal } from '../src/entities/legislative-proposal.entity.js';
 import { LegislativeSource } from '../src/entities/legislative-source.js';
+import { LegislativeVotePosition } from '../src/entities/legislative-vote-position.js';
+import { LegislativeVote } from '../src/entities/legislative-vote.entity.js';
+import { LegislativeVotingResult } from '../src/entities/legislative-voting-result.js';
+import { LegislativeVoting } from '../src/entities/legislative-voting.entity.js';
 import { PersonExternalIdentitySource } from '../src/entities/person-external-identity-source.js';
 import { PersonExternalIdentity } from '../src/entities/person-external-identity.entity.js';
 import { Person } from '../src/entities/person.entity.js';
@@ -88,5 +92,38 @@ describe('legislative model', () => {
           mandate: otherMandate,
         }),
     ).toThrow('Proposal authorship mandate must belong to its person');
+  });
+
+  it('models a voting event and protects vote mandate ownership', () => {
+    const person = new Person('Pessoa votante');
+    const other = new Person('Outra pessoa');
+    const voting = new LegislativeVoting(
+      LegislativeSource.CAMARA,
+      '123-4',
+      new Date('2025-07-01T16:14:29Z'),
+      'https://dadosabertos.camara.leg.br/api/v2/votacoes/123-4',
+      { result: LegislativeVotingResult.APPROVED, sourceResult: '1' },
+    );
+    const mandate = new LegislativeMandate(
+      person,
+      LegislativeBody.CHAMBER_OF_DEPUTIES,
+    );
+    const vote = new LegislativeVote(
+      voting,
+      person,
+      LegislativeVotePosition.YES,
+      'Sim',
+      { mandate, votedAt: new Date('2025-07-01T16:14:19Z') },
+    );
+    expect(vote.sourcePosition).toBe('Sim');
+    expect(
+      () =>
+        new LegislativeVote(voting, person, LegislativeVotePosition.NO, 'Não', {
+          mandate: new LegislativeMandate(
+            other,
+            LegislativeBody.CHAMBER_OF_DEPUTIES,
+          ),
+        }),
+    ).toThrow('mandate must belong');
   });
 });

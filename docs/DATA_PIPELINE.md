@@ -397,6 +397,115 @@ filiação ou afastamento permanecem uma evolução futura. A fonte mantém cach
 memória das legislaturas e cada deputado vinculado é consultado uma vez por
 execução.
 
+## 8.3 Importação de proposições da Câmara
+
+O comando `npm run batch:camara:proposals -- --year=2026` importa proposições
+associadas às pessoas da população eleitoral que já possuem identidade Câmara:
+
+``` text
+PersonExternalIdentity(CAMARA)
+        ↓
+Câmara Proposal Source
+        ↓
+CamaraProposalNormalizer
+        ↓
+LegislativeProposal
+        ↓
+LegislativeProposalAuthor
+```
+
+Foram verificados em 10 de agosto de 2026 os endpoints oficiais
+`GET /api/v2/proposicoes?idDeputadoAutor=...`,
+`GET /api/v2/proposicoes/{id}` e
+`GET /api/v2/proposicoes/{id}/autores`. A listagem é percorrida pelos links
+`next` com páginas de até 100 itens. Detalhes e autores são armazenados em cache
+durante a execução para que uma proposição compartilhada por várias pessoas seja
+consultada uma só vez.
+
+A identidade canônica da proposição é `(source, externalId)`. A ementa oficial
+é armazenada em `summary`; nenhum título é fabricado. O estado processual
+permanece em `sourceStatus`, sem uma normalização prematura. Tipo, número, ano,
+data de apresentação e URL oficial são validados deterministicamente.
+
+Autores são resolvidos exclusivamente pelo ID presente na URI oficial de
+deputado e por `PersonExternalIdentity(CAMARA)`. Nomes nunca participam dessa
+resolução e autores não mapeados não criam pessoas. Todos os signatários
+resolvidos usam papel `AUTHOR`; `proponente = 1` define `isPrimaryAuthor`, e
+`ordemAssinatura` é preservada como ordem da fonte.
+
+A autoria é única por `(proposal, person)`. Quando a data oficial de apresentação
+está contida em exatamente um mandato da mesma pessoa na Câmara, esse mandato é
+associado. Nenhum vínculo é criado quando zero ou vários mandatos satisfazem o
+intervalo.
+
+## 8.4 Importação de votações da Câmara
+
+O comando `npm run batch:camara:votes -- --year=2026` usa o ano apenas para
+selecionar pessoas candidatas já ligadas à Câmara:
+
+``` text
+PersonExternalIdentity(CAMARA)
+        ↓
+LegislativeMandate
+        ↓
+Câmara Voting Source
+        ↓
+CamaraVotingNormalizer
+        ↓
+LegislativeVoting
+        ↓
+resolução exclusiva por ID CAMARA
+        ↓
+LegislativeVote
+```
+
+Foram verificados em 10 de agosto de 2026 os endpoints oficiais
+`GET /api/v2/votacoes?dataInicio=...&dataFim=...`,
+`GET /api/v2/votacoes/{id}` e `GET /api/v2/votacoes/{id}/votos`. A listagem
+aceita intervalos dentro do mesmo ano, pagina em até 100 itens e não oferece
+filtro por deputado ou legislatura. Por isso, os intervalos conhecidos dos
+mandatos são unidos por ano, cada evento é buscado uma vez e seus votos são
+filtrados localmente pelas identidades Eleja. Requisições de votos têm cache na
+execução e não há concorrência ilimitada.
+
+O contrato verificado fornece `id`, `uri`, `dataHoraRegistro`, `descricao`,
+`aprovacao` e, quando inequívoca, `uriProposicaoObjeto`. Votos fornecem
+`deputado_.id`, `tipoVoto` e `dataRegistroVoto`; ausentes não são listados. A
+amostra nominal verificada retornou um registro por deputado, e a documentação
+não define registros históricos de alterações. Defensivamente, se houver mais
+de um registro para o mesmo ID, o importador seleciona o de maior
+`dataRegistroVoto` como estado final e persiste uma linha por `(voting, person)`.
+Não infere ausência e não cria pessoas para IDs não mapeados. Referências
+ambíguas de `objetosPossiveis` não são convertidas em um vínculo de proposta.
+
+## 8.5 Importação de despesas parlamentares da Câmara
+
+``` text
+PersonExternalIdentity(CAMARA)
+        ↓
+LegislativeMandate
+        ↓
+Câmara Expense Source
+        ↓
+CamaraParliamentaryExpenseNormalizer
+        ↓
+ParliamentaryExpense
+```
+
+O comando `npm run batch:camara:expenses -- --year=2026` consulta
+`GET /api/v2/deputados/{id}/despesas`, paginado em até 100 itens, uma vez por
+combinação distinta de deputado, legislatura e ano coberto por mandato. Foram
+verificados os filtros `idLegislatura` e `ano` e os campos `codDocumento`,
+`codLote`, `numRessarcimento`, `parcela`, categoria, fornecedor, documento,
+data, valores bruto/glosa/líquido e URL oficial.
+
+A Câmara documenta que `codDocumento` pode agrupar múltiplos lançamentos. A
+chave canônica combina deputado, documento, lote, ressarcimento e parcela. Os
+valores monetários são capturados do JSON como lexemas decimais, normalizados
+sem aritmética binária e persistidos como `numeric(24,2)`. Pessoa é resolvida
+exclusivamente por identidade `CAMARA`; o mandato é opcional e nunca inferido
+por nome.
+
 ## 9. Export
 
 Após persistência e validação, o exportador lê exclusivamente o modelo

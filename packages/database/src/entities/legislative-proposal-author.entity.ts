@@ -35,7 +35,7 @@ export class LegislativeProposalAuthor {
     nullable: true,
     deleteRule: 'restrict',
   })
-  readonly mandate: LegislativeMandate | null;
+  mandate: LegislativeMandate | null;
 
   @Enum({ items: () => LegislativeProposalAuthorRole })
   role: LegislativeProposalAuthorRole;

@@ -17,6 +17,17 @@ export class CamaraApiClient {
   }
 
   async fetchJson(url: string, resource: string): Promise<unknown> {
+    const text = await this.fetchText(url, resource);
+    try {
+      return JSON.parse(text) as unknown;
+    } catch (error: unknown) {
+      throw new Error(`Câmara ${resource} response is malformed`, {
+        cause: error,
+      });
+    }
+  }
+
+  async fetchText(url: string, resource: string): Promise<string> {
     try {
       const response = await this.request(url, {
         signal: AbortSignal.timeout(this.timeoutMs),
@@ -31,13 +42,7 @@ export class CamaraApiClient {
           `Câmara ${resource} request failed with HTTP ${response.status}`,
         );
       }
-      try {
-        return await response.json();
-      } catch (error: unknown) {
-        throw new Error(`Câmara ${resource} response is malformed`, {
-          cause: error,
-        });
-      }
+      return await response.text();
     } catch (error: unknown) {
       if (error instanceof Error && error.message.startsWith('Câmara ')) {
         throw error;

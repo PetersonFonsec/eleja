@@ -305,8 +305,10 @@ atual de candidatos, bens e comparação.
 
 O modelo canônico inicial de histórico legislativo (TASK-021 legislativa) e a
 correspondência conservadora de identidades com a Câmara (TASK-022 legislativa)
-e a importação de mandatos (TASK-023 legislativa) estão implementados.
-Propostas legislativas (TASK-024 legislativa) permanecem pendentes.
+e as importações de mandatos (TASK-023 legislativa), proposições
+(TASK-024 legislativa) e votações nominais (TASK-025 legislativa) estão
+implementados. A importação factual de despesas CEAP (TASK-026 legislativa)
+também está implementada.
 
 Itens que podem ser introduzidos quando houver necessidade:
 

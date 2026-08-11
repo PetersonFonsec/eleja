@@ -30,3 +30,8 @@ export { LegislativeProposal } from './entities/legislative-proposal.entity.js';
 export { LegislativeSource } from './entities/legislative-source.js';
 export { LegislativeProposalAuthor } from './entities/legislative-proposal-author.entity.js';
 export { LegislativeProposalAuthorRole } from './entities/legislative-proposal-author-role.js';
+export { LegislativeVoting } from './entities/legislative-voting.entity.js';
+export { LegislativeVotingResult } from './entities/legislative-voting-result.js';
+export { LegislativeVote } from './entities/legislative-vote.entity.js';
+export { LegislativeVotePosition } from './entities/legislative-vote-position.js';
+export { ParliamentaryExpense } from './entities/parliamentary-expense.entity.js';
