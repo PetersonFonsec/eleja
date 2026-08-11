@@ -30,6 +30,7 @@ import {
   statusLabel,
 } from './candidate-formatters';
 import { CandidatesApiService } from './candidates-api.service';
+import { CandidateLegislativeSectionComponent } from './candidate-legislative-section.component';
 
 type CandidateState =
   | { status: 'loading' }
@@ -41,7 +42,7 @@ type AssetsState =
 
 @Component({
   selector: 'app-candidate-detail-page',
-  imports: [RouterLink],
+  imports: [RouterLink, CandidateLegislativeSectionComponent],
   templateUrl: './candidate-detail-page.component.html',
   styleUrl: './candidate-detail-page.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

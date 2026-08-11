@@ -1,0 +1,587 @@
+<section class="legislative-section" aria-labelledby="legislative-title">
+  <header class="legislative-heading">
+    <div>
+      <p class="eyebrow">Transparência parlamentar</p>
+      <h2 id="legislative-title">
+        Histórico parlamentar na Câmara dos Deputados
+      </h2>
+    </div>
+  </header>
+  @switch (profileState().status) {
+    @case ('loading') {
+      <div class="legislative-loading" aria-live="polite">
+        <span>Carregando histórico legislativo…</span><i></i><i></i>
+      </div>
+    }
+    @case ('error') {
+      <div class="section-state" role="alert">
+        <h3>Não foi possível carregar o histórico legislativo</h3>
+        <button type="button" (click)="retryProfile()">Tentar novamente</button>
+      </div>
+    }
+    @case ('ready') {
+      @if (profile(); as profile) {
+        @if (!profile.hasLegislativeHistory) {
+          <div class="section-state no-history">
+            <h3>Histórico legislativo federal</h3>
+            <p>
+              Não encontramos atuação parlamentar na Câmara dos Deputados
+              associada a esta pessoa.
+            </p>
+          </div>
+        } @else {
+          <nav
+            class="legislative-tabs"
+            aria-label="Seções do histórico legislativo"
+          >
+            @for (tab of tabs; track tab[0]) {
+              <button
+                type="button"
+                [class.active]="activeTab() === tab[0]"
+                [attr.aria-current]="activeTab() === tab[0] ? 'page' : null"
+                (click)="selectTab(tab[0])"
+              >
+                {{ tab[1] }}
+              </button>
+            }
+          </nav>
+          @switch (activeTab()) {
+            @case ('overview') {
+              <div class="summary-grid">
+                <article>
+                  <span>Mandatos</span
+                  ><strong>{{ profile.summary.mandates }}</strong>
+                </article>
+                <article>
+                  <span>Proposições relacionadas</span
+                  ><strong>{{ profile.summary.proposals }}</strong
+                  ><small
+                    >{{ profile.summary.primaryAuthoredProposals }} como autor
+                    principal</small
+                  >
+                </article>
+                <article>
+                  <span>Votações registradas</span
+                  ><strong>{{ profile.summary.votes }}</strong>
+                </article>
+                <article>
+                  <span>Valor líquido em despesas</span
+                  ><strong>{{
+                    formatBrlDecimal(profile.summary.expenses.totalNetValue)
+                  }}</strong
+                  ><small>{{ profile.summary.expenses.count }} registros</small>
+                </article>
+              </div>
+              @if (profile.currentOrLatestMandate; as mandate) {
+                <article class="mandate-highlight">
+                  <p class="eyebrow">Último mandato</p>
+                  <h3>{{ legislativeBodyLabel(mandate.body) }}</h3>
+                  <p>
+                    {{ mandate.legislatureNumber }}ª Legislatura
+                    @if (mandate.state) {
+                      • {{ mandate.state }}
+                    }
+                    @if (mandate.partyAcronym) {
+                      • {{ mandate.partyAcronym }}
+                    }
+                  </p>
+                  <p>
+                    {{
+                      mandate.startedAt
+                        ? formatDateOnly(mandate.startedAt)
+                        : 'Início não informado'
+                    }}
+                    –
+                    {{
+                      mandate.endedAt
+                        ? formatDateOnly(mandate.endedAt)
+                        : 'atual'
+                    }}
+                  </p>
+                </article>
+              }
+            }
+            @case ('mandates') {
+              <section class="tab-panel">
+                <h3>Mandatos</h3>
+                @switch (mandatesState().status) {
+                  @case ('loading') {
+                    <div class="list-loading">Carregando mandatos…</div>
+                  }
+                  @case ('error') {
+                    <div class="section-state" role="alert">
+                      <p>Não foi possível carregar os mandatos.</p>
+                      <button type="button" (click)="retryMandates()">
+                        Tentar novamente
+                      </button>
+                    </div>
+                  }
+                  @case ('ready') {
+                    @if (mandatesState(); as state) {
+                      @if (state.status === 'ready') {
+                        @if (state.data.length === 0) {
+                          <p class="empty">
+                            Nenhum mandato federal foi encontrado.
+                          </p>
+                        } @else {
+                          <div class="record-list">
+                            @for (mandate of state.data; track mandate.id) {
+                              <article class="record">
+                                <div>
+                                  <h4>
+                                    {{ legislativeBodyLabel(mandate.body) }}
+                                  </h4>
+                                  <p>
+                                    {{ mandate.legislatureNumber }}ª Legislatura
+                                    @if (mandate.state) {
+                                      • {{ mandate.state }}
+                                    }
+                                    @if (mandate.partyAcronym) {
+                                      • {{ mandate.partyAcronym }}
+                                    }
+                                  </p>
+                                </div>
+                                <div>
+                                  <p>
+                                    {{
+                                      mandate.startedAt
+                                        ? formatDateOnly(mandate.startedAt)
+                                        : 'Data não informada'
+                                    }}
+                                    –
+                                    {{
+                                      mandate.endedAt
+                                        ? formatDateOnly(mandate.endedAt)
+                                        : 'atual'
+                                    }}
+                                  </p>
+                                  <span class="neutral-tag">{{
+                                    legislativeStatusLabel(mandate.status)
+                                  }}</span>
+                                </div>
+                              </article>
+                            }
+                          </div>
+                        }
+                      }
+                    }
+                  }
+                }
+              </section>
+            }
+            @case ('proposals') {
+              <section class="tab-panel">
+                <div class="panel-title">
+                  <h3>Proposições</h3>
+                  <span>Registros associados à pessoa</span>
+                </div>
+                <form
+                  class="filters"
+                  (submit)="$event.preventDefault(); loadProposals(1)"
+                >
+                  <label
+                    >Tipo<input
+                      name="proposalType"
+                      [(ngModel)]="proposalFilters.type"
+                      placeholder="PL, PEC…" /></label
+                  ><label
+                    >Ano<input
+                      name="proposalYear"
+                      [(ngModel)]="proposalFilters.year"
+                      inputmode="numeric" /></label
+                  ><label
+                    >Autoria<select
+                      name="primaryAuthor"
+                      [(ngModel)]="proposalFilters.primaryAuthor"
+                    >
+                      <option value="">Todas</option>
+                      <option value="true">Autor principal</option>
+                      <option value="false">Demais autorias</option>
+                    </select></label
+                  ><button type="submit">Aplicar filtros</button>
+                </form>
+                @switch (proposalsState().status) {
+                  @case ('loading') {
+                    <div class="list-loading">Carregando proposições…</div>
+                  }
+                  @case ('error') {
+                    <div class="section-state" role="alert">
+                      <p>Não foi possível carregar as proposições.</p>
+                      <button type="button" (click)="loadProposals(1)">
+                        Tentar novamente
+                      </button>
+                    </div>
+                  }
+                  @case ('ready') {
+                    @if (proposalsState(); as state) {
+                      @if (state.status === 'ready') {
+                        @if (state.data.data.length === 0) {
+                          <p class="empty">
+                            {{
+                              proposalFilters.type ||
+                              proposalFilters.year ||
+                              proposalFilters.primaryAuthor
+                                ? 'Nenhuma proposição encontrada com esses filtros.'
+                                : 'Nenhuma proposição vinculada a esta pessoa foi encontrada.'
+                            }}
+                          </p>
+                        } @else {
+                          <div class="record-list">
+                            @for (item of state.data.data; track item.id) {
+                              <article class="record stacked">
+                                <div class="record-kicker">
+                                  <strong
+                                    >{{ item.type }}
+                                    @if (item.number) {
+                                      {{ item.number }}
+                                    }
+                                    @if (item.year) {
+                                      /{{ item.year }}
+                                    }</strong
+                                  ><span class="neutral-tag">{{
+                                    item.authorship.isPrimaryAuthor
+                                      ? 'Autor principal'
+                                      : 'Autor'
+                                  }}</span>
+                                </div>
+                                <h4>
+                                  {{
+                                    item.title ||
+                                      item.summary ||
+                                      'Descrição não informada'
+                                  }}
+                                </h4>
+                                @if (item.title && item.summary) {
+                                  <p class="long-text">{{ item.summary }}</p>
+                                }
+                                @if (item.sourceStatus || item.status) {
+                                  <p class="secondary">
+                                    {{ item.sourceStatus || item.status }}
+                                  </p>
+                                }
+                                @if (item.url) {
+                                  <a
+                                    [href]="item.url"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    >Ver fonte oficial ↗</a
+                                  >
+                                }
+                              </article>
+                            }
+                          </div>
+                        }
+                        <div class="pagination">
+                          <button
+                            type="button"
+                            [disabled]="state.data.meta.page <= 1"
+                            (click)="loadProposals(state.data.meta.page - 1)"
+                          >
+                            Anterior</button
+                          ><span
+                            >Página {{ state.data.meta.page }} de
+                            {{ state.data.meta.totalPages || 1 }} •
+                            {{ state.data.meta.total }} registros</span
+                          ><button
+                            type="button"
+                            [disabled]="
+                              state.data.meta.page >= state.data.meta.totalPages
+                            "
+                            (click)="loadProposals(state.data.meta.page + 1)"
+                          >
+                            Próxima
+                          </button>
+                        </div>
+                      }
+                    }
+                  }
+                }
+              </section>
+            }
+            @case ('votes') {
+              <section class="tab-panel">
+                <div class="panel-title">
+                  <h3>Votações registradas</h3>
+                  <span>Posições oficiais, sem avaliação política</span>
+                </div>
+                <form
+                  class="filters"
+                  (submit)="$event.preventDefault(); loadVotes(1)"
+                >
+                  <label
+                    >Ano<input
+                      name="voteYear"
+                      [(ngModel)]="voteFilters.year"
+                      inputmode="numeric" /></label
+                  ><label
+                    >Posição<select
+                      name="votePosition"
+                      [(ngModel)]="voteFilters.position"
+                    >
+                      <option value="">Todas</option>
+                      <option value="YES">Sim</option>
+                      <option value="NO">Não</option>
+                      <option value="ABSTENTION">Abstenção</option>
+                      <option value="OBSTRUCTION">Obstrução</option>
+                      <option value="OTHER">Outro</option>
+                    </select></label
+                  ><button type="submit">Aplicar filtros</button>
+                </form>
+                @switch (votesState().status) {
+                  @case ('loading') {
+                    <div class="list-loading">Carregando votações…</div>
+                  }
+                  @case ('error') {
+                    <div class="section-state" role="alert">
+                      <p>Não foi possível carregar as votações.</p>
+                      <button type="button" (click)="loadVotes(1)">
+                        Tentar novamente
+                      </button>
+                    </div>
+                  }
+                  @case ('ready') {
+                    @if (votesState(); as state) {
+                      @if (state.status === 'ready') {
+                        @if (state.data.data.length === 0) {
+                          <p class="empty">
+                            Nenhuma votação nominal foi encontrada para os
+                            mandatos disponíveis.
+                          </p>
+                        } @else {
+                          <div class="record-list">
+                            @for (item of state.data.data; track item.id) {
+                              <article class="record stacked">
+                                <div class="record-kicker">
+                                  <time>{{
+                                    formatDateTime(item.voting.dateTime)
+                                  }}</time
+                                  ><span class="neutral-tag"
+                                    >Voto:
+                                    {{ votePositionLabel(item.position) }}</span
+                                  >
+                                </div>
+                                <h4>
+                                  @if (item.proposal) {
+                                    {{ item.proposal.type }}
+                                    {{ item.proposal.number }}/{{
+                                      item.proposal.year
+                                    }}
+                                  } @else {
+                                    {{
+                                      item.voting.description ||
+                                        'Matéria não identificada'
+                                    }}
+                                  }
+                                </h4>
+                                @if (
+                                  item.position === 'OTHER' ||
+                                  item.position === 'UNKNOWN'
+                                ) {
+                                  <p class="secondary">
+                                    Registro oficial: {{ item.sourcePosition }}
+                                  </p>
+                                }
+                                <p class="secondary">
+                                  Resultado da votação:
+                                  {{ votingResultLabel(item.voting.result) }}
+                                </p>
+                                <a
+                                  [href]="item.voting.sourceUrl"
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  >Ver fonte oficial ↗</a
+                                >
+                              </article>
+                            }
+                          </div>
+                        }
+                        <div class="pagination">
+                          <button
+                            type="button"
+                            [disabled]="state.data.meta.page <= 1"
+                            (click)="loadVotes(state.data.meta.page - 1)"
+                          >
+                            Anterior</button
+                          ><span
+                            >Página {{ state.data.meta.page }} de
+                            {{ state.data.meta.totalPages || 1 }} •
+                            {{ state.data.meta.total }} registros</span
+                          ><button
+                            type="button"
+                            [disabled]="
+                              state.data.meta.page >= state.data.meta.totalPages
+                            "
+                            (click)="loadVotes(state.data.meta.page + 1)"
+                          >
+                            Próxima
+                          </button>
+                        </div>
+                      }
+                    }
+                  }
+                }
+              </section>
+            }
+            @case ('expenses') {
+              <section class="tab-panel">
+                <div class="panel-title">
+                  <h3>Despesas parlamentares</h3>
+                  <span>Cota para o exercício da atividade parlamentar</span>
+                </div>
+                <form
+                  class="filters"
+                  (submit)="$event.preventDefault(); loadExpenses(1)"
+                >
+                  <label
+                    >Ano<input
+                      name="expenseYear"
+                      [(ngModel)]="expenseFilters.year"
+                      inputmode="numeric" /></label
+                  ><label
+                    >Mês<select
+                      name="expenseMonth"
+                      [(ngModel)]="expenseFilters.month"
+                    >
+                      <option value="">Todos</option>
+                      @for (
+                        month of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+                        track month
+                      ) {
+                        <option [value]="month">{{ month }}</option>
+                      }
+                    </select></label
+                  ><label
+                    >Categoria<input
+                      name="expenseCategory"
+                      [(ngModel)]="expenseFilters.category" /></label
+                  ><button type="submit">Aplicar filtros</button>
+                </form>
+                @switch (expensesState().status) {
+                  @case ('loading') {
+                    <div class="list-loading">Carregando despesas…</div>
+                  }
+                  @case ('error') {
+                    <div class="section-state" role="alert">
+                      <p>
+                        Não foi possível carregar as despesas parlamentares.
+                      </p>
+                      <button type="button" (click)="loadExpenses(1)">
+                        Tentar novamente
+                      </button>
+                    </div>
+                  }
+                  @case ('ready') {
+                    @if (expensesState(); as state) {
+                      @if (state.status === 'ready') {
+                        <div class="expense-summary">
+                          <span>{{
+                            expenseFilters.year ||
+                            expenseFilters.month ||
+                            expenseFilters.category
+                              ? 'Total com os filtros atuais'
+                              : 'Total registrado'
+                          }}</span
+                          ><strong>{{
+                            formatBrlDecimal(state.data.summary.totalNetValue)
+                          }}</strong
+                          ><small>{{ state.data.meta.total }} registros</small>
+                        </div>
+                        @if (state.data.data.length === 0) {
+                          <p class="empty">
+                            {{
+                              expenseFilters.year ||
+                              expenseFilters.month ||
+                              expenseFilters.category
+                                ? 'Nenhuma despesa encontrada com esses filtros.'
+                                : 'Nenhum registro de despesa parlamentar foi encontrado.'
+                            }}
+                          </p>
+                        } @else {
+                          <div class="record-list">
+                            @for (item of state.data.data; track item.id) {
+                              <article class="record expense">
+                                <div>
+                                  <time>{{
+                                    item.documentDate
+                                      ? formatDateOnly(item.documentDate)
+                                      : item.month + '/' + item.year
+                                  }}</time>
+                                  <h4>{{ item.category }}</h4>
+                                  <p>
+                                    {{
+                                      item.supplierName ||
+                                        'Fornecedor não informado'
+                                    }}
+                                  </p>
+                                  @if (item.documentNumber) {
+                                    <small
+                                      >Documento
+                                      {{ item.documentNumber }}</small
+                                    >
+                                  }
+                                </div>
+                                <div class="expense-value">
+                                  <strong>{{
+                                    formatBrlDecimal(item.netValue)
+                                  }}</strong>
+                                  @if (item.deductionValue !== '0.00') {
+                                    <small
+                                      >Bruto
+                                      {{ formatBrlDecimal(item.grossValue) }} •
+                                      Glosa
+                                      {{
+                                        formatBrlDecimal(item.deductionValue)
+                                      }}</small
+                                    >
+                                  }
+                                  @if (item.sourceUrl) {
+                                    <a
+                                      [href]="item.sourceUrl"
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      >Fonte oficial ↗</a
+                                    >
+                                  }
+                                </div>
+                              </article>
+                            }
+                          </div>
+                        }
+                        <div class="pagination">
+                          <button
+                            type="button"
+                            [disabled]="state.data.meta.page <= 1"
+                            (click)="loadExpenses(state.data.meta.page - 1)"
+                          >
+                            Anterior</button
+                          ><span
+                            >Página {{ state.data.meta.page }} de
+                            {{ state.data.meta.totalPages || 1 }} •
+                            {{ state.data.meta.total }} registros</span
+                          ><button
+                            type="button"
+                            [disabled]="
+                              state.data.meta.page >= state.data.meta.totalPages
+                            "
+                            (click)="loadExpenses(state.data.meta.page + 1)"
+                          >
+                            Próxima
+                          </button>
+                        </div>
+                      }
+                    }
+                  }
+                }
+              </section>
+            }
+          }
+          <p class="scope-note">
+            Fonte: Dados Abertos da Câmara dos Deputados. Este histórico
+            apresenta os dados disponíveis associados à pessoa identificada no
+            Eleja e não representa um histórico político completo.
+          </p>
+        }
+      }
+    }
+  }
+</section>

@@ -637,8 +637,11 @@ npm run web
 ```
 
 A listagem fica em `http://localhost:4200/candidates`; os cards abrem o perfil
-em `/candidates/:id`, incluindo informações eleitorais, pessoais públicas e
-bens declarados. A seleção "Comparar" abre até três candidaturas em
+em `/candidates/:id`, incluindo informações eleitorais, pessoais públicas,
+bens declarados e histórico parlamentar disponível na Câmara dos Deputados.
+O resumo legislativo é carregado separadamente e as listas paginadas são
+carregadas sob demanda ao abrir cada seção. A seleção "Comparar" abre até três
+candidaturas em
 `/compare?candidates=<uuid-1>,<uuid-2>`. A URL é o único estado persistente da
 comparação e pode ser recarregada ou compartilhada. Em desenvolvimento, o
 Angular encaminha `/api` para `http://localhost:3000` usando

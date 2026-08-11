@@ -293,7 +293,9 @@ responsiva de candidatos com busca, filtros, paginação e estados de interface.
 O perfil do candidato também está implementado com dados eleitorais, pessoais
 públicos e patrimônio declarado. A comparação frontend de até três candidaturas
 também está implementada com estado compartilhável na URL e totais de patrimônio
-declarado.
+declarado. O perfil agora apresenta também o histórico parlamentar disponível
+na Câmara, com resumo e listas paginadas carregadas sob demanda para mandatos,
+proposições, votações nominais e despesas CEAP.
 
 ### Pendente
 
