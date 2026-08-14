@@ -1,21 +1,30 @@
-import { Entity, PrimaryKey, Property } from '@mikro-orm/decorators/legacy';
+import {
+  Entity,
+  PrimaryKey,
+  Property,
+  Unique,
+} from '@mikro-orm/decorators/legacy';
 import { randomUUID } from 'node:crypto';
 
 @Entity({ tableName: 'parties' })
+@Unique({
+  name: 'parties_name_acronym_number_unique',
+  properties: ['name', 'acronym', 'number'],
+})
 export class Party {
   @PrimaryKey({ type: 'uuid' })
   id = randomUUID();
 
-  @Property({ type: 'string', length: 100, nullable: true, unique: true })
+  @Property({ type: 'string', length: 100, nullable: true })
   sourcePartyId: string | null;
 
   @Property({ type: 'string', length: 200 })
   name: string;
 
-  @Property({ type: 'string', length: 30, unique: true })
+  @Property({ type: 'string', length: 30 })
   acronym: string;
 
-  @Property({ type: 'smallint', nullable: true, unique: true })
+  @Property({ type: 'smallint', nullable: true })
   number: number | null;
 
   @Property({ type: 'timestamptz' })

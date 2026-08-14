@@ -607,6 +607,7 @@ npm run batch:candidates -- --year=2026 # extrai o RAW oficial de candidatos
 npm run batch:candidates:parse -- --year=2026 # parseia o RAW local
 npm run batch:candidates:normalize -- --year=2026 # normaliza sem persistir
 npm run batch:candidates:persist -- --year=2026 # persiste candidatos
+npm run batch:candidates:history -- --years=2014,2018,2022,2026 # histórico geral completo
 npm run batch:assets -- --year=2026 # extrai o RAW oficial de bens
 npm run batch:assets:persist -- --year=2026 # persiste bens e proveniência
 npm run batch:export -- --year=2026 # gera os CSVs públicos locais
@@ -795,6 +796,18 @@ bens, persiste o modelo canônico e gera o snapshot em
 com falha pode ser repetida, mantendo o histórico; uma versão `READY` é
 imutável e não é reconstruída silenciosamente. A orquestração termina em
 `READY` e não publica no R2 automaticamente.
+
+Para construir a base histórica de eleições gerais com a mesma pipeline:
+
+``` bash
+npm run batch:candidates:history -- --years=2014,2018,2022,2026
+```
+
+Também é possível executar as etapas anuais existentes com `--year=2014`,
+`2018`, `2022` ou `2026`. A identidade entre eleições usa um fingerprint
+interno do identificador oficial TSE e, quando ele não existe, um composto
+conservador completo; o CPF bruto não é persistido nem exposto. Os bens sempre
+permanecem ligados à candidatura específica pelo `SQ_CANDIDATO`.
 
 ### Publicação dos datasets
 

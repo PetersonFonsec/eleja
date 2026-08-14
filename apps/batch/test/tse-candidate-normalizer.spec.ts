@@ -1,6 +1,7 @@
 import { CandidacyStatus, ElectionType, OfficeScope } from '@eleja/database';
 import { describe, expect, it } from 'vitest';
 import { TseCandidateNormalizer } from '../src/normalization/tse-candidate-normalizer.js';
+import { fingerprintTseCpf } from '../src/identity/tse-person-identity.js';
 import type { TseCandidateRecord } from '../src/sources/tse/tse-candidate-record.js';
 
 function candidate(
@@ -14,6 +15,7 @@ function candidate(
     candidateId: '280001234567',
     candidateFullName: 'JOÃO GONÇALVES',
     candidateBallotName: 'JOÃO',
+    candidateCpf: '12345678901',
     candidateBallotNumber: 13,
     partySourceId: '13',
     partyAcronym: 'PT',
@@ -25,6 +27,7 @@ function candidate(
     electoralUnitCode: 'BR',
     electoralUnitName: 'BRASIL',
     birthDate: '1980-02-29',
+    birthState: 'MG',
     gender: 'MASCULINO',
     education: 'SUPERIOR COMPLETO',
     occupation: 'PROFESSOR',
@@ -56,9 +59,11 @@ describe('TseCandidateNormalizer', () => {
         person: {
           name: 'JOÃO GONÇALVES',
           birthDate: '1980-02-29',
+          birthState: 'MG',
           gender: 'MASCULINO',
           education: 'SUPERIOR COMPLETO',
           occupation: 'PROFESSOR',
+          tseCpfFingerprint: fingerprintTseCpf('12345678901'),
         },
         candidacy: {
           sourceCandidateId: '280001234567',
@@ -209,9 +214,11 @@ describe('TseCandidateNormalizer', () => {
         person: {
           name: 'JOÃO GONÇALVES',
           birthDate: '1980-02-29',
+          birthState: 'MG',
           gender: null,
           education: 'EDUCAÇÃO SUPERIOR',
           occupation: null,
+          tseCpfFingerprint: fingerprintTseCpf('12345678901'),
         },
         candidacy: expect.objectContaining({ ballotName: 'JOÃO' }),
       }),

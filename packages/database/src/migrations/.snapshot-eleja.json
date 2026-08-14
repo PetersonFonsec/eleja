@@ -3950,7 +3950,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "unique": true,
+          "unique": false,
           "length": 30,
           "precision": null,
           "scale": null,
@@ -4001,7 +4001,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "unique": false,
+          "unique": true,
           "length": 200,
           "precision": null,
           "scale": null,
@@ -4018,7 +4018,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
-          "unique": true,
+          "unique": false,
           "length": null,
           "precision": null,
           "scale": null,
@@ -4035,7 +4035,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
-          "unique": true,
+          "unique": false,
           "length": 100,
           "precision": null,
           "scale": null,
@@ -4069,8 +4069,20 @@
             "acronym"
           ],
           "composite": false,
+          "constraint": false,
+          "keyName": "parties_acronym_idx",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "name",
+            "acronym",
+            "number"
+          ],
+          "composite": true,
           "constraint": true,
-          "keyName": "parties_acronym_unique",
+          "keyName": "parties_name_acronym_number_unique",
           "primary": false,
           "unique": true
         },
@@ -4079,10 +4091,10 @@
             "number"
           ],
           "composite": false,
-          "constraint": true,
-          "keyName": "parties_number_unique",
+          "constraint": false,
+          "keyName": "parties_number_idx",
           "primary": false,
-          "unique": true
+          "unique": false
         },
         {
           "columnNames": [
@@ -4092,16 +4104,6 @@
           "constraint": true,
           "keyName": "parties_pkey",
           "primary": true,
-          "unique": true
-        },
-        {
-          "columnNames": [
-            "source_party_id"
-          ],
-          "composite": false,
-          "constraint": true,
-          "keyName": "parties_source_party_id_unique",
-          "primary": false,
           "unique": true
         }
       ],
@@ -4130,6 +4132,23 @@
           "collation": null,
           "enumItems": [],
           "mappedType": "date"
+        },
+        "birth_state": {
+          "name": "birth_state",
+          "type": "varchar(2)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 2,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "collation": null,
+          "enumItems": [],
+          "mappedType": "string"
         },
         "created_at": {
           "name": "created_at",
@@ -4252,6 +4271,18 @@
         }
       },
       "indexes": [
+        {
+          "columnNames": [
+            "birth_date",
+            "birth_state",
+            "gender"
+          ],
+          "composite": true,
+          "constraint": false,
+          "keyName": "people_birth_date_birth_state_gender_idx",
+          "primary": false,
+          "unique": false
+        },
         {
           "columnNames": [
             "name",

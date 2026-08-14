@@ -20,6 +20,10 @@ export interface CandidatePipelineStatistics {
   updated: number;
   unchanged: number;
   persistenceRejected: number;
+  matchedByStableIdentifier: number;
+  matchedByStrongComposite: number;
+  newPersonsCreated: number;
+  ambiguousMatches: number;
 }
 
 export interface AssetPipelineStatistics {

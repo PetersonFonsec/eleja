@@ -5,8 +5,15 @@ import {
   Office,
   Party,
   Person,
+  PersonExternalIdentity,
+  PersonExternalIdentitySource,
   initializeDatabase,
 } from '@eleja/database';
+import {
+  normalizeIdentityName,
+  tseCpfExternalId,
+  type PersonIdentityMatchMethod,
+} from '../identity/tse-person-identity.js';
 import type { NormalizedCandidateData } from '../normalization/normalized-candidate-data.js';
 import type { CandidateImportContext } from './candidate-import-context.js';
 
@@ -36,6 +43,7 @@ export type CandidatePersistenceResult =
       source: CandidateSource;
       sourceStatus: 'INSERTED' | 'UPDATED' | 'UNCHANGED';
       created: CandidatePersistenceCreated;
+      identityMatchMethod: PersonIdentityMatchMethod;
     }
   | { status: 'REJECTED'; issue: CandidatePersistenceIssue };
 
@@ -43,6 +51,7 @@ interface ResolvedEntity<T> {
   entity: T;
   created: boolean;
   cacheKey?: string;
+  identityMatchMethod?: PersonIdentityMatchMethod;
 }
 
 interface TransactionResult {
@@ -62,7 +71,7 @@ export class CandidatePersistenceService {
     string,
     Pick<
       NormalizedCandidateData['party'],
-      'sourcePartyId' | 'number' | 'acronym'
+      'sourcePartyId' | 'number' | 'acronym' | 'name'
     >
   >();
   private readonly officeIdentities = new Map<
@@ -94,6 +103,7 @@ export class CandidatePersistenceService {
           sourcePartyId: data.party.sourcePartyId,
           number: data.party.number,
           acronym: data.party.acronym,
+          name: data.party.name,
         });
         this.officeIdentities.set(data.office.code, {
           sourceCode: data.office.sourceCode,
@@ -129,6 +139,7 @@ export class CandidatePersistenceService {
     );
     if (existingCandidacy) {
       const result = this.updateExistingCandidacy(existingCandidacy, data);
+      await this.persistTseIdentity(em, existingCandidacy.person, data);
       const source = await this.persistSource(
         em,
         existingCandidacy,
@@ -138,6 +149,9 @@ export class CandidatePersistenceService {
       return {
         result: {
           ...result,
+          identityMatchMethod: data.person.tseCpfFingerprint
+            ? 'EXACT_EXTERNAL_IDENTIFIER'
+            : 'STRONG_COMPOSITE',
           source: source.entity,
           sourceStatus: source.status,
         },
@@ -183,6 +197,7 @@ export class CandidatePersistenceService {
         source: source.entity,
         sourceStatus: source.status,
         created,
+        identityMatchMethod: person.identityMatchMethod!,
       },
       cacheEntries: [
         cacheEntry(this.electionIds, election),
@@ -197,7 +212,7 @@ export class CandidatePersistenceService {
     data: NormalizedCandidateData,
   ): Omit<
     Exclude<CandidatePersistenceResult, { status: 'REJECTED' }>,
-    'source' | 'sourceStatus'
+    'source' | 'sourceStatus' | 'identityMatchMethod'
   > {
     assertExistingIdentity(candidacy, data);
     let changed = updatePerson(candidacy.person, data);
@@ -313,7 +328,8 @@ export class CandidatePersistenceService {
         !identity ||
         identity.sourcePartyId !== data.party.sourcePartyId ||
         identity.number !== data.party.number ||
-        identity.acronym !== data.party.acronym
+        identity.acronym !== data.party.acronym ||
+        identity.name !== data.party.name
       ) {
         conflict(data, 'party', 'party identity conflict');
       }
@@ -325,14 +341,10 @@ export class CandidatePersistenceService {
       return { entity, created: false, cacheKey: key };
     }
 
-    let entity = data.party.sourcePartyId
-      ? await em.findOne(Party, { sourcePartyId: data.party.sourcePartyId })
-      : null;
-    entity ??= await em.findOne(Party, {
-      $or: [
-        ...(data.party.number !== null ? [{ number: data.party.number }] : []),
-        { acronym: data.party.acronym },
-      ],
+    let entity = await em.findOne(Party, {
+      name: data.party.name,
+      acronym: data.party.acronym,
+      number: data.party.number,
     });
     const created = !entity;
     if (!entity) {
@@ -348,7 +360,6 @@ export class CandidatePersistenceService {
       if (entity.sourcePartyId === null && data.party.sourcePartyId !== null) {
         entity.sourcePartyId = data.party.sourcePartyId;
       }
-      entity.name = data.party.name;
     }
     return { entity, created, cacheKey: key };
   }
@@ -401,43 +412,198 @@ export class CandidatePersistenceService {
     em: PersistenceEntityManager,
     data: NormalizedCandidateData,
   ): Promise<ResolvedEntity<Person>> {
-    const key = personKey(data);
-    if (key) {
-      const matches = await em.find(
-        Person,
+    const fingerprint = data.person.tseCpfFingerprint ?? null;
+    if (fingerprint) {
+      const identity = await em.findOne(
+        PersonExternalIdentity,
         {
-          name: data.person.name,
-          birthDate: data.person.birthDate,
+          source: PersonExternalIdentitySource.TSE,
+          externalId: tseCpfExternalId(fingerprint),
         },
-        { populate: ['candidacies.election'] },
+        { populate: ['person'] },
       );
-      const eligible = matches.filter(
-        (person) =>
-          gendersAreCompatible(person, data) &&
-          !person.candidacies
-            .getItems()
-            .some(
-              (candidacy) =>
-                candidacy.election.year === data.election.year &&
-                candidacy.election.type === data.election.type &&
-                candidacy.election.round === data.election.round,
-            ),
-      );
-      if (eligible.length === 1) {
-        updatePerson(eligible[0]!, data);
-        return { entity: eligible[0]!, created: false };
+      if (identity) {
+        updatePerson(identity.person, data);
+        return {
+          entity: identity.person,
+          created: false,
+          identityMatchMethod: 'EXACT_EXTERNAL_IDENTIFIER',
+        };
       }
     }
 
+    const eligible = await this.strongCompositeMatches(
+      em,
+      data,
+      Boolean(fingerprint),
+    );
+    if (eligible.length > 1) {
+      conflict(data, 'person', 'ambiguous strong composite identity');
+    }
+    if (eligible.length === 1) {
+      const person = eligible[0]!;
+      updatePerson(person, data);
+      await this.persistTseIdentity(em, person, data);
+      return {
+        entity: person,
+        created: false,
+        identityMatchMethod: 'STRONG_COMPOSITE',
+      };
+    }
     const entity = new Person(
       data.person.name,
       data.person.birthDate,
       data.person.gender,
       data.person.education,
       data.person.occupation,
+      undefined,
+      data.person.birthState ?? null,
     );
     em.persist(entity);
-    return { entity, created: true };
+    await this.persistTseIdentity(em, entity, data);
+    return { entity, created: true, identityMatchMethod: 'NEW_PERSON' };
+  }
+
+  private async strongCompositeMatches(
+    em: PersistenceEntityManager,
+    data: NormalizedCandidateData,
+    requireUnclaimedTseIdentity: boolean,
+  ): Promise<Person[]> {
+    if (!strongCompositeAvailable(data)) return [];
+    const matches = await em.find(
+      Person,
+      {
+        birthDate: data.person.birthDate,
+        birthState: data.person.birthState,
+        gender: data.person.gender,
+      },
+      { populate: ['candidacies.election', 'externalIdentities'] },
+    );
+    const normalizedName = normalizeIdentityName(data.person.name);
+    return matches.filter(
+      (person) =>
+        normalizeIdentityName(person.name) === normalizedName &&
+        (!requireUnclaimedTseIdentity ||
+          !person.externalIdentities
+            .getItems()
+            .some(
+              (identity) =>
+                identity.source === PersonExternalIdentitySource.TSE,
+            )) &&
+        !person.candidacies
+          .getItems()
+          .some(
+            (candidacy) =>
+              candidacy.election.year === data.election.year &&
+              candidacy.election.type === data.election.type &&
+              candidacy.election.round === data.election.round,
+          ),
+    );
+  }
+
+  private async persistTseIdentity(
+    em: PersistenceEntityManager,
+    person: Person,
+    data: NormalizedCandidateData,
+  ): Promise<void> {
+    const fingerprint = data.person.tseCpfFingerprint ?? null;
+    if (!fingerprint) return;
+    const externalId = tseCpfExternalId(fingerprint);
+    const existing = await em.findOne(PersonExternalIdentity, {
+      source: PersonExternalIdentitySource.TSE,
+      externalId,
+    });
+    if (existing) {
+      if (existing.person.id !== person.id) {
+        await this.consolidatePersonByStableIdentity(
+          em,
+          existing.person.id,
+          person.id,
+          data,
+        );
+      }
+      return;
+    }
+    const personIdentities = await em.find(PersonExternalIdentity, {
+      person,
+      source: PersonExternalIdentitySource.TSE,
+    });
+    if (personIdentities.length > 0) {
+      conflict(
+        data,
+        'person',
+        'person already has a different stable TSE identity',
+      );
+    }
+    em.persist(
+      new PersonExternalIdentity(
+        person,
+        PersonExternalIdentitySource.TSE,
+        externalId,
+        { verifiedAt: new Date() },
+      ),
+    );
+  }
+
+  private async consolidatePersonByStableIdentity(
+    em: PersistenceEntityManager,
+    sourcePersonId: Person['id'],
+    targetPersonId: Person['id'],
+    data: NormalizedCandidateData,
+  ): Promise<void> {
+    const connection = em.getConnection();
+    const [conflicts] = await connection.execute<
+      Array<{
+        external: boolean;
+        mandate: boolean;
+        author: boolean;
+        vote: boolean;
+      }>
+    >(
+      `select
+        exists(select 1 from person_external_identities s join person_external_identities t on t.person_id = ? and t.source = s.source where s.person_id = ?) as external,
+        exists(select 1 from legislative_mandates s join legislative_mandates t on t.person_id = ? and t.body = s.body and t.legislature_number is not distinct from s.legislature_number where s.person_id = ?) as mandate,
+        exists(select 1 from legislative_proposal_authors s join legislative_proposal_authors t on t.person_id = ? and t.proposal_id = s.proposal_id where s.person_id = ?) as author,
+        exists(select 1 from legislative_votes s join legislative_votes t on t.person_id = ? and t.voting_id = s.voting_id where s.person_id = ?) as vote`,
+      [
+        targetPersonId,
+        sourcePersonId,
+        targetPersonId,
+        sourcePersonId,
+        targetPersonId,
+        sourcePersonId,
+        targetPersonId,
+        sourcePersonId,
+      ],
+    );
+    if (
+      conflicts?.external ||
+      conflicts?.mandate ||
+      conflicts?.author ||
+      conflicts?.vote
+    ) {
+      conflict(
+        data,
+        'person',
+        'stable TSE identity requires a conflicting person consolidation',
+      );
+    }
+    for (const table of [
+      'candidacies',
+      'person_external_identities',
+      'legislative_mandates',
+      'legislative_proposal_authors',
+      'legislative_votes',
+      'parliamentary_expenses',
+    ]) {
+      await connection.execute(
+        `update "${table}" set "person_id" = ? where "person_id" = ?`,
+        [targetPersonId, sourcePersonId],
+      );
+    }
+    await connection.execute(`delete from "people" where "id" = ?`, [
+      sourcePersonId,
+    ]);
   }
 }
 
@@ -473,9 +639,11 @@ function assertExistingIdentity(
     conflict(data, 'party', 'existing candidacy belongs to a different party');
   }
   if (
-    candidacy.person.name !== data.person.name ||
-    candidacy.person.birthDate !== data.person.birthDate ||
-    !gendersAreCompatible(candidacy.person, data)
+    !data.person.tseCpfFingerprint &&
+    (normalizeIdentityName(candidacy.person.name) !==
+      normalizeIdentityName(data.person.name) ||
+      candidacy.person.birthDate !== data.person.birthDate ||
+      !gendersAreCompatible(candidacy.person, data))
   ) {
     conflict(
       data,
@@ -502,12 +670,17 @@ function partyMatches(party: Party, data: NormalizedCandidateData): boolean {
     (party.number === null ||
       data.party.number === null ||
       party.number === data.party.number) &&
-    party.acronym === data.party.acronym
+    party.acronym === data.party.acronym &&
+    party.name === data.party.name
   );
 }
 
 function updatePerson(person: Person, data: NormalizedCandidateData): boolean {
-  let changed = assignIfChanged(person, 'gender', data.person.gender);
+  let changed =
+    data.person.birthState === undefined
+      ? false
+      : assignIfChanged(person, 'birthState', data.person.birthState);
+  changed = assignIfChanged(person, 'gender', data.person.gender) || changed;
   changed =
     assignIfChanged(person, 'education', data.person.education) || changed;
   changed =
@@ -541,15 +714,16 @@ function electionKey(data: NormalizedCandidateData): string {
 }
 
 function partyKey(data: NormalizedCandidateData): string {
-  return data.party.sourcePartyId
-    ? `source:${data.party.sourcePartyId}`
-    : `fallback:${data.party.number ?? 'null'}|${data.party.acronym}`;
+  return `${data.party.name}|${data.party.acronym}|${data.party.number ?? 'null'}`;
 }
 
-function personKey(data: NormalizedCandidateData): string | undefined {
-  return data.person.birthDate
-    ? `${data.person.name}|${data.person.birthDate}|${data.person.gender ?? 'null'}`
-    : undefined;
+function strongCompositeAvailable(data: NormalizedCandidateData): boolean {
+  return Boolean(
+    data.person.name &&
+    data.person.birthDate &&
+    data.person.birthState &&
+    data.person.gender,
+  );
 }
 
 function cacheEntry<T extends { id: EntityId }>(

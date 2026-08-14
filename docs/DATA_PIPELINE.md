@@ -66,6 +66,12 @@ Ele é iniciado manualmente com
 não agenda jobs e não publica objetos remotos; essas etapas permanecem comandos
 independentes.
 
+O histórico geral verificado pode ser executado sequencialmente com
+`npm run batch:candidates:history -- --years=2014,2018,2022,2026`. Cada ano
+reutiliza a mesma pipeline, mantém RAW, `DatasetVersion` e `BatchRun` próprios e
+produz estatísticas cruzadas somente de contagem, sem calcular evolução de
+patrimônio.
+
 ## 3. Extract
 
 Responsável apenas por obter o conteúdo original.
@@ -161,6 +167,19 @@ Ele seleciona explicitamente o CSV consolidado
 as linhas incrementalmente com delimitador `;`. Nomes de colunas como
 `SQ_CANDIDATO` e `NM_CANDIDATO` permanecem restritos à camada source/parser e
 não são introduzidos no modelo canônico.
+
+Em 14 de agosto de 2026 foram inspecionados os ZIPs oficiais nacionais de 2014,
+2018, 2022 e 2026. As versões então publicadas usam o mesmo layout consolidado,
+ISO-8859-1 e incluem `NR_CPF_CANDIDATO`, `NR_TITULO_ELEITORAL_CANDIDATO`,
+`SG_UF_NASCIMENTO`, `DT_NASCIMENTO`, `CD_GENERO`, nomes e `SQ_CANDIDATO`.
+`NM_MUNICIPIO_NASCIMENTO` não está presente. Os quatro ZIPs de bens usam também
+o mesmo layout. Em 2014 foram observados 28 registros sem CPF utilizável; nos
+outros três anos da amostra o campo estava preenchido.
+
+Na comparação oficial, milhares de CPFs reaparecem entre pleitos, enquanto
+nenhum `SQ_CANDIDATO` compartilhado manteve o mesmo valor entre 2014–2018,
+2018–2022 ou 2022–2026. Portanto, `SQ_CANDIDATO` é usado exclusivamente como
+identidade da candidatura/inscrição e para relacionar bens.
 
 O pipeline de bens usa o ZIP oficial `bem_candidato_<ano>.zip`, seleciona
 explicitamente `bem_candidato_<ano>_BRASIL.csv`, decodifica ISO-8859-1 e lê CSV
@@ -259,22 +278,29 @@ mesmos registros.
 
 Para candidatos, `CandidatePersistenceService` consome somente
 `NormalizedCandidateData`. Ele resolve eleição por `(year, type, round)`,
-partido pelo identificador de fonte com fallback exato para número/sigla,
+partido pelo snapshot oficial exato de nome/sigla/número,
 cargo pelo código canônico e candidatura por `sourceCandidateId`.
 
-Como o TSE não fornece no arquivo atual um identificador estável de pessoa
-separado da candidatura, pessoas só são reutilizadas entre candidaturas quando
-nome canônico e data de nascimento coincidem exatamente, o gênero não é
-conflitante e não existe outra candidatura dessa pessoa na mesma eleição. Nome
-sozinho nunca é usado. Sem data de nascimento, ou quando já existe uma
-candidatura no mesmo pleito, uma nova pessoa é criada; uma reexecução da mesma
-candidatura reutiliza a pessoa já relacionada. Essa escolha prioriza evitar
-falsos merges e foi confirmada por uma colisão real de nome e nascimento no
-dataset de 2026.
+`NR_CPF_CANDIDATO` é convertido imediatamente em um fingerprint SHA-256 com
+separação de domínio; o valor bruto não sai da camada source. A resolução segue:
 
-O banco mantém apenas um índice não exclusivo em `(name, birthDate)` para
-acelerar essa busca; não existe constraint de unicidade sobre identidade
-composta.
+``` text
+PersonExternalIdentity(TSE, cpf-sha256)
+        ↓ ausente
+nome NFKC/caixa/espaços exato + nascimento + UF de nascimento + gênero
+        ↓ zero candidatos             ↓ múltiplos candidatos
+nova Person                           AMBIGUOUS / REJECTED
+```
+
+Nome sozinho, nome de urna, partido, cargo e UF eleitoral nunca provam
+identidade. Acentos não são removidos e não há fuzzy matching. Quando um banco
+legado contém duas pessoas e o identificador estável prova a duplicidade, a
+consolidação move candidaturas, identidades externas e todas as relações
+legislativas na mesma transação. Qualquer conflito de unicidade cancela a
+operação; não existe merge amplo ou probabilístico.
+
+O índice `(birthDate, birthState, gender)` limita a busca composta. A identidade
+TSE exata usa o índice único existente em `(source, externalId)`.
 
 ``` text
 NormalizedCandidateData

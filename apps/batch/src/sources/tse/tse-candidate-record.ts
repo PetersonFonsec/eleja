@@ -6,6 +6,7 @@ export interface TseCandidateRecord {
   candidateId: string;
   candidateFullName: string;
   candidateBallotName: string;
+  candidateCpf?: string;
   candidateBallotNumber: number;
   partySourceId: string;
   partyAcronym: string;
@@ -17,6 +18,7 @@ export interface TseCandidateRecord {
   electoralUnitCode: string;
   electoralUnitName: string;
   birthDate: string;
+  birthState?: string;
   gender: string;
   education: string;
   occupation: string;

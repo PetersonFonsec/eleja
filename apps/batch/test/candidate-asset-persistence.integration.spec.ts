@@ -67,11 +67,9 @@ describe('CandidateAssetPersistenceService', () => {
         orm.em.fork().count(CandidateAsset, { candidacy: fixture.candidacy }),
       ).resolves.toBe(1);
       await expect(
-        orm.em
-          .fork()
-          .count(CandidateAssetSource, {
-            rawChecksum: { $in: ['a'.repeat(64), 'b'.repeat(64)] },
-          }),
+        orm.em.fork().count(CandidateAssetSource, {
+          rawChecksum: { $in: ['a'.repeat(64), 'b'.repeat(64)] },
+        }),
       ).resolves.toBe(2);
     } finally {
       await fixture.cleanup();

@@ -1,4 +1,8 @@
 import type { TseCandidateRecord } from '../sources/tse/tse-candidate-record.js';
+import {
+  fingerprintTseCpf,
+  normalizeBirthState,
+} from '../identity/tse-person-identity.js';
 import type {
   CandidateNormalizationIssue,
   CandidateNormalizationResult,
@@ -124,6 +128,7 @@ export class TseCandidateNormalizer {
       personName: normalizeRequired(record.candidateFullName),
       ballotName: normalizeRequired(record.candidateBallotName),
       birthDate: normalizeRequired(record.birthDate),
+      birthState: normalizeBirthState(record.birthState ?? ''),
     };
     for (const [field, value] of Object.entries(requiredValues)) {
       if (!value) {
@@ -179,9 +184,11 @@ export class TseCandidateNormalizer {
       person: {
         name: requiredValues.personName!,
         birthDate: requiredValues.birthDate!,
+        birthState: requiredValues.birthState!,
         gender: normalizeOptional(record.gender),
         education: normalizeOptional(record.education),
         occupation: normalizeOptional(record.occupation),
+        tseCpfFingerprint: fingerprintTseCpf(record.candidateCpf ?? ''),
       },
       candidacy: {
         sourceCandidateId,

@@ -69,6 +69,9 @@ export const TSE_CANDIDACY_STATUS_MAPPINGS: Readonly<
   Record<string, CandidacyStatus>
 > = {
   '#NE': CandidacyStatus.UNKNOWN,
+  APTO: CandidacyStatus.ACTIVE,
+  INAPTO: CandidacyStatus.INACTIVE,
+  CADASTRADO: CandidacyStatus.UNKNOWN,
 };
 
 export const TSE_ELECTION_TYPE_MAPPINGS: Readonly<

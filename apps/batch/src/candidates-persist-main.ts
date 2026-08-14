@@ -25,6 +25,10 @@ interface PersistenceStatistics {
   sourcesInserted: number;
   sourcesUpdated: number;
   sourcesUnchanged: number;
+  matchedByStableIdentifier: number;
+  matchedByStrongComposite: number;
+  ambiguousMatches: number;
+  persistenceRejectionsByReason: Record<string, number>;
 }
 
 async function main(): Promise<void> {
@@ -65,6 +69,10 @@ async function main(): Promise<void> {
       sourcesInserted: 0,
       sourcesUpdated: 0,
       sourcesUnchanged: 0,
+      matchedByStableIdentifier: 0,
+      matchedByStrongComposite: 0,
+      ambiguousMatches: 0,
+      persistenceRejectionsByReason: {},
     };
 
     console.log('TSE candidate persistence started');
@@ -108,6 +116,16 @@ async function main(): Promise<void> {
     console.log(`Parties created: ${statistics.partiesCreated}`);
     console.log(`Offices created: ${statistics.officesCreated}`);
     console.log(`People created: ${statistics.peopleCreated}`);
+    console.log(
+      `Matched by stable identifier: ${statistics.matchedByStableIdentifier}`,
+    );
+    console.log(
+      `Matched by strong composite: ${statistics.matchedByStrongComposite}`,
+    );
+    console.log(`Ambiguous matches: ${statistics.ambiguousMatches}`);
+    console.log(
+      `Persistence rejections: ${JSON.stringify(statistics.persistenceRejectionsByReason)}`,
+    );
     console.log(`Sources inserted: ${statistics.sourcesInserted}`);
     console.log(`Sources updated: ${statistics.sourcesUpdated}`);
     console.log(`Sources unchanged: ${statistics.sourcesUnchanged}`);
@@ -130,6 +148,11 @@ async function persistBuffer(
     const result = await persistence.persist(data, context);
     if (result.status === 'REJECTED') {
       statistics.persistenceRejected += 1;
+      statistics.persistenceRejectionsByReason[result.issue.reason] =
+        (statistics.persistenceRejectionsByReason[result.issue.reason] ?? 0) +
+        1;
+      if (result.issue.reason.includes('ambiguous'))
+        statistics.ambiguousMatches += 1;
       continue;
     }
     if (result.status === 'INSERTED') statistics.inserted += 1;
@@ -139,6 +162,10 @@ async function persistBuffer(
     statistics.partiesCreated += Number(result.created.party);
     statistics.officesCreated += Number(result.created.office);
     statistics.peopleCreated += Number(result.created.person);
+    if (result.identityMatchMethod === 'EXACT_EXTERNAL_IDENTIFIER')
+      statistics.matchedByStableIdentifier += 1;
+    if (result.identityMatchMethod === 'STRONG_COMPOSITE')
+      statistics.matchedByStrongComposite += 1;
     if (result.sourceStatus === 'INSERTED') statistics.sourcesInserted += 1;
     if (result.sourceStatus === 'UPDATED') statistics.sourcesUpdated += 1;
     if (result.sourceStatus === 'UNCHANGED') statistics.sourcesUnchanged += 1;

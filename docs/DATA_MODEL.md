@@ -22,11 +22,13 @@ Portanto:
 ``` text
 Person
   |
-  +-- Candidacy 2022
+  +-- Candidacy 2014 -- CandidateAsset[]
   |
-  +-- Candidacy 2024
+  +-- Candidacy 2018 -- CandidateAsset[]
   |
-  +-- Candidacy 2026
+  +-- Candidacy 2022 -- CandidateAsset[]
+  |
+  +-- Candidacy 2026 -- CandidateAsset[]
 ```
 
 Não modelar a pessoa diretamente como "Candidate".
@@ -83,6 +85,7 @@ Campos iniciais:
 id
 name
 birthDate
+birthState
 gender
 education
 occupation
@@ -119,8 +122,10 @@ createdAt
 updatedAt
 ```
 
-`sourceCandidateId` representa o identificador estável fornecido pela
-fonte principal, quando disponível.
+`sourceCandidateId` representa a identidade da inscrição/candidatura na fonte.
+No TSE ele recebe `SQ_CANDIDATO`: esse valor liga a candidatura aos seus bens,
+mas não identifica a mesma pessoa entre eleições. A identidade de `Person` e a
+identidade de `Candidacy` são deliberadamente separadas.
 
 `status` representa o estado canônico mínimo da candidatura (`ACTIVE`,
 `INACTIVE` ou `UNKNOWN`). `sourceStatus` preserva a descrição original da
@@ -140,6 +145,11 @@ number
 createdAt
 updatedAt
 ```
+
+Partidos são snapshots da combinação oficial `(name, acronym, number)` usada
+na candidatura. Número e identificador da fonte não são globalmente únicos ao
+longo da história; siglas renomeadas ou números reutilizados não sobrescrevem a
+filiação registrada em outro pleito. Genealogia partidária não é inferida.
 
 ## 8. Office
 
@@ -461,6 +471,12 @@ em fontes diferentes e que uma pessoa tenha identidades TSE, Câmara e Senado.
 `verifiedAt` é opcional e não implica um workflow de verificação.
 
 IDs de provedores não são armazenados diretamente em `Person`.
+
+Para o TSE, `externalId` armazena somente
+`cpf-sha256:<fingerprint>`, derivado com SHA-256 e separação de domínio. O CPF
+bruto existe apenas no registro transitório do parser, não é persistido, não é
+logado e não é exposto pela API. `SQ_CANDIDATO` não entra nessa entidade porque
+identifica a candidatura do pleito, não a pessoa.
 
 ### LegislativeMandate
 

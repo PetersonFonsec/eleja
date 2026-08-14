@@ -45,6 +45,10 @@ export class CandidateImportPipeline {
       updated: 0,
       unchanged: 0,
       persistenceRejected: 0,
+      matchedByStableIdentifier: 0,
+      matchedByStrongComposite: 0,
+      newPersonsCreated: 0,
+      ambiguousMatches: 0,
     };
     stage('PARSE_CANDIDATES');
     stage('NORMALIZE_CANDIDATES');
@@ -89,10 +93,21 @@ async function persistCandidates(
       rawChecksum: artifact.checksum,
       importedAt: artifact.extractedAt,
     });
-    if (result.status === 'REJECTED') statistics.persistenceRejected += 1;
-    else if (result.status === 'INSERTED') statistics.inserted += 1;
-    else if (result.status === 'UPDATED') statistics.updated += 1;
-    else statistics.unchanged += 1;
+    if (result.status === 'REJECTED') {
+      statistics.persistenceRejected += 1;
+      if (result.issue.reason.includes('ambiguous'))
+        statistics.ambiguousMatches += 1;
+    } else {
+      if (result.status === 'INSERTED') statistics.inserted += 1;
+      else if (result.status === 'UPDATED') statistics.updated += 1;
+      else statistics.unchanged += 1;
+      if (result.identityMatchMethod === 'EXACT_EXTERNAL_IDENTIFIER')
+        statistics.matchedByStableIdentifier += 1;
+      if (result.identityMatchMethod === 'STRONG_COMPOSITE')
+        statistics.matchedByStrongComposite += 1;
+      if (result.identityMatchMethod === 'NEW_PERSON')
+        statistics.newPersonsCreated += 1;
+    }
   }
   buffer.length = 0;
 }

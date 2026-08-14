@@ -25,9 +25,11 @@ export interface NormalizedCandidateData {
   person: {
     name: string;
     birthDate: string | null;
+    birthState?: string | null;
     gender: string | null;
     education: string | null;
     occupation: string | null;
+    tseCpfFingerprint?: string | null;
   };
   candidacy: {
     sourceCandidateId: string;

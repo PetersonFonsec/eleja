@@ -159,6 +159,10 @@ function emptyCandidates(): CandidatePipelineStatistics {
     updated: 0,
     unchanged: 0,
     persistenceRejected: 0,
+    matchedByStableIdentifier: 0,
+    matchedByStrongComposite: 0,
+    newPersonsCreated: 0,
+    ambiguousMatches: 0,
   };
 }
 

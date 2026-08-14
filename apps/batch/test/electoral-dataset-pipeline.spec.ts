@@ -17,6 +17,10 @@ const candidateStats: CandidatePipelineStatistics = {
   updated: 2,
   unchanged: 1,
   persistenceRejected: 0,
+  matchedByStableIdentifier: 0,
+  matchedByStrongComposite: 0,
+  newPersonsCreated: 0,
+  ambiguousMatches: 0,
 };
 const assetStats: AssetPipelineStatistics = {
   recordsRead: 20,

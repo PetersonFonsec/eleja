@@ -296,6 +296,10 @@ também está implementada com estado compartilhável na URL e totais de patrim�
 declarado. O perfil agora apresenta também o histórico parlamentar disponível
 na Câmara, com resumo e listas paginadas carregadas sob demanda para mandatos,
 proposições, votações nominais e despesas CEAP.
+Também está implementada a fundação histórica TSE para eleições gerais de
+2014, 2018, 2022 e 2026: identidade determinística de pessoa entre pleitos,
+candidaturas históricas e bens declarados por candidatura. Cálculos de evolução,
+rankings, APIs analíticas e dashboard permanecem pendentes.
 
 ### Pendente
 

@@ -33,6 +33,8 @@ const HEADERS = [
   'DS_OCUPACAO',
   'DS_SITUACAO_CANDIDATURA',
   'NM_SOCIAL_CANDIDATO',
+  'NR_CPF_CANDIDATO',
+  'SG_UF_NASCIMENTO',
 ];
 
 const VALID_VALUES = [
@@ -58,6 +60,8 @@ const VALID_VALUES = [
   'PROFESSOR DE EDUCAÇÃO',
   'APTO',
   '',
+  '12345678901',
+  'MG',
 ];
 
 function csvRow(values: string[]): string {
@@ -105,8 +109,10 @@ describe('TseCandidateDatasetParser', () => {
         electionYear: 2026,
         candidateId: '280001234567',
         candidateFullName: 'JOÃO; "JÚNIOR" GONÇALVES',
+        candidateCpf: '12345678901',
         electoralUnitName: 'SÃO PAULO',
         birthDate: '1980-02-29',
+        birthState: 'MG',
         education: 'SUPERIOR COMPLETO',
         occupation: 'PROFESSOR DE EDUCAÇÃO',
         gender: 'MASCULINO',

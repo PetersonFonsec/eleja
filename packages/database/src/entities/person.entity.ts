@@ -17,6 +17,10 @@ import { PersonExternalIdentity } from './person-external-identity.entity.js';
   name: 'people_name_birth_date_idx',
   properties: ['name', 'birthDate'],
 })
+@Index({
+  name: 'people_birth_date_birth_state_gender_idx',
+  properties: ['birthDate', 'birthState', 'gender'],
+})
 export class Person {
   @PrimaryKey({ type: 'uuid' })
   id = randomUUID();
@@ -26,6 +30,9 @@ export class Person {
 
   @Property({ type: 'date', nullable: true })
   birthDate: string | null;
+
+  @Property({ type: 'string', length: 2, nullable: true })
+  birthState: string | null;
 
   @Property({ type: 'string', length: 100, nullable: true })
   gender: string | null;
@@ -63,6 +70,7 @@ export class Person {
     education: string | null = null,
     occupation: string | null = null,
     createdAt = new Date(),
+    birthState: string | null = null,
   ) {
     if (name.trim().length === 0) {
       throw new Error('Person name must not be empty');
@@ -83,6 +91,10 @@ export class Person {
 
     this.name = name;
     this.birthDate = birthDate;
+    if (birthState !== null && !/^[A-Z]{2}$/.test(birthState)) {
+      throw new Error('Person birth state must use a two-letter UF');
+    }
+    this.birthState = birthState;
     this.gender = gender;
     this.education = education;
     this.occupation = occupation;
