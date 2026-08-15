@@ -1,7 +1,7 @@
 import { resolve } from 'node:path';
 import { CandidateDatasetExtractor } from './extraction/candidate-dataset-extractor.js';
 import { TseCandidateDatasetSource } from './sources/tse/tse-candidate-dataset-source.js';
-import { FileSystemRawStorage } from './storage/file-system-raw-storage.js';
+import { createRawStorage } from './storage/raw-storage-factory.js';
 
 function readElectionYear(arguments_: string[]): number {
   const inline = arguments_.find((argument) => argument.startsWith('--year='));
@@ -17,15 +17,9 @@ async function main(): Promise<void> {
   const electionYear = readElectionYear(process.argv.slice(2));
   const timeoutMs = Number(process.env.TSE_DOWNLOAD_TIMEOUT_MS ?? 60_000);
   const repositoryRoot = resolve(__dirname, '../../..');
-  const rawStorageRoot = resolve(
-    repositoryRoot,
-    process.env.RAW_STORAGE_ROOT ?? '.data/raw',
-  );
+  const rawStorage = createRawStorage(process.env, repositoryRoot);
   const source = new TseCandidateDatasetSource(fetch, timeoutMs);
-  const extractor = new CandidateDatasetExtractor(
-    source,
-    new FileSystemRawStorage(rawStorageRoot),
-  );
+  const extractor = new CandidateDatasetExtractor(source, rawStorage.storage);
 
   console.log('TSE candidate extraction started');
   console.log(`Election year: ${electionYear}`);

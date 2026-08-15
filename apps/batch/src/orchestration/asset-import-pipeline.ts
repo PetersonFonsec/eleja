@@ -4,7 +4,7 @@ import { TseCandidateAssetNormalizer } from '../normalization/tse-candidate-asse
 import { CandidateAssetPersistenceService } from '../persistence/candidate-asset-persistence.js';
 import { TseCandidateAssetDatasetSource } from '../sources/tse/tse-candidate-asset-dataset-source.js';
 import { TseCandidateAssetDatasetParser } from '../sources/tse/tse-candidate-asset-parser.js';
-import { FileSystemRawStorage } from '../storage/file-system-raw-storage.js';
+import type { RawStorage } from '../storage/raw-storage.js';
 import type {
   AssetPipelineStatistics,
   ElectoralPipelineStage,
@@ -15,7 +15,7 @@ type Database = Awaited<ReturnType<typeof initializeDatabase>>;
 export class AssetImportPipeline {
   constructor(
     private readonly orm: Database,
-    private readonly rawStorageRoot: string,
+    private readonly storage: RawStorage,
     private readonly timeoutMs: number,
   ) {}
 
@@ -23,14 +23,13 @@ export class AssetImportPipeline {
     year: number,
     stage: (stage: ElectoralPipelineStage) => void,
   ): Promise<AssetPipelineStatistics> {
-    const storage = new FileSystemRawStorage(this.rawStorageRoot);
     const source = new TseCandidateAssetDatasetSource(fetch, this.timeoutMs);
     stage('EXTRACT_ASSETS');
     const artifact = await new CandidateAssetDatasetExtractor(
       source,
-      storage,
+      this.storage,
     ).extract(year);
-    const content = await storage.get(artifact.storageKey);
+    const content = await this.storage.get(artifact.storageKey);
     const parser = new TseCandidateAssetDatasetParser();
     const normalizer = new TseCandidateAssetNormalizer();
     const persistence = new CandidateAssetPersistenceService(this.orm);

@@ -44,6 +44,31 @@ Abra `http://localhost:4200/candidates`. O Docker elimina a necessidade de uma
 instalação local do PostgreSQL. `npm run db:down` encerra o banco sem apagar o
 volume; a ingestão nunca é executada automaticamente ao iniciar a API ou o web.
 
+### Armazenamento RAW
+
+O filesystem continua sendo o backend padrão para desenvolvimento:
+
+``` env
+RAW_STORAGE_DRIVER=filesystem
+RAW_STORAGE_ROOT=.data/raw
+```
+
+Para armazenar os arquivos RAW no Cloudflare R2, configure apenas no ambiente
+do batch (sem expor credenciais ao frontend):
+
+``` env
+RAW_STORAGE_DRIVER=r2
+R2_ACCOUNT_ID=
+R2_ACCESS_KEY_ID=
+R2_SECRET_ACCESS_KEY=
+R2_BUCKET=
+```
+
+`npm run r2:check` realiza uma verificação real e autenticada de upload,
+existência, download e SHA-256 usando uma chave isolada sob `health/`. A chave é
+estável e inofensiva; ela não é removida porque exclusão não faz parte da
+abstração mínima de RAW storage.
+
 O panorama analítico está disponível em `http://localhost:4200/dashboard`. Os
 filtros de eleição, cargo, UF e partido ficam na URL e atualizam o resumo, a
 cobertura, os rankings financeiros, o histórico visual de patrimônio declarado

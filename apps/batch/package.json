@@ -14,6 +14,7 @@
     "start:export": "npm run build --workspace @eleja/database && npm run build && node --env-file-if-exists=../../.env dist/export-main.js",
     "start:publish": "npm run build --workspace @eleja/database && npm run build && node --env-file-if-exists=../../.env dist/publish-main.js",
     "start:run": "npm run build --workspace @eleja/database && npm run build && node --env-file-if-exists=../../.env dist/run-main.js",
+    "r2:check": "npm run build && node --env-file-if-exists=../../.env dist/r2-check-main.js",
     "start:camara:match-deputies": "npm run build --workspace @eleja/database && npm run build && node --env-file-if-exists=../../.env dist/camara-match-deputies-main.js",
     "start:camara:mandates": "npm run build --workspace @eleja/database && npm run build && node --env-file-if-exists=../../.env dist/camara-mandates-main.js",
     "start:camara:proposals": "npm run build --workspace @eleja/database && npm run build && node --env-file-if-exists=../../.env dist/camara-proposals-main.js",

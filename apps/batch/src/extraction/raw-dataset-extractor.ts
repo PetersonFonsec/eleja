@@ -44,7 +44,16 @@ export async function storeRawDataset(
     const alreadyExists = await storage.exists(storageKey);
     const result = alreadyExists
       ? { stored: false }
-      : await storage.put(storageKey, createReadStream(file));
+      : await storage.put(storageKey, createReadStream(file), {
+          contentLength: size,
+          contentType: download.contentType,
+          metadata: {
+            sha256: checksum,
+            source: 'tse',
+            year: keyPrefix[1] ?? '',
+            dataset: keyPrefix[2] ?? '',
+          },
+        });
     return { checksum, storageKey, size, stored: result.stored };
   } finally {
     await rm(directory, { recursive: true, force: true });

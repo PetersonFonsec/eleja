@@ -109,6 +109,21 @@ tse/<ano>/candidates/<sha256>/<nome-original>
 Essa chave torna a extração idempotente para um conteúdo inalterado e preserva
 uma versão histórica diferente quando a fonte oficial muda.
 
+Em execução persistente, `RAW_STORAGE_DRIVER=r2` usa o Cloudflare R2 pela API
+compatível com S3; `filesystem` continua sendo o padrão local. O download
+oficial é transmitido para um arquivo temporário enquanto o SHA-256 é
+calculado. Depois, esse arquivo é enviado por stream à chave final abaixo e o
+temporário é removido. Assim, a chave deriva dos bytes originais sem manter o
+ZIP inteiro em memória. Um objeto já existente é reutilizado via HEAD, sem
+novo upload.
+
+As chaves lógicas, iguais nos dois backends, são:
+
+``` text
+tse/<ano>/candidates/<sha256>/consulta_cand_<ano>.zip
+tse/<ano>/assets/<sha256>/bem_candidato_<ano>.zip
+```
+
 O mesmo mecanismo atende bens declarados em:
 
 ``` text

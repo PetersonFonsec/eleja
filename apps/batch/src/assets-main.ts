@@ -1,21 +1,18 @@
 import { resolve } from 'node:path';
 import { CandidateAssetDatasetExtractor } from './extraction/candidate-asset-dataset-extractor.js';
-import { FileSystemRawStorage } from './storage/file-system-raw-storage.js';
+import { createRawStorage } from './storage/raw-storage-factory.js';
 import { TseCandidateAssetDatasetSource } from './sources/tse/tse-candidate-asset-dataset-source.js';
 
 async function main(): Promise<void> {
   const year = Number(readOption('year') ?? '2026');
-  const root = resolve(
-    __dirname,
-    '../../..',
-    process.env.RAW_STORAGE_ROOT ?? '.data/raw',
-  );
+  const repositoryRoot = resolve(__dirname, '../../..');
+  const rawStorage = createRawStorage(process.env, repositoryRoot);
   const result = await new CandidateAssetDatasetExtractor(
     new TseCandidateAssetDatasetSource(
       fetch,
       Number(process.env.TSE_DOWNLOAD_TIMEOUT_MS ?? 60_000),
     ),
-    new FileSystemRawStorage(root),
+    rawStorage.storage,
   ).extract(year);
   console.log(JSON.stringify(result, null, 2));
 }

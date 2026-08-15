@@ -7,16 +7,14 @@ import {
   ElectoralDatasetPipeline,
 } from './orchestration/electoral-dataset-pipeline.js';
 import { MikroOrmPipelineExecutionStore } from './orchestration/mikro-orm-pipeline-execution-store.js';
+import { createRawStorage } from './storage/raw-storage-factory.js';
 
 async function main(): Promise<void> {
   const year = readYear(process.argv.slice(2));
   const version = readVersion(process.argv.slice(2)) ?? todayVersion();
   validateVersion(year, version);
   const repositoryRoot = resolve(__dirname, '../../..');
-  const rawRoot = resolve(
-    repositoryRoot,
-    process.env.RAW_STORAGE_ROOT ?? '.data/raw',
-  );
+  const rawStorage = createRawStorage(process.env, repositoryRoot);
   const exportRoot = resolve(
     repositoryRoot,
     process.env.CSV_EXPORT_ROOT ?? '.data/exports',
@@ -39,8 +37,13 @@ async function main(): Promise<void> {
     const result = await new ElectoralDatasetPipeline(
       orm,
       new MikroOrmPipelineExecutionStore(orm),
-      new CandidateImportPipeline(orm, rawRoot, timeout, persistBatchSize),
-      new AssetImportPipeline(orm, rawRoot, timeout),
+      new CandidateImportPipeline(
+        orm,
+        rawStorage.storage,
+        timeout,
+        persistBatchSize,
+      ),
+      new AssetImportPipeline(orm, rawStorage.storage, timeout),
       createDatasetExporter(orm, exportBatchSize),
       exportRoot,
     ).execute(year, version);

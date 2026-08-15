@@ -181,6 +181,27 @@ públicos dos datasets.
 
 Armazena objetos que não precisam ficar no banco relacional.
 
+Para arquivos RAW, o batch seleciona exatamente um backend na inicialização:
+
+``` text
+Fontes oficiais
+      |
+      v
+    Batch
+      |
+      v
+ RawStorage
+   |-- filesystem local
+   `-- Cloudflare R2 (S3 compatível, autenticado)
+      |
+      v
+ Parse -> Normalize -> PostgreSQL
+```
+
+`RAW_STORAGE_DRIVER=filesystem|r2` é a única fronteira de seleção; não há
+dual-write nem fallback silencioso. A publicação dos CSVs permanece uma etapa
+separada e não foi incorporada à abstração de RAW storage.
+
 Estrutura conceitual:
 
 ``` text

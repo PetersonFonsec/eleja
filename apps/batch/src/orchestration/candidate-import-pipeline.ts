@@ -5,7 +5,7 @@ import { CandidatePersistenceService } from '../persistence/candidate-persistenc
 import { CandidateDatasetExtractor } from '../extraction/candidate-dataset-extractor.js';
 import { TseCandidateDatasetSource } from '../sources/tse/tse-candidate-dataset-source.js';
 import { TseCandidateDatasetParser } from '../sources/tse/tse-candidate-parser.js';
-import { FileSystemRawStorage } from '../storage/file-system-raw-storage.js';
+import type { RawStorage } from '../storage/raw-storage.js';
 import type {
   CandidatePipelineStatistics,
   ElectoralPipelineStage,
@@ -16,7 +16,7 @@ type Database = Awaited<ReturnType<typeof initializeDatabase>>;
 export class CandidateImportPipeline {
   constructor(
     private readonly orm: Database,
-    private readonly rawStorageRoot: string,
+    private readonly storage: RawStorage,
     private readonly timeoutMs: number,
     private readonly batchSize: number,
   ) {}
@@ -25,14 +25,13 @@ export class CandidateImportPipeline {
     year: number,
     stage: (stage: ElectoralPipelineStage) => void,
   ): Promise<CandidatePipelineStatistics> {
-    const storage = new FileSystemRawStorage(this.rawStorageRoot);
     const source = new TseCandidateDatasetSource(fetch, this.timeoutMs);
     stage('EXTRACT_CANDIDATES');
     const artifact = await new CandidateDatasetExtractor(
       source,
-      storage,
+      this.storage,
     ).extract(year);
-    const content = await storage.get(artifact.storageKey);
+    const content = await this.storage.get(artifact.storageKey);
     const parser = new TseCandidateDatasetParser();
     const normalizer = new TseCandidateNormalizer();
     const persistence = new CandidatePersistenceService(this.orm);
