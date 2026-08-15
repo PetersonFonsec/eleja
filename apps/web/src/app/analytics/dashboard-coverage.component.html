@@ -8,7 +8,10 @@
       <p class="eyebrow">Transparência</p>
       <h2 id="coverage-title">Cobertura dos dados</h2>
     </div>
-    <p>Informações disponíveis na Eleja para a população selecionada.</p>
+    <p>
+      A cobertura indica quantos candidatos possuem dados disponíveis em cada
+      fonte integrada ao Eleja.
+    </p>
   </div>
   @if (loading) {
     <p class="loading" role="status">Carregando cobertura…</p>
@@ -18,28 +21,39 @@
       <button type="button" (click)="retry.emit()">Tentar novamente</button>
     </div>
   } @else if (coverage) {
-    <div class="coverage-list">
-      @for (item of items(); track item[0]) {
-        <div class="coverage-item">
-          <div class="coverage-label">
-            <strong>{{ item[0] }}</strong
-            ><span
-              >{{ integer.format(item[1]) }} de
-              {{ integer.format(coverage.candidateCount) }} candidatos ·
-              {{ percentage.format(percent(item[1])) }}%</span
-            >
+    <div class="coverage-groups">
+      @for (group of groups(); track group.source) {
+        <section class="coverage-group" [attr.aria-label]="group.source">
+          <h3>{{ group.source }}</h3>
+          <div class="coverage-list">
+            @for (item of group.items; track item.label) {
+              <div class="coverage-item">
+                <div class="coverage-label">
+                  <strong>{{ item.label }}</strong
+                  ><span
+                    >{{ integer.format(item.count) }} de
+                    {{ integer.format(item.total) }} {{ item.population }} ·
+                    {{
+                      percentage.format(percent(item.count, item.total))
+                    }}%</span
+                  >
+                </div>
+                <div
+                  class="track"
+                  role="progressbar"
+                  [attr.aria-label]="item.label"
+                  [attr.aria-valuenow]="percent(item.count, item.total)"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                >
+                  <span
+                    [style.width.%]="percent(item.count, item.total)"
+                  ></span>
+                </div>
+              </div>
+            }
           </div>
-          <div
-            class="track"
-            role="progressbar"
-            [attr.aria-label]="item[0]"
-            [attr.aria-valuenow]="percent(item[1])"
-            aria-valuemin="0"
-            aria-valuemax="100"
-          >
-            <span [style.width.%]="percent(item[1])"></span>
-          </div>
-        </div>
+        </section>
       }
     </div>
   }

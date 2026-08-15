@@ -32,10 +32,24 @@
   margin: 0 0 0.4rem;
   text-transform: uppercase;
 }
+.coverage-groups {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.coverage-group {
+  border: 1px solid #e1e9e6;
+  border-radius: 13px;
+  padding: 1rem;
+}
+.coverage-group h3 {
+  color: #174b40;
+  font-size: 0.78rem;
+  margin: 0 0 1rem;
+}
 .coverage-list {
   display: grid;
   gap: 1.15rem;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 .coverage-label {
   display: flex;
@@ -79,7 +93,7 @@
   padding: 0.65rem 0.9rem;
 }
 @media (max-width: 720px) {
-  .coverage-list {
+  .coverage-groups {
     grid-template-columns: 1fr;
   }
   .section-heading {

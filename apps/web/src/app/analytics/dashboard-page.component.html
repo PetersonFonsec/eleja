@@ -46,21 +46,14 @@
     (retryExpenses)="retryExpenses()"
   />
 
-  @if (
-    !summaryLoading() && !summaryError() && summary()?.candidates?.total !== 0
-  ) {
-    <section class="future-grid" aria-label="Próximas análises do panorama">
-      <article>
-        <p class="tag">Em breve</p>
-        <h2>Evolução patrimonial</h2>
-        <p>
-          Histórico dos bens declarados por uma mesma pessoa ao longo das
-          eleições.
-        </p>
-        <span>Sem inferências sobre causa ou enriquecimento</span>
-      </article>
-    </section>
-  }
+  <app-dashboard-wealth-evolution [filters]="filters()" />
+
+  <app-dashboard-legislative
+    [analytics]="legislative()"
+    [loading]="legislativeLoading()"
+    [error]="legislativeError()"
+    (retry)="retryLegislative()"
+  />
 
   <app-dashboard-coverage
     [coverage]="coverage()"
@@ -75,15 +68,21 @@
       <h2 id="sources-title">Fontes dos dados</h2>
     </div>
     <article>
-      <strong>TSE</strong>
-      <p>Candidaturas e patrimônio declarado em cada eleição.</p>
+      <strong>Tribunal Superior Eleitoral (TSE)</strong>
+      <ul>
+        <li>Candidaturas</li>
+        <li>Patrimônio declarado</li>
+        <li>Histórico patrimonial</li>
+      </ul>
     </article>
     <article>
       <strong>Câmara dos Deputados</strong>
-      <p>
-        Mandatos, proposições, votações e despesas parlamentares integradas pela
-        Eleja.
-      </p>
+      <ul>
+        <li>Mandatos</li>
+        <li>Proposições</li>
+        <li>Votações nominais</li>
+        <li>Despesas parlamentares</li>
+      </ul>
     </article>
   </section>
 </main>

@@ -74,3 +74,35 @@ export type DeclaredWealthRanking =
   AnalyticsRankingResponse<DeclaredWealthRankingItem>;
 export type ParliamentaryExpenseRanking =
   AnalyticsRankingResponse<ParliamentaryExpenseRankingItem>;
+
+export interface WealthHistoryPoint {
+  candidateId: string;
+  electionYear: number;
+  electionType: string;
+  officeCode: string;
+  state: string | null;
+  assetCount: number;
+  declaredWealth: string;
+}
+
+export interface CandidateWealthHistory {
+  candidateId: string;
+  personId: string;
+  hasHistoricalSeries: boolean;
+  data: WealthHistoryPoint[];
+}
+
+export interface LegislativeAnalytics {
+  filters: PublicAnalyticsFilters;
+  peopleWithLegislativeHistory: number;
+  populationPeople: number;
+  mandates: number;
+  proposalAuthorships: number;
+  primaryAuthorships: number;
+  uniqueProposals: number;
+  individualVotes: number;
+  parliamentaryExpenses: {
+    count: number;
+    totalNetValue: string;
+  };
+}

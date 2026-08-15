@@ -23,16 +23,19 @@ import type {
   AnalyticsFilters,
   AnalyticsSummary,
   DeclaredWealthRanking,
+  LegislativeAnalytics,
   ParliamentaryExpenseRanking,
 } from './analytics.types';
 import { DashboardCoverageComponent } from './dashboard-coverage.component';
 import { DashboardFinancialRankingsComponent } from './dashboard-financial-rankings.component';
+import { DashboardLegislativeComponent } from './dashboard-legislative.component';
 import {
   DashboardFiltersComponent,
   DASHBOARD_OFFICES,
   DASHBOARD_STATES,
 } from './dashboard-filters.component';
 import { DashboardSummaryComponent } from './dashboard-summary.component';
+import { DashboardWealthEvolutionComponent } from './dashboard-wealth-evolution.component';
 
 const DEFAULT_YEAR = 2026;
 
@@ -44,6 +47,8 @@ const DEFAULT_YEAR = 2026;
     DashboardSummaryComponent,
     DashboardCoverageComponent,
     DashboardFinancialRankingsComponent,
+    DashboardWealthEvolutionComponent,
+    DashboardLegislativeComponent,
   ],
   templateUrl: './dashboard-page.component.html',
   styleUrl: './dashboard-page.component.css',
@@ -63,11 +68,15 @@ export class DashboardPageComponent implements OnDestroy {
   readonly expenses = signal<ParliamentaryExpenseRanking | null>(null);
   readonly expensesLoading = signal(true);
   readonly expensesError = signal(false);
+  readonly legislative = signal<LegislativeAnalytics | null>(null);
+  readonly legislativeLoading = signal(true);
+  readonly legislativeError = signal(false);
   private readonly destroyed = new Subject<void>();
   private readonly summaryRetry = new BehaviorSubject<void>(undefined);
   private readonly coverageRetry = new BehaviorSubject<void>(undefined);
   private readonly wealthRetry = new BehaviorSubject<void>(undefined);
   private readonly expensesRetry = new BehaviorSubject<void>(undefined);
+  private readonly legislativeRetry = new BehaviorSubject<void>(undefined);
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -165,6 +174,27 @@ export class DashboardPageComponent implements OnDestroy {
         if (ranking) this.expenses.set(ranking);
         this.expensesLoading.set(false);
       });
+    filterState
+      .pipe(
+        switchMap((filters) => this.legislativeRetry.pipe(map(() => filters))),
+        tap(() => {
+          this.legislativeLoading.set(true);
+          this.legislativeError.set(false);
+        }),
+        switchMap((filters) =>
+          this.api.getLegislativeAnalytics(filters).pipe(
+            catchError(() => {
+              this.legislativeError.set(true);
+              return of(null);
+            }),
+          ),
+        ),
+        takeUntil(this.destroyed),
+      )
+      .subscribe((analytics) => {
+        if (analytics) this.legislative.set(analytics);
+        this.legislativeLoading.set(false);
+      });
   }
 
   ngOnDestroy(): void {
@@ -198,6 +228,9 @@ export class DashboardPageComponent implements OnDestroy {
   }
   retryExpenses(): void {
     this.expensesRetry.next();
+  }
+  retryLegislative(): void {
+    this.legislativeRetry.next();
   }
 }
 

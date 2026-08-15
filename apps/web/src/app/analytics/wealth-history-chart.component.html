@@ -1,0 +1,38 @@
+@let plotted = plot();
+<div
+  class="chart"
+  role="img"
+  aria-label="Gráfico da evolução do patrimônio declarado por eleição"
+>
+  <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+    @for (ratio of [0, 0.25, 0.5, 0.75, 1]; track ratio) {
+      <line
+        x1="12"
+        x2="94"
+        [attr.y1]="84 - ratio * 68"
+        [attr.y2]="84 - ratio * 68"
+        class="grid"
+      />
+    }
+    <polyline [attr.points]="line(plotted)" />
+    @for (point of plotted; track point.candidateId) {
+      <ellipse [attr.cx]="point.x" [attr.cy]="point.y" rx="0.75" ry="2">
+        <title>
+          Eleição {{ point.electionYear }}. {{ office(point.officeCode) }}.
+          Patrimônio declarado {{ money(point.declaredWealth) }}.
+          {{ point.assetCount }} bens declarados.
+        </title>
+      </ellipse>
+    }
+  </svg>
+  <div class="axis-values" aria-hidden="true">
+    <span>{{ axisValue(1) }}</span
+    ><span>{{ axisValue(0.5) }}</span
+    ><span>R$ 0</span>
+  </div>
+  <div class="years" aria-hidden="true">
+    @for (point of plotted; track point.candidateId) {
+      <span>{{ point.electionYear }}</span>
+    }
+  </div>
+</div>

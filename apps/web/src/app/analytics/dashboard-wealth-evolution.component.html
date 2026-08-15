@@ -1,0 +1,161 @@
+<section class="wealth-evolution" aria-labelledby="wealth-evolution-title">
+  <header>
+    <div>
+      <p class="eyebrow">Histórico eleitoral</p>
+      <h2 id="wealth-evolution-title">Evolução do patrimônio declarado</h2>
+      <p>Compare as declarações feitas ao TSE em diferentes eleições.</p>
+    </div>
+    <span>Fonte: Tribunal Superior Eleitoral (TSE)</span>
+  </header>
+
+  <div class="selector">
+    <label for="wealth-candidate-search">Buscar candidato</label>
+    <input
+      id="wealth-candidate-search"
+      type="search"
+      autocomplete="off"
+      placeholder="Digite ao menos 2 caracteres"
+      [value]="query()"
+      (input)="search($event)"
+      [attr.aria-expanded]="results().length > 0"
+      aria-controls="wealth-candidate-results"
+    />
+    @if (searchLoading()) {
+      <small role="status">Buscando candidatos…</small>
+    }
+    @if (searchError()) {
+      <div class="inline-state" role="alert">
+        Não foi possível buscar candidatos.
+        <button type="button" (click)="retrySearch()">Tentar novamente</button>
+      </div>
+    }
+    @if (
+      !searchLoading() && !searchError() && searched() && results().length === 0
+    ) {
+      <small>Nenhum candidato encontrado.</small>
+    }
+    @if (results().length > 0) {
+      <ul id="wealth-candidate-results" class="results">
+        @for (candidate of results(); track candidate.id) {
+          <li>
+            <button type="button" (click)="choose(candidate)">
+              <span class="avatar" aria-hidden="true">{{
+                candidate.ballotName.charAt(0) || '?'
+              }}</span
+              ><span
+                ><strong>{{ candidate.ballotName }}</strong
+                ><small>{{ candidate.name }}</small
+                ><small
+                  >{{ candidate.office.name }}
+                  @if (candidate.state) {
+                    • {{ candidate.state }}
+                  }
+                  • {{ candidate.party.acronym }} •
+                  {{ candidate.election.year }}</small
+                ></span
+              >
+            </button>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+
+  @if (!selected()) {
+    <div class="empty-state">
+      <p>
+        Selecione um candidato para visualizar a evolução do patrimônio
+        declarado ao TSE.
+      </p>
+    </div>
+  } @else {
+    @let candidate = selected()!;
+    <div class="selected-candidate">
+      <span class="avatar" aria-hidden="true">{{
+        candidate.ballotName.charAt(0) || '?'
+      }}</span>
+      <div>
+        <a [routerLink]="['/candidates', candidate.id]">{{
+          candidate.ballotName
+        }}</a>
+        <p>{{ candidate.name }}</p>
+        <small
+          >Candidato a {{ candidate.office.name }}
+          @if (candidate.state) {
+            • {{ candidate.state }}
+          }
+          • {{ candidate.party.acronym }}</small
+        >
+      </div>
+    </div>
+    @if (historyLoading()) {
+      <div class="history-skeleton" aria-busy="true">
+        <span class="sr-only">Carregando histórico patrimonial</span>
+      </div>
+    } @else if (historyError()) {
+      <div class="empty-state" role="alert">
+        <p>Não foi possível carregar o histórico patrimonial.</p>
+        <button type="button" (click)="retryHistory()">Tentar novamente</button>
+      </div>
+    } @else if (history()?.data?.length === 0) {
+      <div class="empty-state">
+        <p>
+          Não encontramos dados patrimoniais declarados suficientes para este
+          candidato.
+        </p>
+      </div>
+    } @else if (
+      history()?.data?.length === 1 || !history()?.hasHistoricalSeries
+    ) {
+      @let point = history()!.data[0]!;
+      <div class="single-point">
+        <span>Patrimônio declarado em {{ point.electionYear }}</span
+        ><strong>{{ money(point.declaredWealth) }}</strong>
+        <p>
+          Não há dados suficientes em outras eleições para formar uma série
+          histórica.
+        </p>
+      </div>
+    } @else {
+      <app-wealth-history-chart [points]="history()!.data" />
+    }
+
+    @if (history() && history()!.data.length > 0 && !historyError()) {
+      <div class="table-wrap">
+        <table>
+          <caption>
+            Declarações patrimoniais por eleição
+          </caption>
+          <thead>
+            <tr>
+              <th>Eleição</th>
+              <th>Cargo e UF</th>
+              <th>Patrimônio declarado</th>
+              <th>Bens</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (point of history()!.data; track point.candidateId) {
+              <tr>
+                <td>{{ point.electionYear }}</td>
+                <td>
+                  {{ office(point.officeCode) }}
+                  @if (point.state) {
+                    • {{ point.state }}
+                  }
+                </td>
+                <td>{{ money(point.declaredWealth) }}</td>
+                <td>{{ point.assetCount }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+  <p class="disclaimer">
+    Os valores representam bens declarados ao TSE em cada candidatura e podem
+    variar conforme regras, composição e momento da declaração. Valores
+    nominais, sem ajuste pela inflação.
+  </p>
+</section>

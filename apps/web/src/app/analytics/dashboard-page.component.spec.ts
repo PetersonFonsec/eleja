@@ -8,6 +8,7 @@ import type {
   AnalyticsCoverage,
   AnalyticsSummary,
   DeclaredWealthRanking,
+  LegislativeAnalytics,
   ParliamentaryExpenseRanking,
 } from './analytics.types';
 import { DashboardCoverageComponent } from './dashboard-coverage.component';
@@ -82,6 +83,17 @@ const expenses = (
   ],
   meta: { limit: 10 },
 });
+const legislative = (people = 3): LegislativeAnalytics => ({
+  filters: { year: 2026, office: null, state: null, party: null },
+  peopleWithLegislativeHistory: people,
+  populationPeople: 10,
+  mandates: 4,
+  proposalAuthorships: 20,
+  uniqueProposals: 18,
+  primaryAuthorships: 12,
+  individualVotes: 90,
+  parliamentaryExpenses: { count: 30, totalNetValue: '12450000.75' },
+});
 
 describe('DashboardPageComponent', () => {
   it('hydrates validated URL filters and requests summary and coverage once', () => {
@@ -110,6 +122,9 @@ describe('DashboardPageComponent', () => {
     expect(fixture.expensesRequest).toHaveBeenCalledWith(
       fixture.page.filters(),
       10,
+    );
+    expect(fixture.legislativeRequest).toHaveBeenCalledWith(
+      fixture.page.filters(),
     );
     expect(fixture.page.summary()?.candidates.total).toBe(31_482);
   });
@@ -216,6 +231,27 @@ describe('DashboardPageComponent', () => {
     expect(fixture.page.wealth()?.data[0]?.candidateId).toBe('current');
     expect(fixture.page.expenses()?.data[0]?.candidateId).toBe('current');
   });
+
+  it('isolates and retries legislative analytics without reloading other sections', () => {
+    let calls = 0;
+    const fixture = setup(
+      () => of(summary(10)),
+      () => of(coverage(10)),
+      { year: '2026' },
+      undefined,
+      undefined,
+      () =>
+        ++calls === 1
+          ? throwError(() => new Error('legislative'))
+          : of(legislative()),
+    );
+    expect(fixture.page.legislativeError()).toBe(true);
+    expect(fixture.page.summary()?.candidates.total).toBe(10);
+    fixture.page.retryLegislative();
+    expect(fixture.page.legislativeError()).toBe(false);
+    expect(fixture.page.legislative()?.mandates).toBe(4);
+    expect(fixture.summaryRequest).toHaveBeenCalledOnce();
+  });
 });
 
 describe('dashboard presentation helpers', () => {
@@ -258,6 +294,9 @@ function setup(
   expensesRequest: () => ReturnType<
     AnalyticsApiService['getParliamentaryExpenseRanking']
   > = () => of({ data: [], meta: { limit: 10 } }),
+  legislativeRequest: () => ReturnType<
+    AnalyticsApiService['getLegislativeAnalytics']
+  > = () => of(legislative(0)),
 ) {
   const params = new BehaviorSubject(convertToParamMap(initial));
   const navigate = vi.fn(async () => true);
@@ -267,11 +306,13 @@ function setup(
   const coverageMock = vi.fn(coverageRequest);
   const wealthMock = vi.fn(wealthRequest);
   const expensesMock = vi.fn(expensesRequest);
+  const legislativeMock = vi.fn(legislativeRequest);
   const api = {
     getSummary: summaryMock,
     getCoverage: coverageMock,
     getDeclaredWealthRanking: wealthMock,
     getParliamentaryExpenseRanking: expensesMock,
+    getLegislativeAnalytics: legislativeMock,
   } as unknown as AnalyticsApiService;
   const title = { setTitle: vi.fn() } as unknown as Title;
   const page = new DashboardPageComponent(route, router, api, title);
@@ -283,5 +324,6 @@ function setup(
     coverageRequest: coverageMock,
     wealthRequest: wealthMock,
     expensesRequest: expensesMock,
+    legislativeRequest: legislativeMock,
   };
 }

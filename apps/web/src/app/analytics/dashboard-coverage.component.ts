@@ -24,21 +24,50 @@ export class DashboardCoverageComponent {
     minimumFractionDigits: 1,
   });
 
-  items() {
+  groups() {
     const data = this.coverage;
     if (!data) return [];
     return [
-      ['Patrimônio declarado', data.coverage.withAssets],
-      ['Histórico patrimonial', data.coverage.withHistoricalAssetSeries],
-      ['Identificação na Câmara', data.coverage.withCamaraIdentity],
-      ['Mandatos', data.coverage.withMandates],
-      ['Proposições', data.coverage.withProposals],
-      ['Votações', data.coverage.withVotes],
-      ['Despesas parlamentares', data.coverage.withExpenses],
+      {
+        source: 'Tribunal Superior Eleitoral (TSE)',
+        items: [
+          {
+            label: 'Patrimônio declarado',
+            count: data.coverage.withAssets,
+            total: data.candidateCount,
+            population: 'candidaturas',
+          },
+          {
+            label: 'Histórico patrimonial',
+            count: data.coverage.withHistoricalAssetSeries,
+            total: data.distinctPeople,
+            population: 'pessoas',
+          },
+        ] as const,
+      },
+      {
+        source: 'Câmara dos Deputados',
+        items: [
+          ['Identificação na Câmara', data.coverage.withCamaraIdentity],
+          ['Mandatos', data.coverage.withMandates],
+          ['Proposições', data.coverage.withProposals],
+          ['Votações nominais', data.coverage.withVotes],
+          ['Despesas parlamentares', data.coverage.withExpenses],
+        ].map(([label, count]) => ({
+          label,
+          count,
+          total: data.distinctPeople,
+          population: 'pessoas',
+        })) as ReadonlyArray<{
+          label: string;
+          count: number;
+          total: number;
+          population: string;
+        }>,
+      },
     ] as const;
   }
-  percent(count: number): number {
-    const total = this.coverage?.candidateCount ?? 0;
+  percent(count: number, total = this.coverage?.candidateCount ?? 0): number {
     return total > 0 ? Math.min(100, (count / total) * 100) : 0;
   }
 }

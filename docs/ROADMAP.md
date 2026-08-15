@@ -298,12 +298,14 @@ na Câmara, com resumo e listas paginadas carregadas sob demanda para mandatos,
 proposições, votações nominais e despesas CEAP.
 Também está implementada a fundação histórica TSE para eleições gerais de
 2014, 2018, 2022 e 2026: identidade determinística de pessoa entre pleitos,
-candidaturas históricas e bens declarados por candidatura. Cálculos e gráficos
-de evolução permanecem pendentes. A camada de consultas analíticas, sua API
+candidaturas históricas e bens declarados por candidatura. A visualização da
+evolução nominal do patrimônio declarado está implementada. A camada de consultas analíticas, sua API
 REST pública e a fundação responsiva do Panorama Eleitoral (`/dashboard`) estão
 implementadas com filtros compartilháveis, resumo, cobertura dos dados e
-rankings financeiros. As visualizações de evolução patrimonial e legislativas
-completas permanecem nas próximas etapas.
+rankings financeiros, histórico patrimonial por pessoa, agregados legislativos,
+cobertura e transparência das fontes. A primeira versão do dashboard analítico
+está completa. Análises por categoria de despesa, temas de proposições, Senado e
+ajustes por inflação permanecem como possibilidades futuras.
 
 ### Pendente
 

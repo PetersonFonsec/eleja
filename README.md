@@ -46,8 +46,9 @@ volume; a ingestão nunca é executada automaticamente ao iniciar a API ou o web
 
 O panorama analítico está disponível em `http://localhost:4200/dashboard`. Os
 filtros de eleição, cargo, UF e partido ficam na URL e atualizam o resumo, a
-cobertura e os rankings de patrimônio declarado e despesas parlamentares.
-Gráficos de evolução e análises legislativas permanecem nas próximas entregas.
+cobertura, os rankings financeiros, o histórico visual de patrimônio declarado
+por candidato e os agregados factuais do histórico legislativo disponível na
+Câmara dos Deputados.
 
 Para associar pessoas candidatas a identificadores oficiais de deputados da
 Câmara, depois de importar as candidaturas e aplicar as migrações, execute:

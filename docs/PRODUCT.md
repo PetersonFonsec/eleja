@@ -131,6 +131,18 @@ O primeiro produto público deve contemplar principalmente:
 -   API REST de leitura;
 -   exportação dos dados normalizados em CSV.
 
+O Panorama Eleitoral reúne, sobre os dados canônicos já importados:
+
+-   resumo da população selecionada;
+-   rankings financeiros factuais;
+-   evolução nominal do patrimônio declarado ao TSE;
+-   agregados do histórico legislativo disponível na Câmara dos Deputados;
+-   cobertura por métrica e transparência das fontes oficiais.
+
+Os filtros selecionam candidaturas da eleição atual. Indicadores legislativos
+podem refletir registros históricos das mesmas pessoas e não constituem uma
+avaliação de desempenho.
+
 ## 7. Fora do escopo inicial
 
 -   autenticação;

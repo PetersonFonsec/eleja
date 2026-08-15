@@ -6,7 +6,9 @@ import type {
   AnalyticsFilters,
   AnalyticsSummary,
   DeclaredWealthRanking,
+  LegislativeAnalytics,
   ParliamentaryExpenseRanking,
+  CandidateWealthHistory,
 } from './analytics.types';
 
 @Injectable({ providedIn: 'root' })
@@ -38,6 +40,19 @@ export class AnalyticsApiService {
     return this.http.get<ParliamentaryExpenseRanking>(
       `${environment.apiBaseUrl}/analytics/rankings/parliamentary-expenses`,
       { params: analyticsParams(filters).set('limit', limit) },
+    );
+  }
+
+  getCandidateWealthHistory(candidateId: string) {
+    return this.http.get<CandidateWealthHistory>(
+      `${environment.apiBaseUrl}/analytics/candidates/${encodeURIComponent(candidateId)}/wealth-history`,
+    );
+  }
+
+  getLegislativeAnalytics(filters: AnalyticsFilters) {
+    return this.http.get<LegislativeAnalytics>(
+      `${environment.apiBaseUrl}/analytics/legislative`,
+      { params: analyticsParams(filters) },
     );
   }
 }
