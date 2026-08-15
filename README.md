@@ -44,6 +44,11 @@ Abra `http://localhost:4200/candidates`. O Docker elimina a necessidade de uma
 instalação local do PostgreSQL. `npm run db:down` encerra o banco sem apagar o
 volume; a ingestão nunca é executada automaticamente ao iniciar a API ou o web.
 
+O panorama analítico está disponível em `http://localhost:4200/dashboard`. Os
+filtros de eleição, cargo, UF e partido ficam na URL e atualizam o resumo, a
+cobertura e os rankings de patrimônio declarado e despesas parlamentares.
+Gráficos de evolução e análises legislativas permanecem nas próximas entregas.
+
 Para associar pessoas candidatas a identificadores oficiais de deputados da
 Câmara, depois de importar as candidaturas e aplicar as migrações, execute:
 
@@ -152,6 +157,27 @@ requisição**.
 
 Todos os dados públicos passam previamente pelo pipeline de ingestão e
 validação.
+
+### API de analytics
+
+As consultas públicas do futuro dashboard usam exclusivamente os dados
+canônicos já importados no PostgreSQL. O ano eleitoral é obrigatório:
+
+``` http
+GET /analytics/summary?year=2026
+GET /analytics/rankings/declared-wealth?year=2026&limit=10
+GET /analytics/rankings/parliamentary-expenses?year=2026&limit=10
+GET /analytics/candidates/<candidate-id>/wealth-history
+GET /analytics/legislative?year=2026
+GET /analytics/coverage?year=2026
+```
+
+Os endpoints populacionais também aceitam `office`, `state` e `party`; os
+rankings aceitam `limit` entre 1 e 100. Patrimônio declarado significa a soma
+dos bens declarados ao TSE por candidatura. Despesas parlamentares significam
+a soma líquida das despesas da Câmara vinculadas ao mandato mais recente da
+pessoa. Valores monetários são strings decimais exatas, e ausência de dados de
+bens não é convertida em zero.
 
 ------------------------------------------------------------------------
 

@@ -1,0 +1,94 @@
+<header class="site-header">
+  <a class="brand" routerLink="/candidates" aria-label="Eleja — candidatos"
+    >eleja<span>.</span></a
+  >
+  <nav aria-label="Navegação principal">
+    <a routerLink="/candidates">Candidatos</a
+    ><a routerLink="/dashboard" aria-current="page">Panorama</a>
+  </nav>
+</header>
+
+<main>
+  <section class="hero">
+    <div>
+      <p class="eyebrow">Dados oficiais, contexto público</p>
+      <h1>Panorama Eleitoral</h1>
+      <p>
+        Explore dados oficiais sobre candidaturas, patrimônio declarado e
+        histórico parlamentar.
+      </p>
+    </div>
+    <div class="source-chip">
+      <span>TSE</span><span>Câmara dos Deputados</span>
+    </div>
+  </section>
+
+  <app-dashboard-filters
+    [filters]="filters()"
+    (filterChange)="updateFilters($event)"
+  />
+
+  <app-dashboard-summary
+    [summary]="summary()"
+    [loading]="summaryLoading()"
+    [error]="summaryError()"
+    (retry)="retrySummary()"
+  />
+
+  <app-dashboard-financial-rankings
+    [wealth]="wealth()"
+    [wealthLoading]="wealthLoading()"
+    [wealthError]="wealthError()"
+    [expenses]="expenses()"
+    [expensesLoading]="expensesLoading()"
+    [expensesError]="expensesError()"
+    (retryWealth)="retryWealth()"
+    (retryExpenses)="retryExpenses()"
+  />
+
+  @if (
+    !summaryLoading() && !summaryError() && summary()?.candidates?.total !== 0
+  ) {
+    <section class="future-grid" aria-label="Próximas análises do panorama">
+      <article>
+        <p class="tag">Em breve</p>
+        <h2>Evolução patrimonial</h2>
+        <p>
+          Histórico dos bens declarados por uma mesma pessoa ao longo das
+          eleições.
+        </p>
+        <span>Sem inferências sobre causa ou enriquecimento</span>
+      </article>
+    </section>
+  }
+
+  <app-dashboard-coverage
+    [coverage]="coverage()"
+    [loading]="coverageLoading()"
+    [error]="coverageError()"
+    (retry)="retryCoverage()"
+  />
+
+  <section class="sources" aria-labelledby="sources-title">
+    <div>
+      <p class="eyebrow">Rastreabilidade</p>
+      <h2 id="sources-title">Fontes dos dados</h2>
+    </div>
+    <article>
+      <strong>TSE</strong>
+      <p>Candidaturas e patrimônio declarado em cada eleição.</p>
+    </article>
+    <article>
+      <strong>Câmara dos Deputados</strong>
+      <p>
+        Mandatos, proposições, votações e despesas parlamentares integradas pela
+        Eleja.
+      </p>
+    </article>
+  </section>
+</main>
+
+<footer>
+  <span class="brand">eleja<span>.</span></span>
+  <p>Informação pública para escolhas conscientes.</p>
+</footer>

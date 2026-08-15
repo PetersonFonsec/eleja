@@ -1,0 +1,50 @@
+<section aria-labelledby="summary-title" [attr.aria-busy]="loading">
+  <h2 id="summary-title" class="sr-only">Resumo da população selecionada</h2>
+  @if (loading) {
+    <span class="sr-only">Carregando resumo</span>
+    <div class="summary-grid" aria-hidden="true">
+      @for (item of [1, 2, 3, 4]; track item) {
+        <div class="summary-card skeleton"></div>
+      }
+    </div>
+  } @else if (error) {
+    <div class="state-card" role="alert">
+      <h2>Não foi possível carregar o panorama.</h2>
+      <button type="button" (click)="retry.emit()">Tentar novamente</button>
+    </div>
+  } @else if (summary && summary.candidates.total === 0) {
+    <div class="state-card">
+      <h2>Nenhuma candidatura encontrada</h2>
+      <p>Altere os filtros para consultar outra população eleitoral.</p>
+    </div>
+  } @else if (summary) {
+    <div class="summary-grid">
+      <article class="summary-card">
+        <p>Candidatos</p>
+        <strong>{{ format.format(summary.candidates.total) }}</strong
+        ><span>candidaturas selecionadas</span>
+      </article>
+      <article class="summary-card">
+        <p>Com patrimônio declarado</p>
+        <strong>{{
+          format.format(summary.candidates.withDeclaredAssets)
+        }}</strong
+        ><span>declarações com bens no TSE</span>
+      </article>
+      <article class="summary-card">
+        <p>Com histórico legislativo</p>
+        <strong>{{
+          format.format(summary.candidates.withLegislativeHistory)
+        }}</strong
+        ><span>pessoas com mandato na Câmara</span>
+      </article>
+      <article class="summary-card">
+        <p>Com histórico patrimonial</p>
+        <strong>{{
+          format.format(summary.candidates.withHistoricalAssetSeries)
+        }}</strong
+        ><span>pessoas com ao menos dois pontos</span>
+      </article>
+    </div>
+  }
+</section>

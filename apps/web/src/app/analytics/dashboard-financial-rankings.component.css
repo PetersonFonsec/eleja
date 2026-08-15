@@ -1,0 +1,253 @@
+:host {
+  display: block;
+}
+.rankings {
+  display: grid;
+  gap: 1rem;
+}
+.section-heading {
+  align-items: end;
+  display: flex;
+  justify-content: space-between;
+}
+.section-heading h2 {
+  font-family: Georgia, serif;
+  font-size: 1.9rem;
+  font-weight: 500;
+  margin: 0;
+}
+.section-heading > p {
+  color: #687973;
+  font-size: 0.76rem;
+  line-height: 1.5;
+  max-width: 390px;
+}
+.eyebrow {
+  color: #b37b13;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  margin: 0 0 0.4rem;
+  text-transform: uppercase;
+}
+.ranking-grid {
+  align-items: start;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.ranking-card {
+  background: #fff;
+  border: 1px solid #dce5e2;
+  border-radius: 18px;
+  overflow: hidden;
+}
+.ranking-card > header {
+  align-items: start;
+  border-bottom: 1px solid #e3eae7;
+  display: flex;
+  justify-content: space-between;
+  min-height: 128px;
+  padding: 1.3rem;
+}
+.ranking-card h3 {
+  font-family: Georgia, serif;
+  font-size: 1.3rem;
+  font-weight: 500;
+  margin: 0 0 0.45rem;
+}
+.ranking-card header p {
+  color: #687973;
+  font-size: 0.74rem;
+  line-height: 1.45;
+  margin: 0;
+  max-width: 310px;
+}
+.ranking-card header > span {
+  background: #edf4f1;
+  border-radius: 99px;
+  color: #4c6d64;
+  flex: none;
+  font-size: 0.62rem;
+  font-weight: 700;
+  margin-left: 0.7rem;
+  padding: 0.38rem 0.55rem;
+}
+.ranking-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.ranking-list li + li,
+.ranking-row + .ranking-row {
+  border-top: 1px solid #edf1ef;
+}
+.ranking-list a,
+.ranking-row {
+  align-items: center;
+  color: inherit;
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: 30px minmax(0, 1fr) auto;
+  min-height: 84px;
+  padding: 0.8rem 1.1rem;
+  text-decoration: none;
+}
+.ranking-list a:hover {
+  background: #f6f9f8;
+}
+.ranking-list a:focus-visible {
+  outline: 3px solid rgba(230, 170, 48, 0.48);
+  outline-offset: -3px;
+}
+.rank {
+  align-items: center;
+  border: 1px solid #d9e3df;
+  border-radius: 50%;
+  color: #6c7e78;
+  display: flex;
+  font-size: 0.72rem;
+  font-weight: 800;
+  height: 28px;
+  justify-content: center;
+  width: 28px;
+}
+.rank.top-three {
+  background: #f5ead0;
+  border-color: #ead39f;
+  color: #765315;
+}
+.candidate {
+  align-items: center;
+  display: grid;
+  gap: 0.65rem;
+  grid-template-columns: 34px minmax(0, 1fr);
+  min-width: 0;
+}
+.avatar {
+  align-items: center;
+  aspect-ratio: 1;
+  background: #e5ece9;
+  border-radius: 9px;
+  color: #42655c;
+  display: flex;
+  font-size: 0.85rem;
+  font-weight: 800;
+  justify-content: center;
+}
+.candidate-copy {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.candidate-copy strong {
+  font-size: 0.82rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.candidate-copy small {
+  color: #71817c;
+  font-size: 0.66rem;
+  line-height: 1.45;
+}
+.value {
+  color: #174b40;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-align: right;
+  white-space: nowrap;
+}
+.state {
+  color: #63746e;
+  min-height: 180px;
+  padding: 3rem 1.2rem;
+  text-align: center;
+}
+.state button {
+  background: #174b40;
+  border: 0;
+  border-radius: 9px;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 700;
+  padding: 0.65rem 0.9rem;
+}
+.skeleton i,
+.skeleton b,
+.skeleton em,
+.skeleton strong {
+  animation: pulse 1.4s infinite;
+  background: #e8eeeb;
+  border-radius: 8px;
+  display: block;
+}
+.skeleton i {
+  height: 28px;
+  width: 28px;
+}
+.skeleton b {
+  height: 12px;
+  width: 70%;
+}
+.skeleton em {
+  height: 8px;
+  margin-top: 8px;
+  width: 90%;
+}
+.skeleton strong {
+  height: 14px;
+  width: 90px;
+}
+.sr-only {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+@keyframes pulse {
+  50% {
+    opacity: 0.5;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeleton i,
+  .skeleton b,
+  .skeleton em,
+  .skeleton strong {
+    animation: none;
+  }
+}
+@media (max-width: 920px) {
+  .ranking-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 560px) {
+  .section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .ranking-card > header {
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+  .ranking-card header > span {
+    margin: 0;
+  }
+  .ranking-list a,
+  .ranking-row {
+    gap: 0.55rem;
+    grid-template-columns: 28px minmax(0, 1fr);
+  }
+  .value {
+    grid-column: 2;
+    text-align: left;
+  }
+  .candidate-copy strong {
+    white-space: normal;
+  }
+}

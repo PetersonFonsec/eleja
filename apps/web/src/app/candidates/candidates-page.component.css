@@ -23,12 +23,21 @@
 .brand span {
   color: #e6aa30;
 }
-.source-pill {
+nav {
+  display: flex;
+  gap: 0.35rem;
+}
+nav a {
   background: #eef4f1;
-  border-radius: 999px;
+  border-radius: 8px;
   color: #4d6b63;
-  font-size: 0.75rem;
-  padding: 0.45rem 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.5rem 0.7rem;
+  text-decoration: none;
+}
+nav a:not([aria-current='page']) {
+  background: transparent;
 }
 main {
   margin: 0 auto;
@@ -317,9 +326,6 @@ footer p {
 @media (max-width: 680px) {
   main {
     padding-top: 2rem;
-  }
-  .source-pill {
-    display: none;
   }
   .mobile-filter-button {
     display: flex;

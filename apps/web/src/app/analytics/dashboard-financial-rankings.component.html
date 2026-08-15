@@ -1,0 +1,172 @@
+<section class="rankings" aria-labelledby="financial-rankings-title">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">Dados financeiros oficiais</p>
+      <h2 id="financial-rankings-title">Destaques financeiros</h2>
+    </div>
+    <p>
+      Valores registrados nas fontes oficiais, sem avaliação ou recomendação de
+      candidatos.
+    </p>
+  </div>
+
+  <div class="ranking-grid">
+    <article class="ranking-card" [attr.aria-busy]="wealthLoading">
+      <header>
+        <div>
+          <h3>Maiores patrimônios declarados</h3>
+          <p>Valores declarados ao TSE na eleição selecionada.</p>
+        </div>
+        <span>Fonte: TSE</span>
+      </header>
+      @if (wealthLoading) {
+        <span class="sr-only">Carregando ranking de patrimônio declarado</span>
+        <div class="ranking-list" aria-hidden="true">
+          @for (item of [1, 2, 3, 4, 5]; track item) {
+            <div class="ranking-row skeleton">
+              <i></i>
+              <div><b></b><em></em></div>
+              <strong></strong>
+            </div>
+          }
+        </div>
+      } @else if (wealthError) {
+        <div class="state" role="alert">
+          <p>Não foi possível carregar o ranking de patrimônio declarado.</p>
+          <button type="button" (click)="retryWealth.emit()">
+            Tentar novamente
+          </button>
+        </div>
+      } @else if (wealth?.data?.length === 0) {
+        <div class="state">
+          <p>
+            Nenhum dado de patrimônio declarado foi encontrado para os filtros
+            selecionados.
+          </p>
+        </div>
+      } @else {
+        <ol class="ranking-list">
+          @for (
+            candidate of wealth?.data ?? [];
+            track candidate.candidateId;
+            let rank = $index
+          ) {
+            <li>
+              <a
+                [routerLink]="candidateRoute(candidate)"
+                [attr.aria-label]="
+                  rank +
+                  1 +
+                  'º lugar, ' +
+                  candidate.ballotName +
+                  ', patrimônio declarado de ' +
+                  money(candidate.declaredWealth)
+                "
+              >
+                <span class="rank" [class.top-three]="rank < 3">{{
+                  rank + 1
+                }}</span>
+                <span class="candidate">
+                  <span class="avatar" aria-hidden="true">{{
+                    candidate.ballotName.charAt(0) || '?'
+                  }}</span>
+                  <span class="candidate-copy"
+                    ><strong>{{ candidate.ballotName }}</strong
+                    ><small
+                      >{{ candidate.partyAcronym ?? 'Sem sigla' }} •
+                      {{ currentContext(candidate) }}</small
+                    ><small>{{
+                      wealthMetadata(candidate.assetCount)
+                    }}</small></span
+                  >
+                </span>
+                <span class="value">{{ money(candidate.declaredWealth) }}</span>
+              </a>
+            </li>
+          }
+        </ol>
+      }
+    </article>
+
+    <article class="ranking-card" [attr.aria-busy]="expensesLoading">
+      <header>
+        <div>
+          <h3>Maiores despesas parlamentares</h3>
+          <p>
+            Despesas líquidas registradas no último mandato na Câmara dos
+            Deputados.
+          </p>
+        </div>
+        <span>Fonte: Câmara dos Deputados</span>
+      </header>
+      @if (expensesLoading) {
+        <span class="sr-only"
+          >Carregando ranking de despesas parlamentares</span
+        >
+        <div class="ranking-list" aria-hidden="true">
+          @for (item of [1, 2, 3, 4, 5]; track item) {
+            <div class="ranking-row skeleton">
+              <i></i>
+              <div><b></b><em></em></div>
+              <strong></strong>
+            </div>
+          }
+        </div>
+      } @else if (expensesError) {
+        <div class="state" role="alert">
+          <p>Não foi possível carregar o ranking de despesas parlamentares.</p>
+          <button type="button" (click)="retryExpenses.emit()">
+            Tentar novamente
+          </button>
+        </div>
+      } @else if (expenses?.data?.length === 0) {
+        <div class="state">
+          <p>
+            Nenhuma despesa parlamentar foi encontrada para os candidatos
+            selecionados.
+          </p>
+        </div>
+      } @else {
+        <ol class="ranking-list">
+          @for (
+            candidate of expenses?.data ?? [];
+            track candidate.candidateId;
+            let rank = $index
+          ) {
+            <li>
+              <a
+                [routerLink]="candidateRoute(candidate)"
+                [attr.aria-label]="
+                  rank +
+                  1 +
+                  'º lugar, ' +
+                  candidate.ballotName +
+                  ', despesas parlamentares líquidas de ' +
+                  money(candidate.totalNetValue)
+                "
+              >
+                <span class="rank" [class.top-three]="rank < 3">{{
+                  rank + 1
+                }}</span>
+                <span class="candidate">
+                  <span class="avatar" aria-hidden="true">{{
+                    candidate.ballotName.charAt(0) || '?'
+                  }}</span>
+                  <span class="candidate-copy"
+                    ><strong>{{ candidate.ballotName }}</strong
+                    ><small>Candidato a {{ currentContext(candidate) }}</small
+                    ><small
+                      >{{ mandateContext(candidate) }} •
+                      {{ expenseMetadata(candidate.expenseCount) }}</small
+                    ></span
+                  >
+                </span>
+                <span class="value">{{ money(candidate.totalNetValue) }}</span>
+              </a>
+            </li>
+          }
+        </ol>
+      }
+    </article>
+  </div>
+</section>

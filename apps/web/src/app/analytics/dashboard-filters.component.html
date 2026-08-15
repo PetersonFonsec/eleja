@@ -1,0 +1,49 @@
+<section class="filter-panel" aria-label="Filtros do panorama eleitoral">
+  <div>
+    <label for="dashboard-year">Eleição</label>
+    <select
+      id="dashboard-year"
+      [value]="filters.year"
+      (change)="change('year', $any($event.target).value)"
+    >
+      <option value="2026">Eleições 2026</option>
+    </select>
+  </div>
+  <div>
+    <label for="dashboard-office">Cargo</label>
+    <select
+      id="dashboard-office"
+      [value]="filters.office ?? ''"
+      (change)="change('office', $any($event.target).value)"
+    >
+      <option value="">Todos os cargos</option>
+      @for (office of offices; track office[0]) {
+        <option [value]="office[0]">{{ office[1] }}</option>
+      }
+    </select>
+  </div>
+  <div>
+    <label for="dashboard-state">UF</label>
+    <select
+      id="dashboard-state"
+      [value]="filters.state ?? ''"
+      (change)="change('state', $any($event.target).value)"
+    >
+      <option value="">Todos os estados</option>
+      @for (state of states; track state) {
+        <option [value]="state">{{ state }}</option>
+      }
+    </select>
+  </div>
+  <div>
+    <label for="dashboard-party">Partido</label>
+    <input
+      id="dashboard-party"
+      type="text"
+      maxlength="20"
+      placeholder="Todos os partidos"
+      [value]="filters.party ?? ''"
+      (change)="change('party', $any($event.target).value.toUpperCase())"
+    />
+  </div>
+</section>

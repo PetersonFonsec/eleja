@@ -126,6 +126,52 @@ Não é responsabilidade da API:
 -   autenticar visitantes;
 -   persistir preferências políticas.
 
+### Camada de consultas analíticas
+
+As métricas do futuro dashboard são calculadas diretamente sobre o modelo
+canônico, sem tabelas analíticas materializadas:
+
+``` text
+PostgreSQL canônico
+        ↓
+CandidateAnalyticsQueryService
+        ↓
+DTOs analíticos sem entidades ORM
+        ↓
+Analytics REST API
+        ↓
+futuro dashboard
+```
+
+As consultas são agregações set-based executadas pelo PostgreSQL. O filtro de
+ano, cargo, UF e partido sempre define uma população de `Candidacy`; registros
+legislativos são então contabilizados uma única vez por `Person`, mesmo quando
+ela possui mais de uma candidatura na população.
+
+Semântica das métricas:
+
+-   patrimônio declarado é `SUM(CandidateAsset.value)` de uma candidatura;
+    candidaturas sem linhas de bens ficam fora do ranking e da série, pois o
+    modelo não prova que a ausência representa declaração igual a zero;
+-   despesas do mandato mais recente são `SUM(ParliamentaryExpense.netValue)`
+    somente das despesas explicitamente ligadas ao mandato escolhido da Câmara
+    dos Deputados. Mandato `ACTIVE` tem precedência; caso contrário, vence a
+    maior data de início, seguida de legislatura e identificador. Pessoas sem
+    mandato ou mandatos sem despesas ligadas não aparecem no ranking;
+-   histórico patrimonial preserva uma observação por candidatura com bens,
+    inclusive candidaturas distintas no mesmo ano, em ordem cronológica;
+-   histórico legislativo significa existência de mandato da Câmara e é uma
+    característica de `Person`, não da candidatura. Autoria, proposta única,
+    voto individual e registro de despesa possuem contadores explicitamente
+    separados;
+-   `candidateCount`, `candidatesWithDeclaredAssets` e `coverage.withAssets`
+    contam candidaturas. Os demais campos de cobertura contam pessoas distintas
+    da população filtrada, evitando duplicar o mesmo histórico legislativo.
+
+Valores monetários são agregados como `numeric` no PostgreSQL e retornados como
+strings decimais. Não há cálculo com ponto flutuante, cache, score ou conclusão
+causal sobre a evolução dos valores declarados.
+
 ### Angular
 
 Consome exclusivamente a API pública e, quando necessário, links

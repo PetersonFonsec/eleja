@@ -1,0 +1,44 @@
+:host {
+  display: block;
+}
+.filter-panel {
+  background: #fff;
+  border: 1px solid #d9e4e0;
+  border-radius: 16px;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  padding: 1rem;
+}
+label {
+  color: #49635c;
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 750;
+  margin-bottom: 0.4rem;
+}
+select,
+input {
+  background: #fff;
+  border: 1px solid #c8d7d2;
+  border-radius: 9px;
+  color: #18332c;
+  min-height: 44px;
+  padding: 0.65rem 0.7rem;
+  width: 100%;
+}
+select:focus-visible,
+input:focus-visible {
+  outline: 3px solid rgba(230, 170, 48, 0.35);
+  outline-offset: 2px;
+}
+@media (max-width: 760px) {
+  .filter-panel {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 420px) {
+  .filter-panel {
+    grid-template-columns: 1fr;
+  }
+}
